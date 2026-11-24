@@ -19,4 +19,22 @@ public class TransformationException extends RuntimeException {
 		super(message, cause);
 	}
 
+	/**
+	 * Appends the message of the innermost cause, which names the actual
+	 * conflict (e.g. a generated name already used by the input model).
+	 */
+	@Override
+	public String getMessage() {
+		String message = super.getMessage();
+		Throwable root = getCause();
+		while(root != null && root.getCause() != null) {
+			root = root.getCause();
+		}
+		if(root == null || root.getMessage() == null
+				|| (message != null && message.contains(root.getMessage()))) {
+			return message;
+		}
+		return message + System.lineSeparator() + root.getMessage();
+	}
+
 }
