@@ -17,12 +17,21 @@ public class KodkodPlugin extends Plugin {
 	}
 
 	protected void doRun(IPluginRuntime pluginRuntime) {
+		configureLogging();
+	}
+
+	/**
+	 * Configures log4j for the class loader of the caller. USE 7.5 loads the
+	 * commands through another class loader than the plugin, each with its
+	 * own copy of log4j, so the commands call this as well.
+	 */
+	static void configureLogging() {
 		File externLog = new File(PathHelper.getPluginPath(), "log4j.xml");
 		if(externLog.exists()){
 			DOMConfigurator.configure(externLog.getPath());
 		}
 		else{
-			DOMConfigurator.configure(this.getResource("log4j/log4j.xml"));
+			DOMConfigurator.configure(KodkodPlugin.class.getResource("/log4j/log4j.xml"));
 		}
 	}
 }
