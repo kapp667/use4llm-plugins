@@ -12,14 +12,25 @@ public class FilmstripOptions {
 	private final boolean makeCopy;
 	private final boolean transformSoil;
 	private final String transformationMethod;
+	private final String namePrefix;
 	
 	public FilmstripOptions(MModel model, String modelName, File savepath, boolean makeCopy, boolean transformSoil, String transformationMethod) {
+		this(model, modelName, savepath, makeCopy, transformSoil, transformationMethod, "");
+	}
+	
+	/**
+	 * @param namePrefix prefix of every name the transformation adds to the
+	 *            model, so that it cannot collide with the input model's names;
+	 *            empty for the unprefixed names
+	 */
+	public FilmstripOptions(MModel model, String modelName, File savepath, boolean makeCopy, boolean transformSoil, String transformationMethod, String namePrefix) {
 		this.model = model;
 		this.modelName = modelName;
 		this.savepath = savepath;
 		this.makeCopy = makeCopy;
 		this.transformSoil = transformSoil;
 		this.transformationMethod = transformationMethod;
+		this.namePrefix = namePrefix;
 	}
 
 	/**
@@ -62,6 +73,13 @@ public class FilmstripOptions {
 	 */
 	public String getTransformationMethod() {
 		return transformationMethod;
+	}
+	
+	/**
+	 * @return namePrefix
+	 */
+	public String getNamePrefix() {
+		return namePrefix;
 	}
 	
 }
