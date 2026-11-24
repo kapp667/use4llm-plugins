@@ -70,8 +70,8 @@ public class CopyOperation {
 	public void createAndAddCopyOperation() throws UnsupportedOperationException, UseApiException {
 		MStatement soilOp = createCopyOperation();
 		
-		MOperation copyOp = modelApi.createOperation(FilmstripModelConstants.SNAPSHOT_CLASSNAME, "copy", new String[0][], FilmstripModelConstants.SNAPSHOT_CLASSNAME);
-		modelApi.createPrePostCondition(FilmstripModelConstants.SNAPSHOT_CLASSNAME, "copy", "uncopied", "self.succ().oclIsUndefined()", true);
+		MOperation copyOp = modelApi.createOperation(FilmstripModelConstants.SNAPSHOT_CLASSNAME, FilmstripModelConstants.COPY_OPNAME, new String[0][], FilmstripModelConstants.SNAPSHOT_CLASSNAME);
+		modelApi.createPrePostCondition(FilmstripModelConstants.SNAPSHOT_CLASSNAME, FilmstripModelConstants.COPY_OPNAME, FilmstripModelConstants.COPY_PRE_UNCOPIED_NAME, "self." + FilmstripModelConstants.SUCC_ROLENAME + "().oclIsUndefined()", true);
 		copyOp.setStatement(soilOp);
 	}
 	
