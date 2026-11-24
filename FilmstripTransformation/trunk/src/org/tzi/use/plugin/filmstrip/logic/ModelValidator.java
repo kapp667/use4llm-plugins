@@ -37,11 +37,14 @@ public class ModelValidator implements MMVisitor {
 			FilmstripModelConstants.FILMSTRIP_ASSOCNAME,
 			FilmstripModelConstants.SNAPSHOTELEMENT_ASSOCNAME );
 	private static final HashSet<String> reservedAssociationPrefixes = Sets.newHashSet(
-			FilmstripModelConstants.SNAPSHOT_CLASSNAME );
+			FilmstripModelConstants.SNAPSHOT_CLASSNAME,
+			FilmstripModelConstants.ORDERABLE_ASSOCNAME );
 	private static final HashSet<String> reservedAssociationSuffixes = Sets.newHashSet(
 			FilmstripModelConstants.ORDERABLE_ASSOCNAME );
 	
-	private static final HashSet<String> reservedRoleNames = Sets.newHashSet();
+	// every class inherits the role to its snapshot from SnapshotItem
+	private static final HashSet<String> reservedRoleNames = Sets.newHashSet(
+			FilmstripModelConstants.SNAPSHOT_ROLENAME );
 	private static final HashSet<String> reservedRolePrefixes = Sets.newHashSet(
 			FilmstripModelConstants.PRED_ROLENAME,
 			FilmstripModelConstants.SUCC_ROLENAME );
@@ -92,15 +95,22 @@ public class ModelValidator implements MMVisitor {
 		return false;
 	}
 	
-	private boolean isInvalidClass(MClass e) {
+	// USE keeps classes and associations in one namespace, so a name is
+	// checked against the names generated for both.
+	private boolean isInvalidClassOrAssociationName(String name) {
 		return isInvalidElement(reservedClassNames, reservedClassPrefixes,
-				reservedClassSuffixes, e.name());
+				reservedClassSuffixes, name)
+				|| isInvalidElement(reservedAssociationNames,
+						reservedAssociationPrefixes, reservedAssociationSuffixes,
+						name);
 	}
-	
+
+	private boolean isInvalidClass(MClass e) {
+		return isInvalidClassOrAssociationName(e.name());
+	}
+
 	private boolean isInvalidAssociaton(MAssociation e) {
-		return isInvalidElement(reservedAssociationNames,
-				reservedAssociationPrefixes, reservedAssociationSuffixes,
-				e.name());
+		return isInvalidClassOrAssociationName(e.name());
 	}
 	
 	private boolean isInvalidRole(MAssociationEnd e) {
