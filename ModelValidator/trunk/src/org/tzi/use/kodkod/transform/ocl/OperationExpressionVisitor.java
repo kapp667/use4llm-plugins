@@ -74,7 +74,7 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 			Node self = opVariables.get("self");
 			Expression expression = getAsExpression(self);
 			
-			Map<MClass, MOperation> overiddenOperations = getOverriddenOperations(operation.cls(), operation.name());
+			Map<MClass, MOperation> overiddenOperations = getOverriddenOperations((MClass) operation.cls(), operation.name());
 			
 			DefaultExpressionVisitor mainVisitor = visitOperation(operation);
 			if (overiddenOperations.isEmpty()) {
