@@ -62,7 +62,7 @@ public class FilmstripMVCompatibleExpressionVisitor extends
 		case PRECONDITION:
 		case POSTCONDITION:
 			// self is the operation call object
-			String opName = (type == ExpressionType.POSTCONDITION && !exp.isPre()) ? "succ" : "pred";
+			String opName = (type == ExpressionType.POSTCONDITION && !exp.isPre()) ? FilmstripModelConstants.SUCC_ROLENAME : FilmstripModelConstants.PRED_ROLENAME;
 			MOperation op = ((MClass) selfDecl.type()).operation(opName, true);
 			
 			try {

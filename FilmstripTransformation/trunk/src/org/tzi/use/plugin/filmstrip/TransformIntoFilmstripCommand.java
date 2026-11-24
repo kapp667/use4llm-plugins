@@ -27,13 +27,23 @@ public class TransformIntoFilmstripCommand implements IPluginShellCmdDelegate {
 		}
 		
 		String fileName = pluginCommand.getCmdArguments().trim();
+		String namePrefix = "";
+		if(fileName.startsWith("-prefix ")){
+			String[] args = fileName.substring("-prefix ".length()).trim().split("\\s+", 2);
+			if(args.length < 2){
+				out.println("Usage: filmstrip [-prefix 'prefix'] 'filename'");
+				return;
+			}
+			namePrefix = args[0];
+			fileName = args[1];
+		}
 		
 		out.println("Transforming model ...");
 		File saveFile = new File(Options.getLastDirectory().toFile(), fileName);
 		
 		FilmstripOptions options = new FilmstripOptions(pluginCommand
 				.getSession().system().model(), pluginCommand.getSession()
-				.system().model().name(), saveFile, false, false, FilmstripMMVisitor.NAME);
+				.system().model().name(), saveFile, false, false, FilmstripMMVisitor.NAME, namePrefix);
 		FilmstripTransformer ft = new FilmstripTransformer(options);
 		try {
 			ft.transformAndSave();

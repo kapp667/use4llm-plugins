@@ -25,7 +25,8 @@ import com.google.common.collect.Sets;
 
 public class ModelValidator implements MMVisitor {
 	
-	// The sets are built for each validation, from the classes of the model.
+	// The sets are built for each validation, as the constants depend on the
+	// name prefix of the current transformation.
 	private final HashSet<String> reservedClassNames = Sets.newHashSet(
 			FilmstripModelConstants.SNAPSHOT_CLASSNAME,
 			FilmstripModelConstants.SNAPSHOTITEM_CLASSNAME,
@@ -88,6 +89,12 @@ public class ModelValidator implements MMVisitor {
 	
 	private boolean isInvalidElement(Set<String> matches, Set<String> prefixes, 
 			Set<String> suffixes, String elemName){
+		// with a name prefix, every generated name starts with it, and only
+		// those names can collide
+		String namePrefix = FilmstripModelConstants.getNamePrefix();
+		if(!namePrefix.isEmpty()){
+			return elemName.startsWith(namePrefix);
+		}
 		if(matches.contains(elemName)){
 			return true;
 		}
