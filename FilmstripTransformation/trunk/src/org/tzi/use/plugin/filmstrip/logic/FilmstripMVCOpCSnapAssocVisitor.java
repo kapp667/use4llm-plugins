@@ -142,23 +142,23 @@ public class FilmstripMVCOpCSnapAssocVisitor extends FilmstripMMVisitor {
 				FilmstripModelConstants.PRED_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.OpCSnapSNAPSHOT_PRED_OP);
+				FilmstripModelConstants.OpCSnapSNAPSHOT_PRED_OP, false);
 		model.createQueryOperation(FilmstripModelConstants.SNAPSHOT_CLASSNAME,
 				FilmstripModelConstants.SUCC_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.OpCSnapSNAPSHOT_SUCC_OP);
+				FilmstripModelConstants.OpCSnapSNAPSHOT_SUCC_OP, false);
 		
 		model.createQueryOperation(FilmstripModelConstants.OPC_CLASSNAME,
 				FilmstripModelConstants.PRED_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.OpCSnapOPC_PRED_OP );
+				FilmstripModelConstants.OpCSnapOPC_PRED_OP, false);
 		model.createQueryOperation(FilmstripModelConstants.OPC_CLASSNAME,
 				FilmstripModelConstants.SUCC_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.OpCSnapOPC_SUCC_OP );
+				FilmstripModelConstants.OpCSnapOPC_SUCC_OP, false);
 		
 		// constraints
 		model.createInvariant(
