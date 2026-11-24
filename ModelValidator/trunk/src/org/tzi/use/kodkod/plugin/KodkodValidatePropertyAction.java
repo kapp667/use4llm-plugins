@@ -29,8 +29,11 @@ public class KodkodValidatePropertyAction extends KodkodValidateCmd implements I
 		initialize(pluginAction.getSession(), pluginAction.getParent());
 
 		JFileChooser fileChooser;
-		if (mModel.getModelDirectory() != null) {
-			fileChooser = new JFileChooser(mModel.getModelDirectory().getPath());
+		// USE 7.5 removed MModel.getModelDirectory(); derive it from the model's file name.
+		File modelDirectory = (mModel.filename() == null || mModel.filename().isEmpty()) ? null
+				: new File(mModel.filename()).getAbsoluteFile().getParentFile();
+		if (modelDirectory != null) {
+			fileChooser = new JFileChooser(modelDirectory.getPath());
 		} else {
 			fileChooser = new JFileChooser();
 		}
