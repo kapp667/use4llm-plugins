@@ -14,16 +14,6 @@ log='^([0-9:]+ )?'
 # One line, cut to 200 characters, with tabs and CR characters turned into spaces.
 clean() { tr '\t\r' '  ' | cut -c1-200; }
 
-# The first sign that USE's check rejected the state: a line inside the structure check (each one
-# is a violation, such as a multiplicity), a failed invariant, or a summary with failures.
-check_failure() {
-  awk '/^checking structure\.\.\.$/ { s = 1; next }
-       /^checked structure in / { s = 0; next }
-       s && NF { print; exit }
-       /FAILED\.$/ { print; exit }
-       /^checked [0-9]+ invariants? .*, [1-9][0-9]* failures?\.$/ { print; exit }' "$f"
-}
-
 errors="$(grep -cE "${log}ERROR: " "$f" || true)"
 note="$(grep -m1 -E "${log}ERROR: " "$f" | clean || true)"
 if [ "$status" -eq 124 ] || [ "$status" -eq 137 ]; then
@@ -42,20 +32,8 @@ fi
 check=n/a
 objects=n/a
 if [ "$verdict" = SAT ]; then
-  # The total of USE's "info state" class table: how many objects the solution has.
-  objects="$(awk '/^class +: #objects/ { c = 1 } c && /^total +:/ { print $3; exit }' "$f")"
-  [ -n "$objects" ] || objects=unknown
-  failure="$(check_failure)"
-  # A missing summary counts as a failure, so that a check that did not run never passes.
-  if ! grep -qE '^checked [0-9]+ invariants? ' "$f"; then
-    check=fail
-    failure="USE's check printed no summary"
-  elif [ -n "$failure" ]; then
-    check=fail
-  else
-    check=ok
-  fi
-  if [ "$check" = fail ] && [ -z "$note" ]; then note="$(printf '%s\n' "$failure" | clean)"; fi
+  IFS=$'\t' read -r check objects failure < <("$(dirname "${BASH_SOURCE[0]}")/state.sh" "$f")
+  if [ "$check" = fail ] && [ -z "$note" ]; then note="$failure"; fi
 fi
 
 printf '%s\t%s\t%s\t%s\t%s\n' "$verdict" "$check" "$objects" "$errors" "$note"
