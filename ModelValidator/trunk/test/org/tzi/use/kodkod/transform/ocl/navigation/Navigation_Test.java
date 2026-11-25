@@ -2728,4 +2728,14 @@ public class Navigation_Test extends OCLTest {
 		test("test389", ocl, expected);
 	}
 
+	@Test
+	public void test390() {
+		test("test390", "uf.job.employeeAC.oclIsUndefined()");
+	}
+
+	@Test
+	public void test391() {
+		test("test391", "jobAdaIbm.employeeAC.oclIsUndefined()");
+	}
+
 }
