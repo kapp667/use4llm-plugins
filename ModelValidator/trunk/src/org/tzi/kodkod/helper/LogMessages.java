@@ -106,10 +106,6 @@ public final class LogMessages {
 		return "Start model transformation for " + inQuotes(name);
 	}
 
-	public static String constRealWarning(Double value) {
-		return "No support for real values. " + value + " becomes " + value.intValue();
-	}
-
 	public static String invTransformError(String name) {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
 	}
@@ -178,6 +174,10 @@ public final class LogMessages {
 
 	public static String collectionComparisonError(String expression) {
 		return "Cannot transform " + inQuotes(expression) + ": only two sets can be compared.";
+	}
+
+	public static String realValueError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": Real values are not supported.";
 	}
 
 	public static String modelTransformStoppedError(String name, String reason) {
