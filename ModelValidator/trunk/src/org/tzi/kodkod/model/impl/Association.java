@@ -176,19 +176,19 @@ public class Association extends ModelElement implements IAssociation {
 
 			Decls variableDeclarations = createVariableDeclaration(variables, associationEnds.get(index));
 
-			Expression linkedObjects = createLinkedObjectsExpression(variables, index, false);
+			Expression linkedObjects = createLinkedObjectsExpression(variables, index);
 
 			Formula formula = null;
 			if (multiplicity.isZeroOne()) {
-				formula = zeroOneMultiplicity(variables, index, linkedObjects);
+				formula = zeroOneMultiplicity(linkedObjects);
 			} else {
 				for (Range range : multiplicity.getRanges()) {
 					Formula lowerFormula = Formula.TRUE;
 					if (range.getLower() > 0) {
 						lowerFormula = linkedObjects.count().gte(IntConstant.constant(range.getLower()));
-						if (associationClass != null) {
+						if (associationClass != null && isBinaryAssociation()) {
 							Relation undefined = model.typeFactory().undefinedType().relation();
-							lowerFormula = lowerFormula.and(undefined.in(linkedObjects.join(Expression.UNIV)).not());
+							lowerFormula = lowerFormula.and(undefined.in(linkObjects(variables.get(0), index)).not());
 						}
 					}
 
@@ -256,21 +256,26 @@ public class Association extends ModelElement implements IAssociation {
 	}
 
 	/**
+	 * Returns the objects of a binary association class that link the given
+	 * object, at the other end, to an object at the end with the given index.
+	 */
+	private Expression linkObjects(Variable otherObject, int index) {
+		Expression links = navigationLinks();
+		if (index == 0) {
+			return links.join(otherObject).join(Expression.UNIV);
+		}
+		return links.join(Expression.UNIV).join(otherObject);
+	}
+
+	/**
 	 * Creates the formula for an association end with multiplicity 0..1.
 	 */
-	private Formula zeroOneMultiplicity(List<Variable> variables, int index, Expression linkedObjects) {
+	private Formula zeroOneMultiplicity(Expression linkedObjects) {
 		Formula formula;
-		Expression objects;
-		if (associationClass == null) {
-			objects = linkedObjects;
-		} else {
-			objects = createLinkedObjectsExpression(variables, index, true);
-		}
-		
 		if (isBinaryAssociation()) {
-			formula = objects.one();
+			formula = linkedObjects.one();
 		} else {
-			formula = objects.lone();
+			formula = linkedObjects.lone();
 		}
 		
 		return formula;
@@ -302,11 +307,11 @@ public class Association extends ModelElement implements IAssociation {
 	 * multiplicity check counts the redefining links only, so it reports an
 	 * object of the redefined class with an own link as connected to none.
 	 */
-	private Expression createLinkedObjectsExpression(List<Variable> variables, int currentEndIndex, boolean univJoinRelation) {
+	private Expression createLinkedObjectsExpression(List<Variable> variables, int currentEndIndex) {
 		Expression linkedObjects = null;
 		for (int j = 0; j < currentEndIndex; j++) {
 			if (j == 0) {
-				if (!univJoinRelation)
+				if (associationClass == null)
 					linkedObjects = variables.get(j).join(navigationLinks());
 				else
 					linkedObjects = variables.get(j).join(Expression.UNIV.join(navigationLinks()));
