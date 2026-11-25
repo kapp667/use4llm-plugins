@@ -33,7 +33,7 @@ public final class Model implements IModel {
     private Map<String, IClass> classes = new LinkedHashMap<String, IClass>();
     private Map<String, IInvariant> invariants = new LinkedHashMap<String, IInvariant>();
     private Map<String, IAssociation> associations = new LinkedHashMap<String, IAssociation>();
-    private List<String> invariantTransformationErrors = new ArrayList<String>();
+    private List<String> transformationErrors = new ArrayList<String>();
     private IModelFactory modelFactory;
     private TypeFactory typeFactory;
     private IConfigurator<IModel> configurator;
@@ -111,13 +111,13 @@ public final class Model implements IModel {
 	}
 
 	@Override
-	public void addInvariantTransformationError(String error) {
-		invariantTransformationErrors.add(error);
+	public void addTransformationError(String error) {
+		transformationErrors.add(error);
 	}
 
 	@Override
-	public List<String> invariantTransformationErrors() {
-		return invariantTransformationErrors;
+	public List<String> transformationErrors() {
+		return transformationErrors;
 	}
 	
 	@Override
