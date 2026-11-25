@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import kodkod.instance.TupleFactory;
@@ -24,9 +25,7 @@ public class RealConfigurator extends TypeConfigurator{
 	private final DecimalFormat decimalFormat;
 	
 	public RealConfigurator(){
-		DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance();
-		dfs.setDecimalSeparator('.');
-		decimalFormat = new DecimalFormat("#0.00", dfs); 
+		decimalFormat = new DecimalFormat("#0.00", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	}
 	
 	@Override
