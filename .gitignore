@@ -1,0 +1,19 @@
+# Output of the ant builds (build.xml); the jars in each plugin's lib/ are dependencies and stay tracked
+ModelValidator/trunk/build/
+FilmstripTransformation/trunk/build/
+
+# Compiled classes written outside a build folder
+*.class
+!OCLComplexityPlugin/build/**/*.class
+
+# IDE and editor folders (Eclipse's .project, .classpath and .settings are shared and stay tracked)
+.idea/
+.vscode/
+out/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs written by USE, Kodkod or the tests
+*.log
