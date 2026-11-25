@@ -242,7 +242,7 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 			}
 		}
 
-		unboundedDefinedValues = (max != -1);
+		unboundedDefinedValues = (max == -1);
 		allValuesDefined = (min == -1);
 	}
 
