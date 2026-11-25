@@ -25,41 +25,50 @@ import com.google.common.collect.Sets;
 
 public class ModelValidator implements MMVisitor {
 	
-	private static final HashSet<String> reservedClassNames = Sets.newHashSet(
+	// The sets are built for each validation, from the classes of the model.
+	private final HashSet<String> reservedClassNames = Sets.newHashSet(
 			FilmstripModelConstants.SNAPSHOT_CLASSNAME,
 			FilmstripModelConstants.SNAPSHOTITEM_CLASSNAME,
 			FilmstripModelConstants.OPC_CLASSNAME );
-	private static final HashSet<String> reservedClassPrefixes = Sets.newHashSet();
-	private static final HashSet<String> reservedClassSuffixes = Sets.newHashSet(
+	private final HashSet<String> reservedClassPrefixes = Sets.newHashSet();
+	private final HashSet<String> reservedClassSuffixes = Sets.newHashSet(
 			FilmstripModelConstants.OPC_ABBREVIATION );
-	
-	private static final HashSet<String> reservedAssociationNames = Sets.newHashSet(
+
+	// completed in the constructor with the associations generated for each
+	// class of the model
+	private final HashSet<String> reservedAssociationNames = Sets.newHashSet(
 			FilmstripModelConstants.FILMSTRIP_ASSOCNAME,
-			FilmstripModelConstants.SNAPSHOTELEMENT_ASSOCNAME );
-	private static final HashSet<String> reservedAssociationPrefixes = Sets.newHashSet(
-			FilmstripModelConstants.SNAPSHOT_CLASSNAME,
+			FilmstripModelConstants.SNAPSHOTELEMENT_ASSOCNAME,
+			FilmstripModelConstants.ORDERABLE_ASSOCNAME,
+			FilmstripModelConstants.SNAPSHOT_OPC );
+	private final HashSet<String> reservedAssociationPrefixes = Sets.newHashSet();
+	private final HashSet<String> reservedAssociationSuffixes = Sets.newHashSet(
 			FilmstripModelConstants.ORDERABLE_ASSOCNAME );
-	private static final HashSet<String> reservedAssociationSuffixes = Sets.newHashSet(
-			FilmstripModelConstants.ORDERABLE_ASSOCNAME );
-	
-	// every class inherits the role to its snapshot from SnapshotItem
-	private static final HashSet<String> reservedRoleNames = Sets.newHashSet(
+
+	// every class inherits the role `snapshot' from SnapshotItem
+	private final HashSet<String> reservedRoleNames = Sets.newHashSet(
 			FilmstripModelConstants.SNAPSHOT_ROLENAME );
-	private static final HashSet<String> reservedRolePrefixes = Sets.newHashSet(
+	private final HashSet<String> reservedRolePrefixes = Sets.newHashSet(
 			FilmstripModelConstants.PRED_ROLENAME,
 			FilmstripModelConstants.SUCC_ROLENAME );
-	private static final HashSet<String> reservedRoleSuffixes = Sets.newHashSet();
-	
-	private static final HashSet<String> reservedInvNames = Sets.newHashSet(
+	private final HashSet<String> reservedRoleSuffixes = Sets.newHashSet();
+
+	private final HashSet<String> reservedInvNames = Sets.newHashSet(
 			FilmstripModelConstants.CLASS_INV_VALIDLINKING_NAME);
-	private static final HashSet<String> reservedInvPrefixes = Sets.newHashSet(
+	private final HashSet<String> reservedInvPrefixes = Sets.newHashSet(
 			FilmstripModelConstants.makeValidLinkingInvName(""));
-	private static final HashSet<String> reservedInvSuffixes = Sets.newHashSet();
-	
+	private final HashSet<String> reservedInvSuffixes = Sets.newHashSet();
+
 	private ModelElements elements;
-	
-	private ModelValidator(){
+
+	private ModelValidator(MModel model){
 		elements = new ModelElements();
+		for(MClass cls : model.classes()){
+			reservedAssociationNames.add(
+					FilmstripModelConstants.makeSnapshotClsAssocName(cls.name()));
+			reservedAssociationNames.add(
+					FilmstripModelConstants.makeClsOrdableAssocName(cls.name()));
+		}
 	}
 	
 	private ModelElements getElements() {
@@ -68,7 +77,7 @@ public class ModelValidator implements MMVisitor {
 	
 	public static void validate(MModel model) throws TransformationInputException {
 		
-		ModelValidator validator = new ModelValidator();
+		ModelValidator validator = new ModelValidator(model);
 		model.processWithVisitor(validator);
 		ModelElements elems = validator.getElements();
 		
