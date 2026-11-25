@@ -49,6 +49,7 @@ import org.tzi.use.uml.ocl.expr.ExpTupleLiteral;
 import org.tzi.use.uml.ocl.expr.ExpTupleSelectOp;
 import org.tzi.use.uml.ocl.expr.ExpUndefined;
 import org.tzi.use.uml.ocl.expr.ExpVariable;
+import org.tzi.use.uml.ocl.type.CollectionType;
 import org.tzi.use.uml.ocl.type.Type;
 import org.tzi.use.uml.ocl.type.Type.VoidHandling;
 import org.tzi.use.util.StringUtil;
@@ -80,6 +81,8 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	protected boolean set;
 	protected boolean object_type_nav;
 	protected Type sourceType;
+
+	private boolean collectionOfCollectionsAccepted = false;
 
 	public DefaultExpressionVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
 			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
@@ -127,6 +130,14 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		return object_type_nav;
 	}
 
+	/**
+	 * Accepts a collection of collections as the expression this visitor
+	 * transforms.
+	 */
+	public void acceptCollectionOfCollections() {
+		collectionOfCollectionsAccepted = true;
+	}
+
 	@Override
 	public void visitAllInstances(ExpAllInstances exp) {
 		super.visitAllInstances(exp);
@@ -153,6 +164,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitAsType(ExpAsType exp) {
 		super.visitAsType(exp);
+		refuseCollectionOfCollections(exp);
 		try {
 			visitTypeOperation("oclAsType", exp.getSourceExpr(), exp.getTargetType(), true);
 		} catch (NoSuchMethodError e) {
@@ -163,6 +175,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitAttrOp(ExpAttrOp exp) {
 		super.visitAttrOp(exp);
+		refuseCollectionOfCollections(exp);
 		visitVariableOperation(exp);
 	}
 
@@ -224,6 +237,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitEmptyCollection(ExpEmptyCollection exp) {
 		super.visitEmptyCollection(exp);
+		refuseCollectionOfCollections(exp);
 		sourceType = exp.type();
 		invokeMethod("setLiteral", new ArrayList<Object>(), false);
 	}
@@ -231,6 +245,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitObjOp(ExpObjOp exp) {
 		super.visitObjOp(exp);
+		refuseCollectionOfCollections(exp);
 		DefaultExpressionVisitor visitor = new OperationExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
@@ -241,6 +256,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitLet(ExpLet exp) {
 		super.visitLet(exp);
+		refuseCollectionOfCollections(exp);
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.getVarExpression().processWithVisitor(visitor);
 		Node varExpression = visitor.getObject();
@@ -268,6 +284,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitIf(ExpIf exp) {
 		super.visitIf(exp);
+		refuseCollectionOfCollections(exp);
 
 		List<Object> arguments = new ArrayList<Object>();
 
@@ -333,6 +350,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitQuery(ExpQuery exp) {
 		super.visitQuery(exp);
+		refuseCollectionOfCollections(exp);
 		QueryExpressionVisitor visitor = new QueryExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
@@ -343,12 +361,14 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitSelectByKind(ExpSelectByKind expSelectByKind) {
 		super.visitSelectByKind(expSelectByKind);
+		refuseCollectionOfCollections(expSelectByKind);
 		visitTypeOperation("selectByKind", expSelectByKind.getSourceExpression(), expSelectByKind.type().elemType(), true);
 	}
 	
 	@Override
 	public void visitExpSelectByType(ExpSelectByType expSelectByType) {
 		super.visitExpSelectByType(expSelectByType);
+		refuseCollectionOfCollections(expSelectByType);
 		visitTypeOperation("selectByType", expSelectByType.getSourceExpression(), expSelectByType.type().elemType(), false);
 	}
 
@@ -368,6 +388,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitStdOp(ExpStdOp exp) {
 		super.visitStdOp(exp);
+		refuseCollectionOfCollections(exp);
 		StandardOperationVisitor visitor = new StandardOperationVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
@@ -390,6 +411,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitUndefined(ExpUndefined exp) {
 		super.visitUndefined(exp);
+		refuseCollectionOfCollections(exp);
 		if (exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
 			object = undefined_Set;
 		} else {
@@ -400,6 +422,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitVariable(ExpVariable exp) {
 		super.visitVariable(exp);
+		refuseCollectionOfCollections(exp);
 		visitVariableOperation(exp);
 	}
 
@@ -448,6 +471,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	 * @param literal
 	 */
 	private void visitCollectionLiteral(ExpCollectionLiteral exp, String literal) {
+		refuseCollectionOfCollections(exp);
 		List<Object> arguments = new ArrayList<Object>();
 
 		sourceType = exp.type();
@@ -484,6 +508,9 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	 * @param targetType
 	 */
 	private void visitTypeOperation(String opName, org.tzi.use.uml.ocl.expr.Expression sourceExpression, Type targetType, boolean useInheritance) {
+		if (isCollectionOfCollections(targetType)) {
+			throw new TransformationException(LogMessages.collectionOfCollectionsError(targetType.toString()));
+		}
 		List<Object> arguments = new ArrayList<Object>();
 
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
@@ -509,6 +536,21 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		}
 
 		invokeMethod(opName, arguments, set);
+	}
+
+	/**
+	 * Refuses an expression whose value is a collection of collections, since the
+	 * transformation represents a collection by the set of its elements.
+	 */
+	private void refuseCollectionOfCollections(org.tzi.use.uml.ocl.expr.Expression exp) {
+		if (!collectionOfCollectionsAccepted && isCollectionOfCollections(exp.type())) {
+			throw new TransformationException(LogMessages.collectionOfCollectionsError(exp.toString()));
+		}
+	}
+
+	private static boolean isCollectionOfCollections(Type type) {
+		return type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)
+				&& ((CollectionType) type).elemType().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
 	}
 
 	/**
