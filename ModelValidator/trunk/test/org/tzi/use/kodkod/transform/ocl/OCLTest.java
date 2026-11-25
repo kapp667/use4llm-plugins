@@ -10,10 +10,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -21,32 +19,23 @@ import kodkod.ast.Expression;
 import kodkod.ast.Formula;
 import kodkod.ast.IntExpression;
 import kodkod.ast.Node;
-import kodkod.ast.Relation;
 import kodkod.ast.Variable;
 import kodkod.engine.Evaluator;
-import kodkod.instance.Bounds;
-import kodkod.instance.Instance;
+import kodkod.engine.Solution;
 import kodkod.instance.Tuple;
-import kodkod.instance.TupleFactory;
 import kodkod.instance.TupleSet;
-import kodkod.instance.Universe;
-import kodkod.util.ints.IntIterator;
 
 import org.apache.commons.configuration.MapConfiguration;
 import org.junit.BeforeClass;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
+import org.tzi.kodkod.KodkodSolver;
 import org.tzi.kodkod.helper.PrintHelper;
-import org.tzi.kodkod.model.config.impl.AssociationConfigurator;
-import org.tzi.kodkod.model.config.impl.AttributeConfigurator;
 import org.tzi.kodkod.model.config.impl.PropertyConfigurationVisitor;
 import org.tzi.kodkod.model.iface.IAssociation;
 import org.tzi.kodkod.model.iface.IAttribute;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
-import org.tzi.kodkod.model.type.IntegerType;
-import org.tzi.kodkod.model.type.TypeAtoms;
 import org.tzi.kodkod.model.type.TypeConstants;
-import org.tzi.kodkod.model.visitor.BoundsVisitor;
 import org.tzi.kodkod.ocl.OCLGroupRegistry;
 import org.tzi.kodkod.ocl.operation.AnyOperationGroup;
 import org.tzi.kodkod.ocl.operation.BooleanOperationGroup;
@@ -89,7 +78,8 @@ import org.tzi.use.uml.sys.MSystemState;
  * Base class of the OCL translation tests. The value USE computes for an OCL
  * expression on the object diagram built in {@link #setUpBeforeClass()} has to
  * equal the value Kodkod computes for the translated expression on the same
- * object diagram, encoded as an exact Kodkod instance.
+ * object diagram, encoded as exact bounds and solved by the model validator's
+ * {@link KodkodSolver}.
  * 
  * @author Hendrik
  */
@@ -103,56 +93,10 @@ public class OCLTest {
 	private static final int INTEGER_BOUND = 40;
 
 	protected static IModel model;
-	private static MSystem mSystem;
+	protected static MSystem mSystem;
 	private static StringWriter compileErrors;
 	private static PrintWriter errorWriter;
 	private static Evaluator kodkodEvaluator;
-
-	/** Same as the default configurator, but with the upper bound equal to the lower bound. */
-	private static class ExactAssociationConfigurator extends AssociationConfigurator {
-		/**
-		 * The model constraint requires an Undefined tuple for each object that has
-		 * no link at a 0..1 end of a binary association (not of an association class).
-		 */
-		@Override
-		public TupleSet lowerBound(IAssociation association, int arity, TupleFactory tupleFactory) {
-			TupleSet lower = super.lowerBound(association, arity, tupleFactory);
-			if (association.isBinaryAssociation() && association.associationClass() == null) {
-				for (int end = 0; end < 2; end++) {
-					if (association.associationEnds().get(end).multiplicity().isZeroOne()) {
-						int other = 1 - end;
-						TupleSet unlinked = association.associationEnds().get(other).associatedClass().upperBound(tupleFactory).clone();
-						for (Tuple tuple : lower) {
-							unlinked.remove(tupleFactory.tuple(tuple.atom(other)));
-						}
-						for (Tuple object : unlinked) {
-							Object[] atoms = new Object[2];
-							atoms[other] = object.atom(0);
-							atoms[end] = TypeConstants.UNDEFINED;
-							lower.add(tupleFactory.tuple(atoms));
-						}
-					}
-				}
-			}
-			return lower;
-		}
-
-		@Override
-		public TupleSet upperBound(IAssociation association, int arity, TupleFactory tupleFactory) {
-			return lowerBound(association, arity, tupleFactory);
-		}
-	}
-
-	private static class ExactAttributeConfigurator extends AttributeConfigurator {
-		ExactAttributeConfigurator(IAttribute attribute) {
-			super(attribute);
-		}
-
-		@Override
-		public TupleSet upperBound(IAttribute attribute, int arity, TupleFactory tupleFactory) {
-			return lowerBound(attribute, arity, tupleFactory);
-		}
-	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -188,12 +132,15 @@ public class OCLTest {
 		shell.processLineSafely("!create wolfi:Animal");
 		shell.processLineSafely("!create stan:Animal");
 		shell.processLineSafely("!create jobBobApple:Job_AC between (bob,apple)");
-		shell.processLineSafely("!create jobBobIbm:Job_AC between (bob,ibm)");
+		shell.processLineSafely("!create jobDanIbm:Job_AC between (dan,ibm)");
 		shell.processLineSafely("!create buyAdaPetShopWolfi:Buy_AC between (ada,petShop,wolfi)");
 		shell.processLineSafely("!create buyBobPetShopStan:Buy_AC between (bob,petShop,stan)");
-		shell.processLineSafely("!create buyAdaPetShopStan:Buy_AC between (ada,petShop,stan)");
+		shell.processLineSafely("!create buyAdaAppleStan:Buy_AC between (ada,apple,stan)");
 		shell.processLineSafely("!create examAdaBobCyd:Exam_AC between (ada,bob,cyd)");
 		shell.processLineSafely("!create examDanBobCyd:Exam_AC between (dan,bob,cyd)");
+		shell.processLineSafely("!set bob.age := 3");
+		shell.processLineSafely("!set bob.name := 'Bob'");
+		shell.processLineSafely("!set bob.luckyNumbers := Set{7, 8}");
 
 		model = PluginModelFactory.INSTANCE.getModel(mModel);
 
@@ -213,8 +160,8 @@ public class OCLTest {
 
 	/**
 	 * Configures the model so that every class, association and attribute
-	 * relation is bound exactly to the tuples of the object diagram of mSystem,
-	 * checks that the resulting Kodkod instance holds the object diagram.
+	 * relation holds exactly the object diagram of mSystem, and checks that the
+	 * model validator finds a solution that contains it.
 	 */
 	private static void encodeObjectDiagram(MModel mModel) throws Exception {
 		KodkodModelValidatorConfiguration configuration = KodkodModelValidatorConfiguration.getInstance();
@@ -238,6 +185,27 @@ public class OCLTest {
 			expectedTuples.put(cls.name(), objects);
 		}
 
+		// the number of links of an association class is the number of its objects, which the class limits above already hold
+		Map<String, Integer> links = new HashMap<String, Integer>();
+		for (MLink link : state.allLinks()) {
+			String name = link.association().name();
+			links.put(name, links.containsKey(name) ? links.get(name) + 1 : 1);
+		}
+		for (IAssociation association : model.associations()) {
+			int number = links.containsKey(association.name()) ? links.get(association.name()) : 0;
+			properties.put(association.name() + "_min", number);
+			properties.put(association.name() + "_max", number);
+			expectedTuples.put(association.name(), number);
+		}
+
+		// 0..0 leaves the number of defined values free: the default (all values defined) excludes the undefined ones
+		for (IClass clazz : model.classes()) {
+			for (IAttribute attribute : clazz.attributes()) {
+				properties.put(attribute.owner().name() + "_" + attribute.name() + "_min", 0);
+				properties.put(attribute.owner().name() + "_" + attribute.name() + "_max", 0);
+			}
+		}
+
 		model.reset();
 		StringWriter warnings = new StringWriter();
 		PropertyConfigurationVisitor configurationVisitor = new PropertyConfigurationVisitor(new MapConfiguration(properties), new PrintWriter(warnings, true));
@@ -246,26 +214,11 @@ public class OCLTest {
 			fail("The configuration of the test model failed: " + warnings);
 		}
 
-		Map<String, Integer> links = new HashMap<String, Integer>();
-		for (MLink link : state.allLinks()) {
-			String name = link.association().name();
-			links.put(name, links.containsKey(name) ? links.get(name) + 1 : 1);
-		}
-		for (IAssociation association : model.associations()) {
-			ExactAssociationConfigurator configurator = new ExactAssociationConfigurator();
-			int number = links.containsKey(association.name()) ? links.get(association.name()) : 0;
-			configurator.setLimits(number, number);
-			association.setConfigurator(configurator);
-			expectedTuples.put(association.name(), number);
-		}
-
-		// Attributes: the enricher extracts the defined values, the undefined ones are added here.
-		Map<IAttribute, Integer> definedObjects = new HashMap<IAttribute, Integer>();
+		// Attributes: the enricher extracts the defined values only. The undefined ones are added here, because
+		// the attribute bounds are exact only if every object is specified.
 		Map<IAttribute, Integer> attributeTuples = new HashMap<IAttribute, Integer>();
 		for (IClass clazz : model.classes()) {
 			for (IAttribute attribute : clazz.attributes()) {
-				attribute.setConfigurator(new ExactAttributeConfigurator(attribute));
-				definedObjects.put(attribute, 0);
 				attributeTuples.put(attribute, 0);
 			}
 		}
@@ -278,27 +231,21 @@ public class OCLTest {
 				if (value.isUndefined()) {
 					String undefined = attribute.type().isSet() ? TypeConstants.UNDEFINED_SET : TypeConstants.UNDEFINED;
 					attribute.getConfigurator().addSpecificValue(new String[] { object.cls().name() + "_" + object.name(), undefined });
-				} else {
-					if (value.isCollection()) {
-						tuples = ((CollectionValue) value).size();
-						if (tuples == 0) {
-							fail("The attribute " + object.name() + "." + mAttribute.name() + " is an empty set, which cannot be encoded as an exact Kodkod instance.");
-						}
+				} else if (value.isCollection()) {
+					tuples = ((CollectionValue) value).size();
+					if (tuples == 0) {
+						fail("The attribute " + object.name() + "." + mAttribute.name() + " is an empty set, which cannot be encoded as an exact Kodkod instance.");
 					}
-					definedObjects.put(attribute, definedObjects.get(attribute) + 1);
 				}
 				attributeTuples.put(attribute, attributeTuples.get(attribute) + tuples);
 			}
 		}
-		for (IAttribute attribute : definedObjects.keySet()) {
-			((AttributeConfigurator) attribute.getConfigurator()).setLimits(definedObjects.get(attribute), definedObjects.get(attribute));
-		}
 
 		new ObjectDiagramModelEnricher().enrichModel(mSystem, model);
 
-		Evaluator evaluator = createEvaluator();
+		Evaluator evaluator = solveObjectDiagram();
 
-		// the enricher only logs its errors: check that the instance holds what the object diagram holds
+		// the enricher only logs its errors: check that the solution holds what the object diagram holds
 		for (IClass clazz : model.classes()) {
 			checkTupleNumber(evaluator, clazz.relation(), expectedTuples.get(clazz.name()));
 			for (IAttribute attribute : clazz.attributes()) {
@@ -318,53 +265,18 @@ public class OCLTest {
 	}
 
 	/**
-	 * Creates the Kodkod instance of the configured model, i.e. its exact bounds,
-	 * and an evaluator on it. It is created again for each test, because the
+	 * Solves the configured model with the model validator's solver and returns
+	 * an evaluator on the solution. It is called again for each test, because the
 	 * translation of an OCL expression adds literals (strings, enum literals) to
-	 * the model.
-	 * <p>
-	 * The model constraint is not solved: the object diagram of the test violates
-	 * the multiplicities of the model, so it is unsatisfiable.
+	 * the model, i.e. atoms to the universe.
 	 */
-	private static Evaluator createEvaluator() {
-		Universe universe = createUniverse();
-		Bounds bounds = new Bounds(universe);
-		model.accept(new BoundsVisitor(bounds, universe.factory()));
-		Instance instance = new Instance(universe);
-		for (Relation relation : bounds.relations()) {
-			if (!bounds.lowerBound(relation).equals(bounds.upperBound(relation))) {
-				fail("The bounds of " + relation + " are not exact: " + bounds.lowerBound(relation) + " and " + bounds.upperBound(relation));
-			}
-			instance.add(relation, bounds.lowerBound(relation));
+	private static Evaluator solveObjectDiagram() throws Exception {
+		KodkodSolver solver = new KodkodSolver();
+		Solution solution = solver.solve(model);
+		if (solver.evaluator() == null) {
+			fail("The model validator finds no solution for the object diagram of the test: " + solution.outcome());
 		}
-		for (IntIterator ints = bounds.ints().iterator(); ints.hasNext();) {
-			int i = ints.next();
-			instance.add(i, bounds.exactBound(i));
-		}
-		kodkod.engine.config.Options options = new kodkod.engine.config.Options();
-		options.setBitwidth(KodkodModelValidatorConfiguration.getInstance().bitwidth());
-		return new Evaluator(instance, options);
-	}
-
-	/**
-	 * Same as the universe of the {@code KodkodSolver}.
-	 */
-	private static Universe createUniverse() {
-		Set<Object> atoms = new LinkedHashSet<Object>();
-
-		Set<TypeAtoms> typeAtoms = new LinkedHashSet<TypeAtoms>(model.enumTypes());
-		typeAtoms.addAll(model.typeFactory().typeAtoms());
-		for (TypeAtoms typeAtom : typeAtoms) {
-			atoms.addAll(typeAtom.atoms());
-			if (typeAtom.isInteger()) {
-				atoms.addAll(((IntegerType) typeAtom).toStringAtoms());
-			}
-		}
-		for (IClass clazz : model.classes()) {
-			atoms.addAll(clazz.objectType().atoms());
-		}
-
-		return new Universe(atoms);
+		return solver.evaluator();
 	}
 
 	private static boolean containsAtom(Tuple tuple, Object atom) {
@@ -514,9 +426,9 @@ public class OCLTest {
 		}
 		Value kodkodValue;
 		try {
-			kodkodEvaluator = createEvaluator();
+			kodkodEvaluator = solveObjectDiagram();
 			kodkodValue = evaluateKodkod(transform, expression);
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			throw new AssertionError("Kodkod cannot evaluate: " + ocl + System.lineSeparator() + PrintHelper.prettyKodkod((Node) transform), e);
 		}
 
