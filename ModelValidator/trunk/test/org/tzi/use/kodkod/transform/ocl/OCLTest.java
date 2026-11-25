@@ -198,11 +198,11 @@ public class OCLTest {
 			expectedTuples.put(association.name(), number);
 		}
 
-		// 0..0 leaves the number of defined values free: the default (all values defined) excludes the undefined ones
+		// 0..-1 leaves the number of defined values free: the default (all values defined) excludes the undefined ones
 		for (IClass clazz : model.classes()) {
 			for (IAttribute attribute : clazz.attributes()) {
 				properties.put(attribute.owner().name() + "_" + attribute.name() + "_min", 0);
-				properties.put(attribute.owner().name() + "_" + attribute.name() + "_max", 0);
+				properties.put(attribute.owner().name() + "_" + attribute.name() + "_max", -1);
 			}
 		}
 
