@@ -48,6 +48,9 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 
 	@Override
 	public void visitAny(ExpAny exp) {
+		if (canBeOrdered(exp.getRangeExpression().type())) {
+			throw new TransformationException(LogMessages.collectionOrderError(exp.toString()));
+		}
 		visitQueryAndInvoke(exp);
 	}
 
@@ -105,6 +108,7 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 
 	@Override
 	public void visitIsUnique(ExpIsUnique exp) {
+		refuseDuplicatesOfRange(exp);
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.getRangeExpression().processWithVisitor(visitor);
 		arguments.add(0, visitor.getObject());
@@ -128,7 +132,14 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 
 	@Override
 	public void visitOne(ExpOne exp) {
+		refuseDuplicatesOfRange(exp);
 		visitQueryAndInvoke(exp);
+	}
+
+	private void refuseDuplicatesOfRange(ExpQuery exp) {
+		if (canHoldDuplicates(exp.getRangeExpression().type())) {
+			throw new TransformationException(LogMessages.collectionDuplicatesError(exp.toString()));
+		}
 	}
 
 	@Override
