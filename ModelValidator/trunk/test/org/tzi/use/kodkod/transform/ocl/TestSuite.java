@@ -16,6 +16,6 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AnyTestSuite.class, AttributeAccess_Test.class, BooleanTestSuite.class, AllInstances_Test.class, IfThenElse_Test.class,
-		IntegerTestSuite.class, SetConstructor_Test.class, Navigation_Test.class, Let_Test.class, SetTestSuite.class })
+		IntegerTestSuite.class, SetConstructor_Test.class, Navigation_Test.class, Let_Test.class, SetTestSuite.class, ObjectDiagram_Test.class })
 public class TestSuite {
 }
