@@ -37,16 +37,30 @@ final class TestSpecifications {
 	}
 
 	/**
-	 * Compiles the specification and transforms it with the operation groups
-	 * the plugin registers, so that the result does not depend on the tests
-	 * that ran before.
+	 * Compiles the specification and transforms it as
+	 * {@link #transform(MModel)} does.
 	 */
 	static IModel transform(String spec) {
+		return transform(compile(spec));
+	}
+
+	/**
+	 * Compiles the specification, and fails the test if it does not compile.
+	 */
+	static MModel compile(String spec) {
 		MModel mModel = USECompiler.compileSpecification(new ByteArrayInputStream(spec.getBytes(StandardCharsets.UTF_8)), "M.use",
 				new PrintWriter(System.err), new ModelFactory());
 		if (mModel == null) {
 			fail("The test specification does not compile.");
 		}
+		return mModel;
+	}
+
+	/**
+	 * Transforms the model with the operation groups the plugin registers, so
+	 * that the result does not depend on the tests that ran before.
+	 */
+	static IModel transform(MModel mModel) {
 		TypeFactory typeFactory = new PrimitiveTypeFactory();
 		OCLGroupRegistry registry = OCLGroupRegistry.INSTANCE;
 		registry.unregisterAll();
