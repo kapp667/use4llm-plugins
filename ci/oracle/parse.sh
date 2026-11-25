@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Judge one oracle case from its raw USE output.
 # Usage: ci/oracle/parse.sh <output file> <exit status of the USE run>
-# Prints "verdict<TAB>check<TAB>errors<TAB>note", the middle columns of an oracle.tsv row.
+# Prints "verdict<TAB>check<TAB>objects<TAB>errors<TAB>note", the middle columns of an oracle.tsv row.
 set -euo pipefail
 
 [ "$#" -eq 2 ] || { sed -n '2,4p' "$0" >&2; exit 2; }
@@ -40,7 +40,11 @@ else
 fi
 
 check=n/a
+objects=n/a
 if [ "$verdict" = SAT ]; then
+  # The total of USE's "info state" class table: how many objects the solution has.
+  objects="$(awk '/^class +: #objects/ { c = 1 } c && /^total +:/ { print $3; exit }' "$f")"
+  [ -n "$objects" ] || objects=unknown
   failure="$(check_failure)"
   # A missing summary counts as a failure, so that a check that did not run never passes.
   if ! grep -qE '^checked [0-9]+ invariants? ' "$f"; then
@@ -54,4 +58,4 @@ if [ "$verdict" = SAT ]; then
   if [ "$check" = fail ] && [ -z "$note" ]; then note="$(printf '%s\n' "$failure" | clean)"; fi
 fi
 
-printf '%s\t%s\t%s\t%s\n' "$verdict" "$check" "$errors" "$note"
+printf '%s\t%s\t%s\t%s\t%s\n' "$verdict" "$check" "$objects" "$errors" "$note"
