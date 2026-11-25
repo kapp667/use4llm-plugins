@@ -46,6 +46,9 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 	 * Validation to check the independence of a single invariant.
 	 */
 	public void validate(IModel model, String className, String invariantName) {
+		if (refusesUntransformedInvariants(model)) {
+			return;
+		}
 		validateSingleInvariant = true;
 		changeLogLevels();
 
@@ -71,6 +74,9 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 
 	@Override
 	public void validate(IModel model) {
+		if (refusesUntransformedInvariants(model)) {
+			return;
+		}
 		validateSingleInvariant = false;
 		Logger.getLogger(KodkodModelValidator.class).setLevel(Level.WARN);
 		Logger.getLogger(KodkodSolver.class).setLevel(Level.WARN);

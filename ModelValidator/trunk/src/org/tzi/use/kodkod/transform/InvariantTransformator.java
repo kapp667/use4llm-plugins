@@ -133,35 +133,27 @@ public class InvariantTransformator {
 				transformAndAdd(model, inv);
 			} catch (Exception exception) {
 				printTransformationError(inv, exception);
+				model.addInvariantTransformationError(StringUtil.inQuotes(inv.toString()) + ": " + reason(exception));
 			}
 		}
-		LOG.info(LogMessages.invTransformSuccessful);
-	}
-
-	/**
-	 * Transformation of all given invariants.
-	 */
-	public List<IInvariant> transform(IModel model, List<MClassInvariant> classInvariants) {
-		List<IInvariant> invariants = new ArrayList<IInvariant>();
-
-		for (MClassInvariant inv : classInvariants) {
-			try {
-				IInvariant invariant = transform(model, inv);
-				invariants.add(invariant);
-
-			} catch (TransformationException exception) {
-				printTransformationError(inv, exception);
-			}
+		if (model.invariantTransformationErrors().isEmpty()) {
+			LOG.info(LogMessages.invTransformSuccessful);
 		}
-		LOG.info(LogMessages.invTransformSuccessful);
-		return invariants;
 	}
 
 	private void printTransformationError(MClassInvariant inv, Exception exception) {
 		if (LOG.isDebugEnabled()) {
 			LOG.error(LogMessages.invTransformError(inv.toString()), exception);
 		} else {
-			LOG.error(LogMessages.invTransformError(inv.toString()) + " " + exception.getMessage());
+			LOG.error(LogMessages.invTransformError(inv.toString()) + " " + reason(exception));
 		}
+	}
+
+	/**
+	 * Some exceptions, a NullPointerException for one, have no message: their
+	 * class name is the only reason there is to report.
+	 */
+	private static String reason(Exception exception) {
+		return exception.getMessage() != null ? exception.getMessage() : exception.toString();
 	}
 }
