@@ -34,7 +34,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test5() {
-		String ocl = "Set{}->select(i | Undefined)";
+		String ocl = "Set{}->select(i | oclUndefined(Boolean))";
 		String expected = "(none = Undefined_Set) => Undefined_Set else {i: none | Undefined = Boolean_True}  ";
 		test("test5", ocl, expected);
 	}
@@ -83,7 +83,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test12() {
-		String ocl = "Set{1}->select(i | Undefined)";
+		String ocl = "Set{1}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1]) | Undefined = Boolean_True} ";
 		test("test12", ocl, expected);
 	}
@@ -132,7 +132,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test19() {
-		String ocl = "Set{1,2}->select(i | Undefined)";
+		String ocl = "Set{1,2}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2]) | Undefined = Boolean_True} ";
 		test("test19", ocl, expected);
 	}
@@ -181,7 +181,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test26() {
-		String ocl = "Set{1,2,3}->select(i | Undefined)";
+		String ocl = "Set{1,2,3}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3]) | Undefined = Boolean_True}";
 		test("test26", ocl, expected);
 	}
@@ -252,7 +252,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test36() {
-		String ocl = "Set{Undefined,1}->select(i | Undefined)";
+		String ocl = "Set{Undefined,1}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1]) | Undefined = Boolean_True} ";
 		test("test36", ocl, expected);
 	}
@@ -315,7 +315,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test45() {
-		String ocl = "Set{Undefined,1,2}->select(i | Undefined)";
+		String ocl = "Set{Undefined,1,2}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2]) | Undefined = Boolean_True}  ";
 		test("test45", ocl, expected);
 	}
@@ -364,7 +364,7 @@ public class Select_Test extends OCLTest {
 
 	@Test
 	public void test52() {
-		String ocl = "Set{Undefined}->select(i | Undefined)";
+		String ocl = "Set{Undefined}->select(i | oclUndefined(Boolean))";
 		String expected = "(((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) = Undefined_Set) => Undefined_Set else {i: (Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined) | Undefined = Boolean_True}";
 		test("test52", ocl, expected);
 	}
@@ -420,7 +420,7 @@ public class Select_Test extends OCLTest {
 	
 	@Test
 	public void test59() {
-		String ocl = "ada.luckyNumbers->select(i | Undefined)";
+		String ocl = "ada.luckyNumbers->select(i | oclUndefined(Boolean))";
 		String expected = "(((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) = Undefined_Set) => Undefined_Set else {i: (Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers) | Undefined = Boolean_True} ";
 		test("test59", ocl, expected);
 	}
