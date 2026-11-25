@@ -1,18 +1,25 @@
 #!/usr/bin/env bash
 # Run the ModelValidator end to end on every USE model of a corpus, then judge each solution
-# with USE's own check. Each model is solved twice: with the default bounds the validator writes,
-# then with wide bounds derived from them by widen.sh. Uses java and timeout from PATH.
+# with USE's own check. Each model is solved with the default bounds the validator writes, then
+# with wide bounds derived from them by widen.sh. A model with a witness, a file beside it with the
+# same name and the extension .cmd, .in or .soil whose "!" commands build a state USE's check
+# accepts, is also solved with the exact sizes of that state, derived by witness.sh; the validator
+# must find a solution there. A witness whose replay times out, whose state USE's check does not
+# accept or has no object, or whose model has no default properties file, gets a SKIPPED row.
+# Uses java and timeout from PATH.
 # Usage: ci/oracle/run.sh <USE install dir> <plugin jar dir> <corpus dir> <out dir>
 #   USE install dir: the unpacked USE binary release (searched for lib/use-gui.jar)
 #   plugin jar dir:  holds ModelValidatorPlugin.jar and use-filmstrip.jar
 #   corpus dir:      searched for *.use files; each one is a case
-# Outputs: <out dir>/oracle.tsv, a default row then a wide row per model in sorted order, and
-#          <out dir>/cases/<n>/output.txt and wide.txt, the raw USE outputs of the n-th model.
-#          Exits 1 if and only if a SAT solution fails USE's check, or widen.sh fails.
-# ORACLE_TIMEOUT sets the seconds allowed per run of USE, up to two per model (default 120).
+# Outputs: <out dir>/oracle.tsv, a default row, a wide row and, for a model with a witness, a
+#          witness row per model in sorted order, and <out dir>/cases/<n>/output.txt, wide.txt,
+#          replay.txt and witness.txt, the raw USE outputs of the n-th model.
+#          Exits 1 if and only if a SAT solution fails USE's check, the witness bounds are UNSAT,
+#          or widen.sh or witness.sh fails.
+# ORACLE_TIMEOUT sets the seconds allowed per run of USE, up to four per model (default 120).
 set -euo pipefail
 
-[ "$#" -eq 4 ] || { sed -n '2,12p' "$0" >&2; exit 2; }
+[ "$#" -eq 4 ] || { sed -n '2,19p' "$0" >&2; exit 2; }
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usedir="$(cd "$1" && pwd)"
 jars="$(cd "$2" && pwd)"
@@ -52,20 +59,34 @@ tsv="$out/oracle.tsv"
 printf 'model\tbounds\tverdict\tcheck\tobjects\terrors\tseconds\tnote\n' >"$tsv"
 failures=0
 
-# Runs USE on the model of the current case with a command file, then adds the row of the given
-# bounds to the table. Usage: solve <bounds> <command file> <output file name>
+# Runs USE on the model of the current case with a command file and sets status to its exit
+# status. Usage: use_run <command file> <output file name>
+use_run() {
+  status=0
+  (cd "$dir" && timeout --kill-after=10 "$limit" java -Djava.awt.headless=true -jar "$out/use/lib/use-gui.jar" \
+    -nogui -nr "$(basename "$model")" "$1" </dev/null >"$2" 2>&1) || status=$?
+}
+
+# Runs use_run, then adds the row of the given bounds to the table.
+# Usage: solve <bounds> <command file> <output file name>
 solve() {
   local start status seconds row verdict check objects errors note
   start="$EPOCHREALTIME"
-  status=0
-  (cd "$dir" && timeout --kill-after=10 "$limit" java -Djava.awt.headless=true -jar "$out/use/lib/use-gui.jar" \
-    -nogui -nr "$(basename "$model")" "$2" </dev/null >"$3" 2>&1) || status=$?
+  use_run "$2" "$3"
   seconds="$(awk -v a="$start" -v b="$EPOCHREALTIME" 'BEGIN { printf "%.1f", b - a }')"
   row="$("$here/parse.sh" "$dir/$3" "$status")"
   IFS=$'\t' read -r verdict check objects errors note <<<"$row"
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$model" "$1" "$verdict" "$check" "$objects" "$errors" "$seconds" "$note" >>"$tsv"
   echo "[$n/${#models[@]}] $model, $1 bounds: $verdict, check $check, $objects objects, $errors errors, ${seconds}s"
   [ "$check" != fail ] || failures=$((failures + 1))
+  # The witness state meets the witness bounds, so UNSAT is a wrong answer.
+  if [ "$1" = witness ] && [ "$verdict" = UNSAT ]; then failures=$((failures + 1)); fi
+}
+
+# Adds a SKIPPED row of the given bounds to the table. Usage: skip <bounds> <reason>
+skip() {
+  printf '%s\t%s\tSKIPPED\tn/a\tn/a\t0\t0.0\t%s\n' "$model" "$1" "$2" >>"$tsv"
+  echo "[$n/${#models[@]}] $model, $1 bounds: SKIPPED, $2"
 }
 
 n=0
@@ -86,10 +107,35 @@ for model in "${models[@]}"; do
     solve wide "$dir/wide.cmd" wide.txt
   else
     # The validator writes the file even for a model it refuses; a missing one is still reported.
-    printf '%s\twide\tSKIPPED\tn/a\tn/a\t0\t0.0\tno default properties file to widen\n' "$model" >>"$tsv"
-    echo "[$n/${#models[@]}] $model, wide bounds: SKIPPED, no default properties file"
+    skip wide "no default properties file to widen"
+  fi
+  witness=""
+  for ext in cmd in soil; do
+    candidate="$corpus/${model%.use}.$ext"
+    if [ -f "$candidate" ] && grep -q '^!' "$candidate"; then witness="$candidate"; break; fi
+  done
+  if [ -z "$witness" ]; then
+    :
+  elif [ ! -f "$defaults" ]; then
+    skip witness "no default properties file to derive the witness bounds from"
+  else
+    # Replay the witness, print the model and state witness.sh reads, then run USE's check.
+    { grep '^!' "$witness"; printf 'info model\ninfo state\ncheck\nexit\n'; } >"$dir/replay.cmd"
+    use_run "$dir/replay.cmd" replay.txt
+    IFS=$'\t' read -r check objects failure < <("$here/state.sh" "$dir/replay.txt")
+    if [ "$status" -eq 124 ] || [ "$status" -eq 137 ]; then
+      skip witness "the replay of $(basename "$witness") timed out"
+    elif [ "$check" != ok ]; then
+      skip witness "USE's check does not accept the state of $(basename "$witness"): $failure"
+    elif [ "$objects" = 0 ] || [ "$objects" = unknown ]; then
+      skip witness "the state of $(basename "$witness") has no object"
+    else
+      "$here/witness.sh" "$defaults" "$dir/replay.cmd" "$dir/replay.txt" >"$dir/witness.properties"
+      printf 'mv -validate witness.properties\ninfo state\ncheck\nexit\n' >"$dir/witness.cmd"
+      solve witness "$dir/witness.cmd" witness.txt
+    fi
   fi
 done
 
-echo "oracle: ${#models[@]} models, $failures solutions failing USE's check; table in $tsv"
+echo "oracle: ${#models[@]} models, $failures failures (a solution USE's check rejects, or UNSAT witness bounds); table in $tsv"
 [ "$failures" -eq 0 ]
