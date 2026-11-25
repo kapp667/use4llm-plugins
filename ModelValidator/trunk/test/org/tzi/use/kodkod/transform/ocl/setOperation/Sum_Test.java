@@ -6,7 +6,7 @@ import org.tzi.use.kodkod.transform.ocl.OCLTest;
 public class Sum_Test extends OCLTest {
 	@Test
 	public void test1() {
-		String ocl = "Set{}->sum()";
+		String ocl = "oclEmpty(Set(Integer))->sum()";
 		String expected = "(none = Undefined_Set || Undefined in none) => Undefined else Int[int[none]] ";
 		test("test1", ocl, expected);
 	}
@@ -216,7 +216,7 @@ public class Sum_Test extends OCLTest {
 
 	@Test
 	public void test31() {
-		String ocl = "Set{Undefined}->sum()";
+		String ocl = "Set{oclUndefined(Integer)}->sum()";
 		String expected = "(((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) = Undefined_Set || Undefined in ((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined))) => Undefined else Int[int[(Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)]]";
 		test("test31", ocl, expected);
 	}
