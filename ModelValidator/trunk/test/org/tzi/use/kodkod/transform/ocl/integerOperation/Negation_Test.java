@@ -49,7 +49,7 @@ public class Negation_Test extends OCLTest {
 
 	@Test
 	public void test7() {
-		String ocl = "-Undefined";
+		String ocl = "-oclUndefined(Integer)";
 		String expected = "(Undefined = Undefined) => Undefined else Int[-int[Undefined]]  ";
 		test("test7", ocl, expected);
 	}

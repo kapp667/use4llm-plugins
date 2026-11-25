@@ -35,7 +35,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test5() {
-		String ocl = "Set{}->any(i | Undefined)";
+		String ocl = "Set{}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(none = Undefined_Set) && one none && (some i: none | Undefined = Boolean_True)) => none else Undefined ";
 		test("test5", ocl, expected);
 	}
@@ -84,7 +84,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test12() {
-		String ocl = "Set{1}->any(i | Undefined)";
+		String ocl = "Set{1}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) = Undefined_Set) && one ((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) && (some i: (Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1]) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) else Undefined ";
 		test("test12", ocl, expected);
 	}
@@ -119,7 +119,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test17() {
-		String ocl = "Set{1,2}->any(i | Undefined)";
+		String ocl = "Set{1,2}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) = Undefined_Set) && one ((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) && (some i: (Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2]) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) else Undefined ";
 		test("test17", ocl, expected);
 	}
@@ -147,7 +147,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test21() {
-		String ocl = "Set{1,2,3}->any(i | Undefined)";
+		String ocl = "Set{1,2,3}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) = Undefined_Set) && one ((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) && (some i: (Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3]) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) else Undefined";
 		test("test21", ocl, expected);
 	}
@@ -203,7 +203,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test29() {
-		String ocl = "Set{Undefined,1}->any(i | Undefined)";
+		String ocl = "Set{Undefined,1}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) = Undefined_Set) && one ((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) && (some i: (Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1]) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) else Undefined ";
 		test("test29", ocl, expected);
 	}
@@ -238,7 +238,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test34() {
-		String ocl = "Set{Undefined,1,2}->any(i | Undefined)";
+		String ocl = "Set{Undefined,1,2}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) = Undefined_Set) && one ((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) && (some i: (Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2]) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) else Undefined ";
 		test("test34", ocl, expected);
 	}
@@ -287,7 +287,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test41() {
-		String ocl = "Set{Undefined}->any(i | Undefined)";
+		String ocl = "Set{Undefined}->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) = Undefined_Set) && one ((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) && (some i: (Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined) | Undefined = Boolean_True)) => ((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) else Undefined";
 		test("test41", ocl, expected);
 	}
@@ -336,7 +336,7 @@ public class Any_Test extends OCLTest {
 
 	@Test
 	public void test48() {
-		String ocl = "ada.luckyNumbers->any(i | Undefined)";
+		String ocl = "ada.luckyNumbers->any(i | oclUndefined(Boolean))";
 		String expected = "(!(((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) = Undefined_Set) && one ((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) && (some i: (Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers) | Undefined = Boolean_True)) => ((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) else Undefined ";
 		test("test48", ocl, expected);
 	}

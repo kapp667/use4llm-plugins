@@ -41,7 +41,7 @@ public class Abs_Test extends OCLTest {
 
 	@Test
 	public void test6() {
-		String ocl = "Undefined.abs()";
+		String ocl = "oclUndefined(Integer).abs()";
 		String expected = "(Undefined = Undefined) => Undefined else Int[abs(int[Undefined])]  ";
 		test("test6", ocl, expected);
 	}
