@@ -2,30 +2,17 @@ package org.tzi.use.kodkod.transform.ocl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import kodkod.instance.Tuple;
 
-import org.apache.commons.configuration.MapConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
-import org.tzi.kodkod.model.config.impl.PropertyConfigurationVisitor;
 import org.tzi.kodkod.model.iface.IModel;
-import org.tzi.kodkod.model.impl.SimpleFactory;
-import org.tzi.kodkod.model.type.PrimitiveTypeFactory;
-import org.tzi.use.kodkod.transform.ModelTransformator;
-import org.tzi.use.parser.use.USECompiler;
-import org.tzi.use.uml.mm.MModel;
-import org.tzi.use.uml.mm.ModelFactory;
 
 /**
  * Checks that a {@code subsets} constraint on an association end holds in the
@@ -118,7 +105,7 @@ public class SubsetsAssociationEnd_Test {
 	public void subsettingLinkWithoutSubsettedLinkIsUnsatisfiable() {
 		links("ac", 1);
 		links("bd", 0);
-		validator.validate(configure(transform(SAME_POSITION)));
+		validator.validate(TestSpecifications.configure(TestSpecifications.transform(SAME_POSITION), properties));
 		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
 	}
 
@@ -126,7 +113,7 @@ public class SubsetsAssociationEnd_Test {
 	public void subsettingLinkWithSubsettedLinkIsSatisfiable() {
 		links("ac", 1);
 		links("bd", 1);
-		validator.validate(configure(transform(SAME_POSITION)));
+		validator.validate(TestSpecifications.configure(TestSpecifications.transform(SAME_POSITION), properties));
 		assertEquals("SATISFIABLE", validator.outcome);
 	}
 
@@ -136,7 +123,7 @@ public class SubsetsAssociationEnd_Test {
 		properties.put("T3_max", 1);
 		links("ac", 1);
 		links("bd", 1);
-		IModel model = configure(transform(OTHER_POSITION));
+		IModel model = TestSpecifications.configure(TestSpecifications.transform(OTHER_POSITION), properties);
 		validator.validate(model);
 		Tuple ac = validator.tuples(model.getAssociation("ac").relation()).iterator().next();
 		Tuple bd = validator.tuples(model.getAssociation("bd").relation()).iterator().next();
@@ -147,13 +134,13 @@ public class SubsetsAssociationEnd_Test {
 	public void missingZeroOneLinkNeedsNoSubsettedLink() {
 		links("ac", 0);
 		links("bd", 0);
-		validator.validate(configure(transform(ZERO_ONE)));
+		validator.validate(TestSpecifications.configure(TestSpecifications.transform(ZERO_ONE), properties));
 		assertEquals("SATISFIABLE", validator.outcome);
 	}
 
 	@Test
 	public void subsetsOnADerivedAssociationIsRefused() {
-		IModel model = transform(DERIVED);
+		IModel model = TestSpecifications.transform(DERIVED);
 		assertEquals(Arrays.asList("Model `M', whose transformation stopped: Cannot transform the constraint "
 				+ "`subsets bd::d' on association end `ac::c': derived associations are not supported."),
 				model.transformationErrors());
@@ -162,22 +149,5 @@ public class SubsetsAssociationEnd_Test {
 	private void links(String association, int number) {
 		properties.put(association + "_min", number);
 		properties.put(association + "_max", number);
-	}
-
-	private static IModel transform(String spec) {
-		MModel mModel = USECompiler.compileSpecification(new ByteArrayInputStream(spec.getBytes(StandardCharsets.UTF_8)), "M.use",
-				new PrintWriter(System.err), new ModelFactory());
-		return new ModelTransformator(new SimpleFactory(), new PrimitiveTypeFactory()).transform(mModel);
-	}
-
-	private IModel configure(IModel model) {
-		StringWriter warnings = new StringWriter();
-		PropertyConfigurationVisitor configurationVisitor = new PropertyConfigurationVisitor(new MapConfiguration(properties),
-				new PrintWriter(warnings, true));
-		model.accept(configurationVisitor);
-		if (configurationVisitor.containErrors() || warnings.getBuffer().length() > 0) {
-			fail("The configuration of the test model failed: " + warnings);
-		}
-		return model;
 	}
 }
