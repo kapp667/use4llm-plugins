@@ -33,7 +33,7 @@ public class CollectionConstructorGroup extends OCLOperationGroup {
 		final Variable i = Variable.unary("i");
 
 		return from.eq(undefined).or(to.eq(undefined))
-				.thenElse(undefined_Set, i.sum().gte(from.sum()).and(i.sum().lte(to.sum())).comprehension(i.oneOf(Expression.INTS)));
+				.thenElse(undefined, i.sum().gte(from.sum()).and(i.sum().lte(to.sum())).comprehension(i.oneOf(Expression.INTS)));
 	}
 
 	// OCL: Set{e_1,e_2,...}, where e_i may be a non-collection value or a range
