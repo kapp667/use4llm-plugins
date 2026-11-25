@@ -54,6 +54,11 @@ public class SimpleFactory implements IModelFactory {
 	}
 
 	@Override
+	public IAssociation createUnionAssociation(IModel model, String name) {
+		return new UnionAssociation(model, name);
+	}
+
+	@Override
 	public IAssociationEnd createAssociationEnd(String name, Multiplicity multiplicity, int aggregationKind, IClass associatedClass) {
 		return new AssociationEnd(name, multiplicity, aggregationKind, associatedClass);
 	}
