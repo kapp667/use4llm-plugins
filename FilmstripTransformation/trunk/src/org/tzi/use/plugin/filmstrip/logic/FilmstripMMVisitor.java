@@ -26,6 +26,7 @@ import org.tzi.use.uml.mm.MAssociationEnd;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MClassInvariant;
+import org.tzi.use.uml.mm.MDataType;
 import org.tzi.use.uml.mm.MElementAnnotation;
 import org.tzi.use.uml.mm.MGeneralization;
 import org.tzi.use.uml.mm.MInvalidModelException;
@@ -312,23 +313,23 @@ public class FilmstripMMVisitor implements MMVisitor {
 				FilmstripModelConstants.PRED_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.SNAPSHOT_PRED_OP);
+				FilmstripModelConstants.SNAPSHOT_PRED_OP, false);
 		model.createQueryOperation(FilmstripModelConstants.SNAPSHOT_CLASSNAME,
 				FilmstripModelConstants.SUCC_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.SNAPSHOT_SUCC_OP);
+				FilmstripModelConstants.SNAPSHOT_SUCC_OP, false);
 		
 		model.createQueryOperation(FilmstripModelConstants.OPC_CLASSNAME,
 				FilmstripModelConstants.PRED_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.SNAPSHOT_PRED_OP);
+				FilmstripModelConstants.SNAPSHOT_PRED_OP, false);
 		model.createQueryOperation(FilmstripModelConstants.OPC_CLASSNAME,
 				FilmstripModelConstants.SUCC_ROLENAME,
 				new String[0][],
 				FilmstripModelConstants.SNAPSHOT_CLASSNAME,
-				FilmstripModelConstants.SNAPSHOT_SUCC_OP);
+				FilmstripModelConstants.SNAPSHOT_SUCC_OP, false);
 		
 		// constraints
 		model.createInvariant(
@@ -641,7 +642,14 @@ public class FilmstripMMVisitor implements MMVisitor {
 		newEnumeration.setPositionInModel(e.getPositionInModel());
 		copyAnnotations(e, newEnumeration);
 	}
-	
+
+	@Override
+	public void visitDataType(MDataType e) {
+		// data types were added in USE 7.5; the transformation does not support them
+		throw new TransformationException("Data type " + StringUtil.inQuotes(e.name())
+				+ " is not supported by the filmstrip transformation.");
+	}
+
 	@Override
 	public void visitGeneralization(MGeneralization e) {
 		MGeneralization generalization;
@@ -664,7 +672,11 @@ public class FilmstripMMVisitor implements MMVisitor {
 		for(EnumType e : m.enumTypes()){
 			visitEnum(e);
 		}
-		
+
+		for(MDataType d : m.dataTypes()){
+			visitDataType(d);
+		}
+
 		Set<MAssociationClass> associationClasses = new HashSet<MAssociationClass>();
 		for(MClass c : m.classes()){
 			if(c instanceof MAssociationClass){
@@ -923,10 +935,10 @@ public class FilmstripMMVisitor implements MMVisitor {
 		MAttribute target = mc.mapAttribute(src);
 		
 		if(src.isDerived()){
-			target.setDeriveExpression(visitExpression(src.getDeriveExpression(), ExpressionType.SOIL, target.owner(), null));
+			target.setDeriveExpression(visitExpression(src.getDeriveExpression(), ExpressionType.SOIL, mc.mapClass(target.owner()), null));
 		}
 		if(src.getInitExpression().isPresent()){
-			target.setInitExpression(visitExpression(src.getInitExpression().get(), ExpressionType.SOIL, target.owner(), null));
+			target.setInitExpression(visitExpression(src.getInitExpression().get(), ExpressionType.SOIL, mc.mapClass(target.owner()), null));
 		}
 		
 	}

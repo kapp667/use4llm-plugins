@@ -11,6 +11,7 @@ import org.tzi.use.uml.mm.MAssociationEnd;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MClassInvariant;
+import org.tzi.use.uml.mm.MDataType;
 import org.tzi.use.uml.mm.MElementAnnotation;
 import org.tzi.use.uml.mm.MGeneralization;
 import org.tzi.use.uml.mm.MMVisitor;
@@ -196,6 +197,11 @@ public class ModelValidator implements MMVisitor {
 
 	@Override
 	public void visitEnum(EnumType enumType) {
+	}
+
+	@Override
+	public void visitDataType(MDataType e) {
+		// not visited by visitModel; FilmstripMMVisitor refuses data types
 	}
 	
 }
