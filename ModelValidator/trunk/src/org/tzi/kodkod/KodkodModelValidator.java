@@ -22,9 +22,9 @@ public abstract class KodkodModelValidator {
 	protected Evaluator evaluator;
 
 	/**
-	 * Validates the given model. If an invariant of the model could not be
-	 * transformed, it logs an error naming every such invariant and returns
-	 * without solving: a solution would ignore those invariants.
+	 * Validates the given model. If an element of the model could not be
+	 * transformed, it logs an error naming every such element and returns
+	 * without solving: a solution would ignore those elements.
 	 * 
 	 * @param model
 	 */
@@ -32,7 +32,7 @@ public abstract class KodkodModelValidator {
 		this.model = model;
 		evaluator = null;
 
-		if (refusesUntransformedInvariants(model)) {
+		if (refusesUntransformedElements(model)) {
 			return;
 		}
 		
@@ -77,17 +77,17 @@ public abstract class KodkodModelValidator {
 	}
 
 	/**
-	 * Logs an error naming every invariant of the model that could not be
+	 * Logs an error naming every element of the model that could not be
 	 * transformed, if there is any.
 	 * 
 	 * @param model
-	 * @return true if the model has such invariants and must not be validated.
+	 * @return true if the model has such elements and must not be validated.
 	 */
-	protected boolean refusesUntransformedInvariants(IModel model) {
-		if (model.invariantTransformationErrors().isEmpty()) {
+	protected boolean refusesUntransformedElements(IModel model) {
+		if (model.transformationErrors().isEmpty()) {
 			return false;
 		}
-		LOG.error(LogMessages.untransformedInvariantsError(model.invariantTransformationErrors()));
+		LOG.error(LogMessages.untransformedElementsError(model.transformationErrors()));
 		return true;
 	}
 

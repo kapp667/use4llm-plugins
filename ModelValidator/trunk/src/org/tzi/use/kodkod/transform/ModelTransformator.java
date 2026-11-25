@@ -99,8 +99,9 @@ public class ModelTransformator {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.modelTransformError, exception);
 			} else {
-				LOG.error(LogMessages.modelTransformError);
+				LOG.error(LogMessages.modelTransformError + " " + LogMessages.exceptionReason(exception));
 			}
+			model.addTransformationError(LogMessages.modelTransformStoppedError(mModel.name(), LogMessages.exceptionReason(exception)));
 		}
 
 		return model;
