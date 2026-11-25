@@ -19,7 +19,7 @@ public class IntegerOperationGroup extends OCLOperationGroup {
 
 		symbolOperationMapping.put("*", "multiply");
 		symbolOperationMapping.put("-", "minus");
-		symbolOperationMapping.put("/", "div");
+		// no "/": it is a Real division in OCL, which the translation does not support
 		symbolOperationMapping.put("+", "plus");
 		symbolOperationMapping.put("<", "less");
 		symbolOperationMapping.put("<=", "lessOrEqual");
