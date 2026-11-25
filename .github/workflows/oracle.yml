@@ -1,8 +1,9 @@
 name: Oracle
 
-# Runs the ModelValidator end to end on the examples of the USE release, with the default bounds
-# and then with wide ones, and fails only when USE's check rejects an object diagram the
-# validator returned as a solution.
+# Runs the ModelValidator end to end on two corpora, the examples of the USE release and the
+# test files of USE's sources at the same release, with the default bounds and then with wide
+# ones, and fails only when USE's check rejects an object diagram the validator returned as a
+# solution.
 on:
   schedule:
     - cron: '17 3 * * *'
@@ -24,6 +25,8 @@ jobs:
       USE_VERSION: 7.5.0
       # SHA-256 of use-7.5.0-use-bin.zip
       USE_ZIP_SHA256: 9b5a49d1d2345e65d1da8518008887e8bc12df388b6eef08228c5a1052618d10
+      # The commit that tag v7.5.0 of useocl/use names
+      USE_COMMIT: af444c47534c4ef9254f24034757e5a499edf660
     steps:
       - uses: actions/checkout@v4
 
@@ -49,15 +52,31 @@ jobs:
           echo "${USE_ZIP_SHA256}  ${RUNNER_TEMP}/use-${USE_VERSION}-use-bin.zip" | sha256sum --check
           unzip -q "${RUNNER_TEMP}/use-${USE_VERSION}-use-bin.zip" -d "${RUNNER_TEMP}/use"
 
+      # USE's own test models: the parser and evaluator tests of use-core and the shell tests of
+      # use-gui, at the commit of the release.
+      - name: Download USE's test files
+        run: |
+          set -o pipefail
+          git init -q "${RUNNER_TEMP}/use-src"
+          cd "${RUNNER_TEMP}/use-src"
+          git fetch -q --depth 1 https://github.com/useocl/use.git "refs/tags/v${USE_VERSION}"
+          [ "$(git rev-parse 'FETCH_HEAD^{commit}')" = "$USE_COMMIT" ] || { echo "tag v${USE_VERSION} does not name ${USE_COMMIT}" >&2; exit 1; }
+          mkdir "${RUNNER_TEMP}/use-tests"
+          git archive FETCH_HEAD use-core/src/test/resources use-gui/src/it/resources | tar -x -C "${RUNNER_TEMP}/use-tests"
+
       - name: Build plugins
         run: ci/build-and-test.sh --build-only "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build"
 
-      # The release zip may or may not have a top folder: the corpus is its examples folder.
+      # The release zip may or may not have a top folder: the first corpus is its examples folder.
+      # The second corpus runs even if the oracle fails on the first.
       - name: Run the oracle
         run: |
           examples="$(find "${RUNNER_TEMP}/use" -type d -name examples -not -path '*/examples/*' | sort | sed -n 1p)"
           [ -n "$examples" ] || { echo "examples folder not found" >&2; exit 1; }
-          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "$examples" "${RUNNER_TEMP}/oracle"
+          status=0
+          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "$examples" "${RUNNER_TEMP}/oracle/examples" || status=1
+          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "${RUNNER_TEMP}/use-tests" "${RUNNER_TEMP}/oracle/tests" || status=1
+          exit "$status"
 
       - name: Upload oracle results
         if: always()
@@ -65,8 +84,8 @@ jobs:
         with:
           name: oracle
           path: |
-            ${{ runner.temp }}/oracle/oracle.tsv
-            ${{ runner.temp }}/oracle/cases/*/output.txt
-            ${{ runner.temp }}/oracle/cases/*/wide.txt
-            ${{ runner.temp }}/oracle/cases/*/*.properties
+            ${{ runner.temp }}/oracle/*/oracle.tsv
+            ${{ runner.temp }}/oracle/*/cases/*/output.txt
+            ${{ runner.temp }}/oracle/*/cases/*/wide.txt
+            ${{ runner.temp }}/oracle/*/cases/*/*.properties
           if-no-files-found: ignore
