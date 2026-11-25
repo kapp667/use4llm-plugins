@@ -252,6 +252,10 @@ public class ModelTransformator {
 	}
 
 	private IAssociation transformAssociation(MultiplicityTransformator multTransformator, IModel model, MAssociation mAssociation) {
+		if(mAssociation.hasQualifiedEnds()){
+			throw new TransformationException(LogMessages.qualifiedAssociationError(mAssociation.name()));
+		}
+
 		IAssociation association;
 		if(mAssociation.isDerived()){
 			association = factory.createDerivedAssociation(model, mAssociation.name());
