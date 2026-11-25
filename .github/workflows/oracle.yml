@@ -3,7 +3,7 @@ name: Oracle
 # Runs the ModelValidator end to end on two corpora, the examples of the USE release and the
 # test files of USE's sources at the same release, with the default bounds and then with wide
 # ones, and fails only when USE's check rejects an object diagram the validator returned as a
-# solution.
+# solution, or when a verdict differs from the expected ones committed in ci/oracle/expected.
 on:
   schedule:
     - cron: '17 3 * * *'
@@ -11,6 +11,7 @@ on:
   pull_request:
     branches: [develop]
     paths:
+      - 'ModelValidator/trunk/**'
       - 'ci/oracle/**'
       - '.github/workflows/oracle.yml'
 
@@ -68,14 +69,18 @@ jobs:
         run: ci/build-and-test.sh --build-only "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build"
 
       # The release zip may or may not have a top folder: the first corpus is its examples folder.
-      # The second corpus runs even if the oracle fails on the first.
+      # The second corpus runs, and each run's verdicts are compared with the expected ones, even
+      # if the oracle fails on the first.
       - name: Run the oracle
         run: |
           examples="$(find "${RUNNER_TEMP}/use" -type d -name examples -not -path '*/examples/*' | sort | sed -n 1p)"
           [ -n "$examples" ] || { echo "examples folder not found" >&2; exit 1; }
           status=0
-          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "$examples" "${RUNNER_TEMP}/oracle/examples" || status=1
-          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "${RUNNER_TEMP}/use-tests" "${RUNNER_TEMP}/oracle/tests" || status=1
+          for corpus in examples tests; do
+            if [ "$corpus" = examples ]; then dir="$examples"; else dir="${RUNNER_TEMP}/use-tests"; fi
+            ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "$dir" "${RUNNER_TEMP}/oracle/$corpus" || status=1
+            ci/oracle/compare.sh "ci/oracle/expected/$corpus.tsv" "${RUNNER_TEMP}/oracle/$corpus/oracle.tsv" || status=1
+          done
           exit "$status"
 
       - name: Upload oracle results
