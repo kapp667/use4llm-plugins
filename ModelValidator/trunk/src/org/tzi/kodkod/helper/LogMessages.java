@@ -114,9 +114,21 @@ public final class LogMessages {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
 	}
 
-	public static String untransformedInvariantsError(List<String> errors) {
-		return "Cannot validate the model: the following invariants cannot be transformed, and a solution would ignore them.\n"
+	public static String untransformedElementsError(List<String> errors) {
+		return "Cannot validate the model: the following elements cannot be transformed, and a solution would ignore them.\n"
 				+ String.join("\n", errors);
+	}
+
+	public static String modelTransformStoppedError(String name, String reason) {
+		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
+	}
+
+	/**
+	 * Some exceptions, a NullPointerException for one, have no message: their
+	 * class name is the only reason there is to report.
+	 */
+	public static String exceptionReason(Exception exception) {
+		return exception.getMessage() != null ? exception.getMessage() : exception.toString();
 	}
 
 	public static String invTransformSuccessful(String name) {
