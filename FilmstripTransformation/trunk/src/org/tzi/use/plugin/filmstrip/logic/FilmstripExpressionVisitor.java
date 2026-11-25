@@ -35,6 +35,7 @@ import org.tzi.use.uml.ocl.expr.ExpEmptyCollection;
 import org.tzi.use.uml.ocl.expr.ExpExists;
 import org.tzi.use.uml.ocl.expr.ExpForAll;
 import org.tzi.use.uml.ocl.expr.ExpIf;
+import org.tzi.use.uml.ocl.expr.ExpInstanceOp;
 import org.tzi.use.uml.ocl.expr.ExpInvalidException;
 import org.tzi.use.uml.ocl.expr.ExpIsKindOf;
 import org.tzi.use.uml.ocl.expr.ExpIsTypeOf;
@@ -412,7 +413,22 @@ public class FilmstripExpressionVisitor implements ExpressionVisitor {
 		// cannot occur
 	}
 	
+	/**
+	 * USE 7.5 visits class operations, data type operations and data type
+	 * constructors through this one method. Only class operations are supported.
+	 */
 	@Override
+	public void visitInstanceOp(ExpInstanceOp exp) {
+		if(exp instanceof ExpObjOp && exp.getOperation().cls() instanceof MClass){
+			visitObjOp((ExpObjOp) exp);
+		} else {
+			throw new TransformationException("Operation "
+					+ StringUtil.inQuotes(exp.getOperation().cls().name() + "::" + exp.getOperation().name())
+					+ " is not supported: only operations of classes can be transformed, "
+					+ "not operations or constructors of data types.");
+		}
+	}
+
 	public void visitObjOp(ExpObjOp exp) {
 		Expression[] exps = processSubExpressionArray(exp.getArguments());
 		MOperation op = mc.mapClass(exp.getOperation().cls()).operation(exp.getOperation().name(), true);

@@ -5,6 +5,7 @@ import org.tzi.use.uml.mm.MAssociationClass;
 import org.tzi.use.uml.mm.MAssociationEnd;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
+import org.tzi.use.uml.mm.MClassifier;
 import org.tzi.use.uml.mm.MNavigableElement;
 import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.ocl.type.Type;
@@ -16,7 +17,7 @@ import org.tzi.use.uml.ocl.type.Type;
  */
 public interface MModelConnector {
 	
-	public MClass mapClass(MClass cls);
+	public MClass mapClass(MClassifier cls);
 	public MAttribute mapAttribute(MAttribute attr);
 	public MOperation mapOperation(MOperation operation);
 	public MAssociation mapAssociation(MAssociation assoc);

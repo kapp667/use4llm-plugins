@@ -7,6 +7,7 @@ import org.tzi.use.uml.mm.MAssociationClass;
 import org.tzi.use.uml.mm.MAssociationEnd;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
+import org.tzi.use.uml.mm.MClassifier;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.MNavigableElement;
 import org.tzi.use.uml.mm.MOperation;
@@ -38,7 +39,13 @@ public class FilmstripModelConnector implements MModelConnector {
 	 * @return counterpart of given class
 	 */
 	@Override
-	public MClass mapClass(MClass cls){
+	public MClass mapClass(MClassifier cls){
+		// USE 7.5 owners are classifiers; only classes can be transformed, not data types.
+		if(!(cls instanceof MClass)){
+			throw new TransformationException(
+					"Data type " + StringUtil.inQuotes(cls.name())
+							+ " is not supported by the filmstrip transformation.");
+		}
 		MClass c = model.getClass(cls.name());
 		
 		if(c == null){

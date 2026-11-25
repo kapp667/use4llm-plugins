@@ -49,7 +49,7 @@ public class CopySOILTransformer {
 	public void transformSoilOperations(){
 		for(MClass cls : model.classes()){
 			for(MOperation op : cls.operations()){
-				if(!op.hasStatement() || FilmstripUtil.isFilmstripClass(op.cls())){
+				if(!op.hasStatement() || FilmstripUtil.isFilmstripClass(cls)){
 					continue;
 				}
 				
@@ -112,7 +112,7 @@ public class CopySOILTransformer {
 		vars.add(new VarDecl("s", snapshot));
 		vars.add(new VarDecl("op", opCls));
 		
-		MNavigableElement src = snapshot.navigableEnd(op.cls().nameAsRolename());
+		MNavigableElement src = snapshot.navigableEnd(((MClass) op.cls()).nameAsRolename());
 		MNavigableElement dst = op.cls().navigableEnd(FilmstripModelConstants.makeRoleName(FilmstripModelConstants.SNAPSHOT_CLASSNAME));
 		Expression selfSnapshot;
 		try {
