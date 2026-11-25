@@ -84,7 +84,7 @@ public class VariableOperationGroup extends OCLOperationGroup {
 		res = ConstraintHelper.univRightN(res, totalArity - toRole);
 		
 		returnsSet = true;
-		return res;
+		return src.eq(undefined).thenElse(undefined, res);
 	}
 	
 	public final Expression access(Expression srcExpr, Expression attribute, Boolean set_type) {
