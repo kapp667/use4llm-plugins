@@ -119,6 +119,16 @@ public final class LogMessages {
 				+ String.join("\n", errors);
 	}
 
+	public static String subsetsNotBinaryError(String end, String subsettedEnd) {
+		return "Cannot transform the constraint " + inQuotes("subsets " + subsettedEnd) + " on association end " + inQuotes(end)
+				+ ": only binary associations are supported.";
+	}
+
+	public static String subsetsDerivedError(String end, String subsettedEnd) {
+		return "Cannot transform the constraint " + inQuotes("subsets " + subsettedEnd) + " on association end " + inQuotes(end)
+				+ ": derived associations are not supported.";
+	}
+
 	public static String modelTransformStoppedError(String name, String reason) {
 		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
 	}

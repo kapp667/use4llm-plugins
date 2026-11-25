@@ -1,6 +1,7 @@
 package org.tzi.use.kodkod.transform;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -86,6 +87,8 @@ public class ModelTransformator {
 
 			transformSimpleAssociations(model, simpleAssociations);
 
+			transformSubsets(model, mModel.associations());
+
 			InvariantTransformator invariantTransformator = new InvariantTransformator(factory, typeFactory);
 			List<MClassInvariant> classInvariants = new ArrayList<MClassInvariant>(mModel.classInvariants());
 			Collections.sort(classInvariants, new UseFileOrderComparator());
@@ -158,6 +161,35 @@ public class ModelTransformator {
 		for (MAssociation mAssociation : mAssociations) {
 			model.addAssociation(transformAssociation(multTransformator, model, mAssociation));
 		}
+	}
+
+	/**
+	 * Adds the constraints of the {@code subsets} on association ends. Like
+	 * USE's check, it supports binary associations only.
+	 */
+	private void transformSubsets(IModel model, Collection<MAssociation> mAssociations) {
+		for (MAssociation mAssociation : mAssociations) {
+			for (MAssociationEnd mEnd : mAssociation.associationEnds()) {
+				for (MAssociationEnd mSubsettedEnd : mEnd.getSubsettedEnds()) {
+					String end = mAssociation.name() + "::" + mEnd.nameAsRolename();
+					String subsettedEnd = mSubsettedEnd.association().name() + "::" + mSubsettedEnd.nameAsRolename();
+					if (mAssociation.associationEnds().size() != 2 || mSubsettedEnd.association().associationEnds().size() != 2) {
+						throw new TransformationException(LogMessages.subsetsNotBinaryError(end, subsettedEnd));
+					}
+					if (mAssociation.isDerived() || mSubsettedEnd.association().isDerived()) {
+						throw new TransformationException(LogMessages.subsetsDerivedError(end, subsettedEnd));
+					}
+					IAssociation association = model.getAssociation(mAssociation.name());
+					IAssociation subsettedAssociation = model.getAssociation(mSubsettedEnd.association().name());
+					association.addSubsettedEnd(associationEnd(association, mEnd), subsettedAssociation,
+							associationEnd(subsettedAssociation, mSubsettedEnd));
+				}
+			}
+		}
+	}
+
+	private IAssociationEnd associationEnd(IAssociation association, MAssociationEnd mEnd) {
+		return association.associationEnds().get(mEnd.association().associationEnds().indexOf(mEnd));
 	}
 
 	private IAssociation transformAssociation(MultiplicityTransformator multTransformator, IModel model, MAssociation mAssociation) {

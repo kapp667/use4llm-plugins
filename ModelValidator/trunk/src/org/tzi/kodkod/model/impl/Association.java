@@ -38,6 +38,7 @@ public class Association extends ModelElement implements IAssociation {
 	protected IAssociationClass associationClass;
 	protected List<IAssociationEnd> associationEnds;
 	protected IConfigurator<IAssociation> configurator;
+	private List<Formula> subsetsDefinitions = new ArrayList<Formula>();
 
 	Association(IModel model, String name) {
 		super(model, name);
@@ -69,7 +70,8 @@ public class Association extends ModelElement implements IAssociation {
 
 	@Override
 	public Formula constraints() {
-		Formula formula = Formula.and(typeDefinitions(), multiplicityDefinitions(), cycleFreenessDefinitions());
+		Formula formula = Formula.and(typeDefinitions(), multiplicityDefinitions(), cycleFreenessDefinitions(),
+				Formula.and(subsetsDefinitions));
 		return formula.and(configurator.constraints(this));
 	}
 
@@ -316,6 +318,29 @@ public class Association extends ModelElement implements IAssociation {
 			}
 		}
 		return linkedObjects;
+	}
+
+	@Override
+	public void addSubsettedEnd(IAssociationEnd end, IAssociation subsettedAssociation, IAssociationEnd subsettedEnd) {
+		Formula formula = navigation(this, end).in(navigation(subsettedAssociation, subsettedEnd));
+		subsetsDefinitions.add(formula);
+		LOG.debug("Subsets for " + name() + ": " + PrintHelper.prettyKodkod(formula));
+	}
+
+	/**
+	 * Returns the links of a binary association as pairs from the other end to
+	 * the given end, without the column of an association class and without
+	 * the undefined values that stand for the missing links of a 0..1 end.
+	 */
+	private static Expression navigation(IAssociation association, IAssociationEnd end) {
+		Expression links = association.relation();
+		if (association.associationClass() != null) {
+			links = Expression.UNIV.join(links);
+		}
+		List<IAssociationEnd> ends = association.associationEnds();
+		links = links.intersection(ends.get(0).associatedClass().inheritanceOrRegularRelation().product(
+				ends.get(1).associatedClass().inheritanceOrRegularRelation()));
+		return ends.indexOf(end) == 1 ? links : links.transpose();
 	}
 
 	@Override
