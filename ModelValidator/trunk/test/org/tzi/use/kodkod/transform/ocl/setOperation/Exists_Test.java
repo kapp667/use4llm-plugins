@@ -34,7 +34,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test5() {
-		String ocl = "Set{}->exists(i | Undefined)";
+		String ocl = "Set{}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(none = Undefined_Set) && some none && (some i: none | Undefined = Boolean_True) ";
 		test("test5", ocl, expected);
 	}
@@ -76,7 +76,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test11() {
-		String ocl = "Set{}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(none = Undefined_Set) && some none && (some i1: none, i2: none | Undefined = Boolean_True)";
 		test("test11", ocl, expected);
 	}
@@ -125,7 +125,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test18() {
-		String ocl = "Set{1}->exists(i | Undefined)";
+		String ocl = "Set{1}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) && (some i: (Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1]) | Undefined = Boolean_True) ";
 		test("test18", ocl, expected);
 	}
@@ -167,7 +167,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test24() {
-		String ocl = "Set{1}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{1}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1])) && (some i1: (Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1]), i2: (Undefined_Set in (none + Int[1])) => Undefined_Set else (none + Int[1]) | Undefined = Boolean_True)";
 		test("test24", ocl, expected);
 	}
@@ -216,7 +216,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test31() {
-		String ocl = "Set{1,2}->exists(i | Undefined)";
+		String ocl = "Set{1,2}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) && (some i: (Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2]) | Undefined = Boolean_True) ";
 		test("test31", ocl, expected);
 	}
@@ -258,7 +258,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test37() {
-		String ocl = "Set{1,2}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{1,2}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2])) && (some i1: (Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2]), i2: (Undefined_Set in (none + Int[1] + Int[2])) => Undefined_Set else (none + Int[1] + Int[2]) | Undefined = Boolean_True)";
 		test("test37", ocl, expected);
 	}
@@ -307,7 +307,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test44() {
-		String ocl = "Set{1,2,3}->exists(i | Undefined)";
+		String ocl = "Set{1,2,3}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) && (some i: (Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3]) | Undefined = Boolean_True) ";
 		test("test44", ocl, expected);
 	}
@@ -363,7 +363,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test52() {
-		String ocl = "Set{1,2,3}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{1,2,3}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) = Undefined_Set) && some ((Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3])) && (some i1: (Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3]), i2: (Undefined_Set in (none + Int[1] + Int[2] + Int[3])) => Undefined_Set else (none + Int[1] + Int[2] + Int[3]) | Undefined = Boolean_True)";
 		test("test52", ocl, expected);
 	}
@@ -433,7 +433,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test62() {
-		String ocl = "Set{Undefined,1}->exists(i | Undefined)";
+		String ocl = "Set{Undefined,1}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) = Undefined_Set) && some ((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) && (some i: (Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1]) | Undefined = Boolean_True) ";
 		test("test62", ocl, expected);
 	}
@@ -475,7 +475,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test68() {
-		String ocl = "Set{Undefined,1}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{Undefined,1}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) = Undefined_Set) && some ((Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1])) && (some i1: (Undefined_Set in (none + Undefined + Int[1])) => Undefined_Set else (none + Undefined + Int[1]), i2: (Undefined_Set in (none + Undefined + Int[1]) ) => Undefined_Set else (none + Undefined + Int[1]) | Undefined = Boolean_True)";
 		test("test68", ocl, expected);
 	}
@@ -538,7 +538,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test77() {
-		String ocl = "Set{Undefined,1,2}->exists(i | Undefined)";
+		String ocl = "Set{Undefined,1,2}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) = Undefined_Set) && some ((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) && (some i: (Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2]) | Undefined = Boolean_True) ";
 		test("test77", ocl, expected);
 	}
@@ -601,7 +601,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test86() {
-		String ocl = "Set{Undefined,1,2}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{Undefined,1,2}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) = Undefined_Set) && some ((Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2])) && (some i1: (Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2]), i2: (Undefined_Set in (none + Undefined + Int[1] + Int[2])) => Undefined_Set else (none + Undefined + Int[1] + Int[2]) | Undefined = Boolean_True)";
 		test("test86", ocl, expected);
 	}
@@ -650,7 +650,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test93() {
-		String ocl = "Set{Undefined}->exists(i | Undefined)";
+		String ocl = "Set{Undefined}->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) = Undefined_Set) && some ((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) && (some i: (Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined) | Undefined = Boolean_True) ";
 		test("test93", ocl, expected);
 	}
@@ -692,7 +692,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test99() {
-		String ocl = "Set{Undefined}->exists(i1,i2 | Undefined)";
+		String ocl = "Set{Undefined}->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) = Undefined_Set) && some ((Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined)) && (some i1: (Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined), i2: (Undefined_Set in (none + Undefined)) => Undefined_Set else (none + Undefined) | Undefined = Boolean_True)";
 		test("test99", ocl, expected);
 	}
@@ -741,7 +741,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test106() {
-		String ocl = "ada.luckyNumbers->exists(i | Undefined)";
+		String ocl = "ada.luckyNumbers->exists(i | oclUndefined(Boolean))";
 		String expected = "!(((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) = Undefined_Set) && some ((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) && (some i: (Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers) | Undefined = Boolean_True) ";
 		test("test106", ocl, expected);
 	}
@@ -783,7 +783,7 @@ public class Exists_Test extends OCLTest {
 
 	@Test
 	public void test112() {
-		String ocl = "ada.luckyNumbers->exists(i1,i2 | Undefined)";
+		String ocl = "ada.luckyNumbers->exists(i1,i2 | oclUndefined(Boolean))";
 		String expected = "!(((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) = Undefined_Set) && some ((Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers)) && (some i1: (Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers), i2: (Person_ada = Undefined) => Undefined_Set else (Person_ada . Person_luckyNumbers) | Undefined = Boolean_True)";
 		test("test112", ocl, expected);
 	}

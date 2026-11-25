@@ -209,49 +209,49 @@ public class GreaterOrEqual_Test extends OCLTest {
 
 	@Test
 	public void test30() {
-		String ocl = "Undefined >= -1";
+		String ocl = "oclUndefined(Integer) >= -1";
 		String expected = "!(Undefined = Undefined) && !(Int[-1] = Undefined) && int[Undefined] >= int[Int[-1]]  ";
 		test("test30", ocl, expected);
 	}
 
 	@Test
 	public void test31() {
-		String ocl = "Undefined >= 0";
+		String ocl = "oclUndefined(Integer) >= 0";
 		String expected = "!(Undefined = Undefined) && !(Int[0] = Undefined) && int[Undefined] >= int[Int[0]]  ";
 		test("test31", ocl, expected);
 	}
 
 	@Test
 	public void test32() {
-		String ocl = "Undefined >= 1";
+		String ocl = "oclUndefined(Integer) >= 1";
 		String expected = "!(Undefined = Undefined) && !(Int[1] = Undefined) && int[Undefined] >= int[Int[1]]   ";
 		test("test32", ocl, expected);
 	}
 
 	@Test
 	public void test33() {
-		String ocl = "-1 >= Undefined";
+		String ocl = "-1 >= oclUndefined(Integer)";
 		String expected = "!(Int[-1] = Undefined) && !(Undefined = Undefined) && int[Int[-1]] >= int[Undefined]  ";
 		test("test33", ocl, expected);
 	}
 
 	@Test
 	public void test34() {
-		String ocl = "0 >= Undefined";
+		String ocl = "0 >= oclUndefined(Integer)";
 		String expected = "!(Int[0] = Undefined) && !(Undefined = Undefined) && int[Int[0]] >= int[Undefined]  ";
 		test("test34", ocl, expected);
 	}
 
 	@Test
 	public void test35() {
-		String ocl = "1 >= Undefined";
+		String ocl = "1 >= oclUndefined(Integer)";
 		String expected = "!(Int[1] = Undefined) && !(Undefined = Undefined) && int[Int[1]] >= int[Undefined]   ";
 		test("test35", ocl, expected);
 	}
 
 	@Test
 	public void test36() {
-		String ocl = "Undefined >= Undefined";
+		String ocl = "oclUndefined(Integer) >= oclUndefined(Integer)";
 		String expected = "!(Undefined = Undefined) && !(Undefined = Undefined) && int[Undefined] >= int[Undefined]   ";
 		test("test36", ocl, expected);
 	}

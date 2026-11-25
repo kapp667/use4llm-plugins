@@ -168,21 +168,21 @@ public class SetConstructor_Test extends OCLTest {
 
 	@Test
 	public void test24() {
-		String ocl = "Set{Undefined..Undefined}";
+		String ocl = "Set{oclUndefined(Integer)..oclUndefined(Integer)}";
 		String expected = "(Undefined_Set in (none + ((Undefined = Undefined || Undefined = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Undefined] && int[i] <= int[Undefined]}))) => Undefined_Set else (none + ((Undefined = Undefined || Undefined = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Undefined] && int[i] <= int[Undefined]})) ";
 		test("test24", ocl, expected);
 	}
 
 	@Test
 	public void test25() {
-		String ocl = "Set{Undefined..9}";
+		String ocl = "Set{oclUndefined(Integer)..9}";
 		String expected = "(Undefined_Set in (none + ((Undefined = Undefined || Int[9] = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Undefined] && int[i] <= int[Int[9]]}))) => Undefined_Set else (none + ((Undefined = Undefined || Int[9] = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Undefined] && int[i] <= int[Int[9]]})) ";
 		test("test25", ocl, expected);
 	}
 
 	@Test
 	public void test26() {
-		String ocl = "Set{1..Undefined}";
+		String ocl = "Set{1..oclUndefined(Integer)}";
 		String expected = "(Undefined_Set in (none + ((Int[1] = Undefined || Undefined = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Int[1]] && int[i] <= int[Undefined]}))) => Undefined_Set else (none + ((Int[1] = Undefined || Undefined = Undefined) => Undefined_Set else {i: ints | int[i] >= int[Int[1]] && int[i] <= int[Undefined]})) ";
 		test("test26", ocl, expected);
 	}

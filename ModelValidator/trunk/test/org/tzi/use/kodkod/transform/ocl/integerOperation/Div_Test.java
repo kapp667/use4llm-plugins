@@ -461,49 +461,49 @@ public class Div_Test extends OCLTest {
 
 	@Test
 	public void test66() {
-		String ocl = "0 div Undefined";
+		String ocl = "0 div oclUndefined(Integer)";
 		String expected = "(Int[0] = Undefined || Undefined = Undefined || int[Undefined] = 0) => Undefined else Int[int[Int[0]] / int[Undefined]] ";
 		test("test66", ocl, expected);
 	}
 
 	@Test
 	public void test67() {
-		String ocl = "Undefined div 0";
+		String ocl = "oclUndefined(Integer) div 0";
 		String expected = "(Undefined = Undefined || Int[0] = Undefined || int[Int[0]] = 0) => Undefined else Int[int[Undefined] / int[Int[0]]] ";
 		test("test67", ocl, expected);
 	}
 
 	@Test
 	public void test68() {
-		String ocl = "1 div Undefined";
+		String ocl = "1 div oclUndefined(Integer)";
 		String expected = "(Int[1] = Undefined || Undefined = Undefined || int[Undefined] = 0) => Undefined else Int[int[Int[1]] / int[Undefined]] ";
 		test("test68", ocl, expected);
 	}
 
 	@Test
 	public void test69() {
-		String ocl = "Undefined div 1";
+		String ocl = "oclUndefined(Integer) div 1";
 		String expected = "(Undefined = Undefined || Int[1] = Undefined || int[Int[1]] = 0) => Undefined else Int[int[Undefined] / int[Int[1]]] ";
 		test("test69", ocl, expected);
 	}
 
 	@Test
 	public void test70() {
-		String ocl = "-1 div Undefined";
+		String ocl = "-1 div oclUndefined(Integer)";
 		String expected = "(Int[-1] = Undefined || Undefined = Undefined || int[Undefined] = 0) => Undefined else Int[int[Int[-1]] / int[Undefined]] ";
 		test("test70", ocl, expected);
 	}
 
 	@Test
 	public void test71() {
-		String ocl = "Undefined div -1";
+		String ocl = "oclUndefined(Integer) div -1";
 		String expected = "(Undefined = Undefined || Int[-1] = Undefined || int[Int[-1]] = 0) => Undefined else Int[int[Undefined] / int[Int[-1]]]  ";
 		test("test71", ocl, expected);
 	}
 
 	@Test
 	public void test72() {
-		String ocl = "Undefined div Undefined";
+		String ocl = "oclUndefined(Integer) div oclUndefined(Integer)";
 		String expected = "(Undefined = Undefined || Undefined = Undefined || int[Undefined] = 0) => Undefined else Int[int[Undefined] / int[Undefined]]  ";
 		test("test72", ocl, expected);
 	}

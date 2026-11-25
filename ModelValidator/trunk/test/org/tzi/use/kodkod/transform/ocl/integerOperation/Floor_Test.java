@@ -41,7 +41,7 @@ public class Floor_Test extends OCLTest {
 
 	@Test
 	public void test6() {
-		String ocl = "Undefined.floor()";
+		String ocl = "oclUndefined(Integer).floor()";
 		String expected = "(Undefined = Undefined) => Undefined else Undefined  ";
 		test("test6",ocl, expected);
 	}
