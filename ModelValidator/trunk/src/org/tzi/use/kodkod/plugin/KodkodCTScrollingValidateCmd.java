@@ -21,8 +21,8 @@ import org.tzi.use.uml.ocl.expr.Expression;
 import org.tzi.use.uml.ocl.value.VarBindings;
 import org.tzi.use.util.StringUtil;
 import org.tzi.use.util.input.Readline;
-import org.tzi.use.util.input.ShellReadline;
 import org.tzi.use.util.input.StreamReadline;
+import org.tzi.use.util.input.shell.ShellReadline;
 
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
