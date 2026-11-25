@@ -22,6 +22,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		RedefinesAssociationEnd_Test.class,
 		SolutionDiagram_Test.class,
 		QualifiedAssociation_Test.class,
-		NestedCollection_Test.class })
+		NestedCollection_Test.class,
+		CollectionKind_Test.class })
 public class TestSuite {
 }

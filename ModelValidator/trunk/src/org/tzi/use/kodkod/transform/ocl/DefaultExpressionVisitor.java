@@ -554,6 +554,22 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	}
 
 	/**
+	 * Whether a value of the type can hold an element more than once, which the
+	 * set the transformation represents it by does not keep.
+	 */
+	protected static boolean canHoldDuplicates(Type type) {
+		return type.isTypeOfBag() || type.isTypeOfSequence() || type.isTypeOfCollection();
+	}
+
+	/**
+	 * Whether the elements of a value of the type can have an order, which the set
+	 * the transformation represents it by does not keep.
+	 */
+	protected static boolean canBeOrdered(Type type) {
+		return type.isTypeOfSequence() || type.isTypeOfOrderedSet() || type.isTypeOfCollection();
+	}
+
+	/**
 	 * Invokes the method to transform the operation with the given name.
 	 */
 	protected void invokeMethod(String opName, List<Object> arguments, boolean setOperation) {

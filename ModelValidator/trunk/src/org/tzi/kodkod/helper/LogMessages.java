@@ -166,6 +166,20 @@ public final class LogMessages {
 		return "Cannot transform " + inQuotes(expression) + ": collections of collections are not supported.";
 	}
 
+	public static String collectionDuplicatesError(String expression) {
+		return "Cannot transform " + inQuotes(expression)
+				+ ": its result depends on the duplicates of a collection that is not a set, which the transformation does not keep.";
+	}
+
+	public static String collectionOrderError(String expression) {
+		return "Cannot transform " + inQuotes(expression)
+				+ ": its result depends on the order of a collection that is not a set, which the transformation does not keep.";
+	}
+
+	public static String collectionComparisonError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": only two sets can be compared.";
+	}
+
 	public static String modelTransformStoppedError(String name, String reason) {
 		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
 	}
