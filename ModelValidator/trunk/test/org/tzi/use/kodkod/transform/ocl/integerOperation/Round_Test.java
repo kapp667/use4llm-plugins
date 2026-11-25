@@ -41,7 +41,7 @@ public class Round_Test extends OCLTest {
 
 	@Test
 	public void test6() {
-		String ocl = "Undefined.round()";
+		String ocl = "oclUndefined(Integer).round()";
 		String expected = "Undefined  ";
 		test("test6", ocl, expected);
 	}

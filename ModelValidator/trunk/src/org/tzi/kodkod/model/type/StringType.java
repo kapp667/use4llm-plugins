@@ -34,12 +34,6 @@ public class StringType extends ConfigurableType {
 	
 	@Override
 	public void addTypeLiteral(String literal) {
-		if (literal.equals("false")) {
-			literal = literal.replace('f', 'F');
-		} else if (literal.equals("true")) {
-			literal = literal.replace('t', 'T');
-		}
-
 		String literalName = name()+"_"+literal;
 		
 		if(!typeLiterals().containsKey(literalName)){
