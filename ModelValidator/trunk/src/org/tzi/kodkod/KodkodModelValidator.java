@@ -29,6 +29,11 @@ public abstract class KodkodModelValidator {
 	public void validate(IModel model) {
 		this.model = model;
 		evaluator = null;
+
+		if (!model.invariantTransformationErrors().isEmpty()) {
+			LOG.error(LogMessages.untransformedInvariantsError(model.invariantTransformationErrors()));
+			return;
+		}
 		
 		KodkodSolver kodkodSolver = new KodkodSolver();
 		try {

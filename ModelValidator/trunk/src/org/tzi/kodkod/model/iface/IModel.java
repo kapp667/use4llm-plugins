@@ -1,6 +1,7 @@
 package org.tzi.kodkod.model.iface;
 
 import java.util.Collection;
+import java.util.List;
 
 import kodkod.ast.Formula;
 
@@ -93,6 +94,21 @@ public interface IModel extends IConfigurableElement {
 	 * @return a collection with all class invariants.
 	 */
 	public Collection<IInvariant> classInvariants();
+
+	/**
+	 * Records that an invariant of the use model could not be transformed.
+	 *
+	 * @param error the invariant and the reason
+	 */
+	public void addInvariantTransformationError(String error);
+
+	/**
+	 * Returns the errors of the invariants that could not be transformed. A
+	 * model with such errors cannot be validated.
+	 *
+	 * @return a list of the errors, empty if every invariant was transformed.
+	 */
+	public List<String> invariantTransformationErrors();
 	
 	/**
 	 * Returns the model factory to create the elements of this model.
