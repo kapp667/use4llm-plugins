@@ -18,6 +18,10 @@ import org.tzi.use.uml.sys.MSystem;
  */
 public abstract class AbstractPlugin {
 
+	static {
+		KodkodPlugin.configureLogging();
+	}
+
 	protected static final Logger LOG = Logger.getLogger(AbstractPlugin.class);
 
 	protected Session session;

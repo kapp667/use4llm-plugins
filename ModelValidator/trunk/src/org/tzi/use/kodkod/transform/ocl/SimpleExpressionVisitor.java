@@ -2,6 +2,7 @@ package org.tzi.use.kodkod.transform.ocl;
 
 import org.apache.log4j.Logger;
 import org.tzi.use.kodkod.transform.TransformationException;
+import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.ocl.expr.ExpAllInstances;
 import org.tzi.use.uml.ocl.expr.ExpAny;
 import org.tzi.use.uml.ocl.expr.ExpAsType;
@@ -20,6 +21,7 @@ import org.tzi.use.uml.ocl.expr.ExpEmptyCollection;
 import org.tzi.use.uml.ocl.expr.ExpExists;
 import org.tzi.use.uml.ocl.expr.ExpForAll;
 import org.tzi.use.uml.ocl.expr.ExpIf;
+import org.tzi.use.uml.ocl.expr.ExpInstanceOp;
 import org.tzi.use.uml.ocl.expr.ExpIsKindOf;
 import org.tzi.use.uml.ocl.expr.ExpIsTypeOf;
 import org.tzi.use.uml.ocl.expr.ExpIsUnique;
@@ -189,7 +191,22 @@ public class SimpleExpressionVisitor implements ExpressionVisitor {
 		LOG.debug("ExpObjAsSet");
 	}
 
+	/**
+	 * USE 7.5 visits class operations, data type operations and data type
+	 * constructors through this one method. Only class operations can be
+	 * transformed; the others are refused.
+	 */
 	@Override
+	public void visitInstanceOp(ExpInstanceOp exp) {
+		if (exp instanceof ExpObjOp && exp.getOperation().cls() instanceof MClass) {
+			visitObjOp((ExpObjOp) exp);
+		} else {
+			throw new TransformationException("Operation " + exp.getOperation().cls().name() + "::"
+					+ exp.getOperation().name() + " is not supported: only operations of classes can be "
+					+ "transformed, not operations or constructors of data types.");
+		}
+	}
+
 	public void visitObjOp(ExpObjOp exp) {
 		LOG.debug("ExpObjOp");
 	}
