@@ -25,6 +25,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		NestedCollection_Test.class,
 		CollectionKind_Test.class,
 		RealValue_Test.class,
-		DefaultConfiguration_Test.class })
+		DefaultConfiguration_Test.class,
+		RealAtom_Test.class })
 public class TestSuite {
 }
