@@ -44,6 +44,9 @@ final class TestSpecifications {
 	static IModel transform(String spec) {
 		MModel mModel = USECompiler.compileSpecification(new ByteArrayInputStream(spec.getBytes(StandardCharsets.UTF_8)), "M.use",
 				new PrintWriter(System.err), new ModelFactory());
+		if (mModel == null) {
+			fail("The test specification does not compile.");
+		}
 		TypeFactory typeFactory = new PrimitiveTypeFactory();
 		OCLGroupRegistry registry = OCLGroupRegistry.INSTANCE;
 		registry.unregisterAll();
