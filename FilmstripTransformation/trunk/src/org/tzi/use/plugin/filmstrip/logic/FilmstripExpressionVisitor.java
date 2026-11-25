@@ -511,8 +511,9 @@ public class FilmstripExpressionVisitor implements ExpressionVisitor {
 	@Override
 	public void visitTupleLiteral(ExpTupleLiteral exp) {
 		ExpTupleLiteral.Part[] parts = new ExpTupleLiteral.Part[exp.getParts().length];
-		for(ExpTupleLiteral.Part p : exp.getParts()){
-			p = new ExpTupleLiteral.Part(p.getName(),
+		for(int i = 0; i < parts.length; i++){
+			ExpTupleLiteral.Part p = exp.getParts()[i];
+			parts[i] = new ExpTupleLiteral.Part(p.getName(),
 					processSubExpression(p.getExpression()),
 					mc.mapType(p.getType()));
 		}
