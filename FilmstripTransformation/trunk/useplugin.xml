@@ -15,7 +15,7 @@
 	<commands>
 		<command shellcmd="filmstrip"
 			label="filmstrip"
-			help="Usage: filmstrip 'filename'; Transforms the current model into a filmstrip model and saves it to 'filename'."
+			help="Usage: filmstrip [-prefix 'prefix'] 'filename'; Transforms the current model into a filmstrip model and saves it to 'filename'. With -prefix, every name the transformation adds starts with 'prefix'."
 			class="org.tzi.use.plugin.filmstrip.TransformIntoFilmstripCommand"
 			id="org.tzi.use.plugin.filmstrip.TransformIntoFilmstripCommand">
 		</command>
