@@ -19,6 +19,10 @@ jobs:
       USE_ZIP_SHA256: 9b5a49d1d2345e65d1da8518008887e8bc12df388b6eef08228c5a1052618d10
       JUNIT_SHA256: 8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3
       HAMCREST_SHA256: 66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9
+      # JaCoCo version, and SHA-256 of its agent (runtime) and CLI (nodeps) jars
+      JACOCO_VERSION: 0.8.12
+      JACOCO_AGENT_SHA256: 115e8e6e6593ca3a9892dfef695df4d487c706e59e71e64dc0ab95716ee02622
+      JACOCO_CLI_SHA256: 594c01125b84864a7fc5a9efab19b71b7de36b27346863f6d7cd0cd45400ceb0
     steps:
       - uses: actions/checkout@v4
 
@@ -53,8 +57,18 @@ jobs:
           echo "${JUNIT_SHA256}  junit-4.13.2.jar" | sha256sum --check
           echo "${HAMCREST_SHA256}  hamcrest-core-1.3.jar" | sha256sum --check
 
+      - name: Download JaCoCo
+        run: |
+          mkdir -p "${RUNNER_TEMP}/jacoco"
+          cd "${RUNNER_TEMP}/jacoco"
+          base=https://repo1.maven.org/maven2/org/jacoco
+          curl -fsSLO "${base}/org.jacoco.agent/${JACOCO_VERSION}/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar"
+          curl -fsSLO "${base}/org.jacoco.cli/${JACOCO_VERSION}/org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar"
+          echo "${JACOCO_AGENT_SHA256}  org.jacoco.agent-${JACOCO_VERSION}-runtime.jar" | sha256sum --check
+          echo "${JACOCO_CLI_SHA256}  org.jacoco.cli-${JACOCO_VERSION}-nodeps.jar" | sha256sum --check
+
       - name: Build plugins and run JUnit
-        run: ci/build-and-test.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/junit" "${RUNNER_TEMP}/out"
+        run: ci/build-and-test.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/junit" "${RUNNER_TEMP}/out" "${RUNNER_TEMP}/jacoco"
 
       - name: Upload plugin jars
         if: success()
@@ -64,3 +78,12 @@ jobs:
           path: |
             ${{ runner.temp }}/out/ModelValidatorPlugin.jar
             ${{ runner.temp }}/out/use-filmstrip.jar
+
+      # Also when the tests fail; nothing is uploaded if the report was not written.
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ${{ runner.temp }}/out/coverage
+          if-no-files-found: ignore
