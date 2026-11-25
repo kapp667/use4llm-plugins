@@ -158,6 +158,10 @@ public final class LogMessages {
 		return "Cannot transform the union ends of association class " + inQuotes(associationClass) + ": association classes are not supported.";
 	}
 
+	public static String qualifiedAssociationError(String association) {
+		return "Cannot transform association " + inQuotes(association) + ": qualified association ends are not supported.";
+	}
+
 	public static String modelTransformStoppedError(String name, String reason) {
 		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
 	}

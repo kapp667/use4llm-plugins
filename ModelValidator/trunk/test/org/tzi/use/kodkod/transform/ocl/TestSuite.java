@@ -20,6 +20,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		UntransformedInvariant_Test.class, PartialModel_Test.class,
 		SubsetsAssociationEnd_Test.class, UnionAssociationEnd_Test.class,
 		RedefinesAssociationEnd_Test.class,
-		SolutionDiagram_Test.class })
+		SolutionDiagram_Test.class,
+		QualifiedAssociation_Test.class })
 public class TestSuite {
 }
