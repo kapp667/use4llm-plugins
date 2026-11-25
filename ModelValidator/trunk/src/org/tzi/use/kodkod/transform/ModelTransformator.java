@@ -1,6 +1,7 @@
 package org.tzi.use.kodkod.transform;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.iface.IModelFactory;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd.Parameter;
+import org.tzi.kodkod.model.impl.UnionAssociation;
 import org.tzi.kodkod.model.type.ObjectType;
 import org.tzi.kodkod.model.type.Type;
 import org.tzi.kodkod.model.type.TypeFactory;
@@ -86,6 +88,10 @@ public class ModelTransformator {
 
 			transformSimpleAssociations(model, simpleAssociations);
 
+			transformSubsets(model, mModel.associations());
+
+			transformUnions(model, mModel.associations());
+
 			InvariantTransformator invariantTransformator = new InvariantTransformator(factory, typeFactory);
 			List<MClassInvariant> classInvariants = new ArrayList<MClassInvariant>(mModel.classInvariants());
 			Collections.sort(classInvariants, new UseFileOrderComparator());
@@ -99,8 +105,9 @@ public class ModelTransformator {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.modelTransformError, exception);
 			} else {
-				LOG.error(LogMessages.modelTransformError);
+				LOG.error(LogMessages.modelTransformError + " " + LogMessages.exceptionReason(exception));
 			}
+			model.addTransformationError(LogMessages.modelTransformStoppedError(mModel.name(), LogMessages.exceptionReason(exception)));
 		}
 
 		return model;
@@ -159,10 +166,69 @@ public class ModelTransformator {
 		}
 	}
 
+	/**
+	 * Adds the constraints of the {@code subsets} on association ends. Like
+	 * USE's check, it supports binary associations only.
+	 */
+	private void transformSubsets(IModel model, Collection<MAssociation> mAssociations) {
+		for (MAssociation mAssociation : mAssociations) {
+			for (MAssociationEnd mEnd : mAssociation.associationEnds()) {
+				for (MAssociationEnd mSubsettedEnd : mEnd.getSubsettedEnds()) {
+					String end = mAssociation.name() + "::" + mEnd.nameAsRolename();
+					String subsettedEnd = mSubsettedEnd.association().name() + "::" + mSubsettedEnd.nameAsRolename();
+					if (mAssociation.associationEnds().size() != 2 || mSubsettedEnd.association().associationEnds().size() != 2) {
+						throw new TransformationException(LogMessages.subsetsNotBinaryError(end, subsettedEnd));
+					}
+					if (mAssociation.isDerived() || mSubsettedEnd.association().isDerived()) {
+						throw new TransformationException(LogMessages.subsetsDerivedError(end, subsettedEnd));
+					}
+					IAssociation association = model.getAssociation(mAssociation.name());
+					IAssociation subsettedAssociation = model.getAssociation(mSubsettedEnd.association().name());
+					association.addSubsettedEnd(associationEnd(association, mEnd), subsettedAssociation,
+							associationEnd(subsettedAssociation, mSubsettedEnd));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Gives each association with union ends the associations whose ends
+	 * subset its ends at the same position: as in USE's navigation, its links
+	 * are theirs.
+	 */
+	private void transformUnions(IModel model, Collection<MAssociation> mAssociations) {
+		for (MAssociation mAssociation : mAssociations) {
+			if (!mAssociation.isUnion() || mAssociation.isDerived()) {
+				continue;
+			}
+			UnionAssociation association = (UnionAssociation) model.getAssociation(mAssociation.name());
+			List<MAssociationEnd> mEnds = mAssociation.associationEnds();
+			for (int i = 0; i < mEnds.size(); i++) {
+				for (MAssociationEnd mSubsettingEnd : mEnds.get(i).getSubsettingEnds()) {
+					if (mSubsettingEnd.association().associationEnds().indexOf(mSubsettingEnd) == i) {
+						association.addSubsettingAssociation(model.getAssociation(mSubsettingEnd.association().name()));
+					}
+				}
+			}
+		}
+	}
+
+	private IAssociationEnd associationEnd(IAssociation association, MAssociationEnd mEnd) {
+		return association.associationEnds().get(mEnd.association().associationEnds().indexOf(mEnd));
+	}
+
 	private IAssociation transformAssociation(MultiplicityTransformator multTransformator, IModel model, MAssociation mAssociation) {
 		IAssociation association;
 		if(mAssociation.isDerived()){
 			association = factory.createDerivedAssociation(model, mAssociation.name());
+		} else if(mAssociation.isUnion()){
+			if(mAssociation.associationEnds().size() != 2){
+				throw new TransformationException(LogMessages.unionNotBinaryError(mAssociation.name()));
+			}
+			if(mAssociation instanceof MAssociationClass){
+				throw new TransformationException(LogMessages.unionAssociationClassError(mAssociation.name()));
+			}
+			association = factory.createUnionAssociation(model, mAssociation.name());
 		} else {
 			association = factory.createAssociation(model, mAssociation.name());
 		}
