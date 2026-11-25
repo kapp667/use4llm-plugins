@@ -129,6 +129,27 @@ public final class LogMessages {
 				+ ": derived associations are not supported.";
 	}
 
+	public static String redefinesNotBinaryError(String redefinedAssociation, String redefiningAssociation) {
+		return redefinesError(redefinedAssociation, redefiningAssociation, "only binary associations are supported.");
+	}
+
+	public static String redefinesAssociationClassError(String redefinedAssociation, String redefiningAssociation) {
+		return redefinesError(redefinedAssociation, redefiningAssociation, "association classes are not supported.");
+	}
+
+	public static String redefinesDerivedError(String redefinedAssociation, String redefiningAssociation) {
+		return redefinesError(redefinedAssociation, redefiningAssociation, "derived associations are not supported.");
+	}
+
+	public static String redefinesUnionError(String redefinedAssociation, String redefiningAssociation) {
+		return redefinesError(redefinedAssociation, redefiningAssociation, "union associations are not supported.");
+	}
+
+	private static String redefinesError(String redefinedAssociation, String redefiningAssociation, String reason) {
+		return "Cannot transform the redefinition of association " + inQuotes(redefinedAssociation) + " by "
+				+ inQuotes(redefiningAssociation) + ": " + reason;
+	}
+
 	public static String unionNotBinaryError(String association) {
 		return "Cannot transform the union ends of association " + inQuotes(association) + ": only binary associations are supported.";
 	}
