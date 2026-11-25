@@ -1,14 +1,25 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import kodkod.ast.Relation;
+import kodkod.instance.TupleSet;
+
 import org.tzi.kodkod.KodkodModelValidator;
 
 /**
  * A validator that records the outcome of the last validation, null if there
- * was none.
+ * was none, and gives the tuples of its solution.
  */
 class OutcomeRecorder extends KodkodModelValidator {
 
 	String outcome;
+
+	/**
+	 * Returns the tuples of the relation in the solution of the last
+	 * validation, which must have found one.
+	 */
+	TupleSet tuples(Relation relation) {
+		return solution.instance().tuples(relation);
+	}
 
 	@Override
 	protected void satisfiable() {
