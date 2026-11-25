@@ -1,7 +1,6 @@
 package org.tzi.kodkod.ocl.operation;
 
 import kodkod.ast.Expression;
-import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 
 import org.tzi.kodkod.model.type.StringType;
@@ -41,20 +40,20 @@ public class IntegerOperationGroup extends OCLOperationGroup {
 		return e.eq(undefined).thenElse(undefined, e);
 	}
 
-	public final Formula greater(Expression l, Expression r) {
-		return l.eq(undefined).not().and(r.eq(undefined).not()).and(l.sum().gt(r.sum()));
+	public final Expression greater(Expression l, Expression r) {
+		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().gt(r.sum()).thenElse(booleanTrue, booleanFalse));
 	}
 
-	public final Formula greaterOrEqual(Expression l, Expression r) {
-		return l.eq(undefined).not().and(r.eq(undefined).not()).and(l.sum().gte(r.sum()));
+	public final Expression greaterOrEqual(Expression l, Expression r) {
+		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().gte(r.sum()).thenElse(booleanTrue, booleanFalse));
 	}
 
-	public final Formula less(Expression l, Expression r) {
-		return l.eq(undefined).not().and(r.eq(undefined).not()).and(l.sum().lt(r.sum()));
+	public final Expression less(Expression l, Expression r) {
+		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().lt(r.sum()).thenElse(booleanTrue, booleanFalse));
 	}
 
-	public final Formula lessOrEqual(Expression l, Expression r) {
-		return l.eq(undefined).not().and(r.eq(undefined).not()).and(l.sum().lte(r.sum()));
+	public final Expression lessOrEqual(Expression l, Expression r) {
+		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().lte(r.sum()).thenElse(booleanTrue, booleanFalse));
 	}
 
 	public final Expression max(Expression l, Expression r) {
