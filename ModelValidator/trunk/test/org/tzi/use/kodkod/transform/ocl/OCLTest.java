@@ -494,6 +494,10 @@ public class OCLTest {
 	}
 
 	protected void test(String test, String ocl, String expected) {
+		test(test, ocl);
+	}
+
+	protected void test(String test, String ocl) {
 		System.out.println(test + " ocl:");
 		System.out.println("\t" + ocl);
 
