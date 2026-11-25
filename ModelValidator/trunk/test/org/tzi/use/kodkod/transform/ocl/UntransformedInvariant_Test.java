@@ -121,28 +121,4 @@ public class UntransformedInvariant_Test {
 		assertEquals(log.toString(), 1, log.toString().split("Cannot validate the model", -1).length - 1);
 	}
 
-	private static class OutcomeRecorder extends KodkodModelValidator {
-
-		private String outcome;
-
-		@Override
-		protected void satisfiable() {
-			outcome = "SATISFIABLE";
-		}
-
-		@Override
-		protected void trivially_satisfiable() {
-			outcome = "TRIVIALLY_SATISFIABLE";
-		}
-
-		@Override
-		protected void trivially_unsatisfiable() {
-			outcome = "TRIVIALLY_UNSATISFIABLE";
-		}
-
-		@Override
-		protected void unsatisfiable() {
-			outcome = "UNSATISFIABLE";
-		}
-	}
 }
