@@ -124,7 +124,7 @@ public class CopySOILTransformer {
 		}
 		
 		// s := self.snapshot.copy()
-		stmtList.add(new MVariableAssignmentStatement("s", new MRValueOperationCall(new MObjectOperationCallStatement(selfSnapshot, snapshot.operation("copy", false), new Expression[0]))));
+		stmtList.add(new MVariableAssignmentStatement("s", new MRValueOperationCall(new MObjectOperationCallStatement(selfSnapshot, snapshot.operation(FilmstripModelConstants.COPY_OPNAME, false), new Expression[0]))));
 		
 		// op := new *_*OpC
 		stmtList.add(new MVariableAssignmentStatement("op", new MRValueNewObject(new MNewObjectStatement(opCls, (String) null))));

@@ -7,12 +7,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.tzi.use.api.UseApiException;
+import org.tzi.use.plugin.filmstrip.FilmstripModelConstants;
 import org.tzi.use.plugin.filmstrip.logic.addon.CopyOperation;
 import org.tzi.use.plugin.filmstrip.logic.addon.CopySOILTransformer;
 import org.tzi.use.uml.mm.MMPrintVisitor;
 import org.tzi.use.uml.mm.MMVisitor;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.util.Log;
+import org.tzi.use.util.StringUtil;
 
 public class FilmstripTransformer {
 
@@ -23,6 +25,28 @@ public class FilmstripTransformer {
 	}
 
 	public MModel transform() throws TransformationInputException,
+			TransformationException {
+		synchronized(FilmstripModelConstants.class){
+			FilmstripModelConstants.setNamePrefix(validNamePrefix());
+			try {
+				return transformWithPrefix();
+			}
+			finally {
+				FilmstripModelConstants.setNamePrefix("");
+			}
+		}
+	}
+	
+	private String validNamePrefix() throws TransformationException {
+		String prefix = options.getNamePrefix();
+		if(!prefix.isEmpty() && !prefix.matches("[A-Za-z_][A-Za-z0-9_]*")){
+			throw new TransformationException("Invalid name prefix " + StringUtil.inQuotes(prefix)
+					+ ": it must start with a letter or an underscore and hold only letters, digits and underscores.");
+		}
+		return prefix;
+	}
+	
+	private MModel transformWithPrefix() throws TransformationInputException,
 			TransformationException {
 		// validate
 		ModelValidator.validate(options.getModel());
@@ -81,8 +105,18 @@ public class FilmstripTransformer {
 			throw new IOException("No filepath given.");
 		}
 		
-		MModel res = transform();
-		
+		synchronized(FilmstripModelConstants.class){
+			FilmstripModelConstants.setNamePrefix(validNamePrefix());
+			try {
+				save(transformWithPrefix());
+			}
+			finally {
+				FilmstripModelConstants.setNamePrefix("");
+			}
+		}
+	}
+	
+	private void save(MModel res) throws FileNotFoundException, IOException {
 		// Write result
 		try (FileOutputStream out = new FileOutputStream(options.getSavepath(), false)) {
 			StringWriter sw = new StringWriter();
@@ -90,7 +124,8 @@ public class FilmstripTransformer {
 			res.processWithVisitor(v);
 			String filmstripModel = sw.toString();
 			//XXX hack to remove syntactic nonsense
-			filmstripModel = filmstripModel.replace(".succ.pred", "");
+			filmstripModel = filmstripModel.replace("." + FilmstripModelConstants.SUCC_ROLENAME
+					+ "." + FilmstripModelConstants.PRED_ROLENAME, "");
 			out.write(filmstripModel.getBytes());
 			out.close();
 		}
