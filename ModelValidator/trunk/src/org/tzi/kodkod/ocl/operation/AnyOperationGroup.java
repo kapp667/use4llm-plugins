@@ -3,6 +3,7 @@ package org.tzi.kodkod.ocl.operation;
 import kodkod.ast.Expression;
 import kodkod.ast.Formula;
 
+import org.tzi.kodkod.model.type.StringType;
 import org.tzi.kodkod.model.type.TypeFactory;
 import org.tzi.kodkod.ocl.OCLOperationGroup;
 
@@ -72,7 +73,7 @@ public class AnyOperationGroup extends OCLOperationGroup {
 	}
 
 	public Formula oclIsKindOf(Expression src, Expression cls) {
-		return src.eq(undefined).or(src.in(cls));
+		return src.eq(undefined).or(src.in(instanceAtoms(cls)));
 	}
 
 	public Formula oclIsKindOf(Formula src, Expression cls) {
@@ -80,11 +81,28 @@ public class AnyOperationGroup extends OCLOperationGroup {
 	}
 
 	public Formula oclIsTypeOf(Expression src, Expression cls) {
-		return cls.eq(Expression.UNIV).not().and(src.in(cls));
+		return cls.eq(Expression.UNIV).not().and(src.in(instanceAtoms(cls)));
 	}
 
 	public Formula oclIsTypeOf(Formula src, Expression cls) {
 		return cls.eq(typeFactory.booleanType().relation());
+	}
+
+	/**
+	 * Returns the atoms of the values of the given type. The literals and the
+	 * toString atoms of Strings are not in the String relation, whose bounds
+	 * constrain the attribute values only.
+	 */
+	private Expression instanceAtoms(Expression cls) {
+		StringType stringType = (StringType) typeFactory.stringType();
+		if (cls != stringType.relation()) {
+			return cls;
+		}
+		Expression atoms = cls.union(Expression.UNIV.join(stringType.toStringMap()));
+		for (Expression literal : stringType.typeLiterals().values()) {
+			atoms = atoms.union(literal);
+		}
+		return atoms;
 	}
 
 	public Formula isUndefined(Expression src) {
