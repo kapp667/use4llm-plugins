@@ -39,6 +39,7 @@ public class Association extends ModelElement implements IAssociation {
 	protected List<IAssociationEnd> associationEnds;
 	protected IConfigurator<IAssociation> configurator;
 	private List<Formula> subsetsDefinitions = new ArrayList<Formula>();
+	private List<IAssociation> redefiningAssociations = new ArrayList<IAssociation>();
 
 	Association(IModel model, String name) {
 		super(model, name);
@@ -71,7 +72,7 @@ public class Association extends ModelElement implements IAssociation {
 	@Override
 	public Formula constraints() {
 		Formula formula = Formula.and(typeDefinitions(), multiplicityDefinitions(), cycleFreenessDefinitions(),
-				Formula.and(subsetsDefinitions));
+				Formula.and(subsetsDefinitions), redefinitionDefinitions());
 		return formula.and(configurator.constraints(this));
 	}
 
@@ -105,7 +106,7 @@ public class Association extends ModelElement implements IAssociation {
 			
 			Variable y = Variable.unary("y");
 			Variable cls = Variable.unary("cls");
-			Expression closureExp = cls.join(relation());
+			Expression closureExp = cls.join(navigationLinks());
 			
 			Expression generalClosure = y.in(closureExp).comprehension(cls.oneOf(startRelation).and(y.oneOf(startRelation))).closure();
 			Variable start = Variable.unary("start");
@@ -296,23 +297,26 @@ public class Association extends ModelElement implements IAssociation {
 	}
 
 	/**
-	 * Returns an expression with the linked objects of an association end.
+	 * Returns an expression with the linked objects of an association end. It
+	 * goes through the redefining links, as USE's navigation does: USE's
+	 * multiplicity check counts the redefining links only, so it reports an
+	 * object of the redefined class with an own link as connected to none.
 	 */
 	private Expression createLinkedObjectsExpression(List<Variable> variables, int currentEndIndex, boolean univJoinRelation) {
 		Expression linkedObjects = null;
 		for (int j = 0; j < currentEndIndex; j++) {
 			if (j == 0) {
 				if (!univJoinRelation)
-					linkedObjects = variables.get(j).join(relation());
+					linkedObjects = variables.get(j).join(navigationLinks());
 				else
-					linkedObjects = variables.get(j).join(Expression.UNIV.join(relation()));
+					linkedObjects = variables.get(j).join(Expression.UNIV.join(navigationLinks()));
 			} else {
 				linkedObjects = variables.get(j).join(linkedObjects);
 			}
 		}
 		for (int j = associationEnds.size() - 1; j > currentEndIndex; j--) {
 			if (j == associationEnds.size() - 1 && currentEndIndex == 0) {
-				linkedObjects = relation().join(variables.get(j - 1));
+				linkedObjects = navigationLinks().join(variables.get(j - 1));
 			} else {
 				linkedObjects = linkedObjects.join(variables.get(j - 1));
 			}
@@ -327,10 +331,57 @@ public class Association extends ModelElement implements IAssociation {
 		LOG.debug("Subsets for " + name() + ": " + PrintHelper.prettyKodkod(formula));
 	}
 
+	@Override
+	public void addRedefiningAssociation(IAssociation redefiningAssociation) {
+		if (!redefiningAssociations.contains(redefiningAssociation)) {
+			redefiningAssociations.add(redefiningAssociation);
+		}
+	}
+
+	@Override
+	public List<IAssociation> redefiningAssociations() {
+		return Collections.unmodifiableList(redefiningAssociations);
+	}
+
+	@Override
+	public Expression navigationLinks() {
+		Expression navigationLinks = relation();
+		for (IAssociation redefiningAssociation : redefiningAssociations) {
+			navigationLinks = navigationLinks.union(pairs(redefiningAssociation, redefiningAssociation.relation()));
+		}
+		return navigationLinks;
+	}
+
 	/**
-	 * Returns the links of a binary association as pairs from the other end to
-	 * the given end, without the column of an association class and without
-	 * the undefined values that stand for the missing links of a 0..1 end.
+	 * Creates the formula that, as in USE, keeps out of this association the
+	 * objects of a redefining association's class at an end where that class
+	 * differs from its own.
+	 */
+	private Formula redefinitionDefinitions() {
+		if (redefiningAssociations.isEmpty()) {
+			return Formula.TRUE;
+		}
+		List<Formula> formulas = new ArrayList<Formula>();
+		Expression ownLinks = pairs(this, relation());
+		for (IAssociation redefiningAssociation : redefiningAssociations) {
+			for (int i = 0; i < associationEnds.size(); i++) {
+				IClass redefiningClass = redefiningAssociation.associationEnds().get(i).associatedClass();
+				if (!redefiningClass.equals(associationEnds.get(i).associatedClass())) {
+					Expression objects = i == 0 ? ownLinks.join(Expression.UNIV) : Expression.UNIV.join(ownLinks);
+					Formula formula = objects.intersection(redefiningClass.inheritanceOrRegularRelation()).no();
+					formulas.add(formula);
+					LOG.debug("Redefinition for " + name() + ": " + PrintHelper.prettyKodkod(formula));
+				}
+			}
+		}
+		return Formula.and(formulas);
+	}
+
+	/**
+	 * Returns the navigation links of a binary association as pairs from the
+	 * other end to the given end, without the column of an association class
+	 * and without the undefined values that stand for the missing links of a
+	 * 0..1 end.
 	 */
 	private static Expression navigation(IAssociation association, IAssociationEnd end) {
 		Expression links = links(association);
@@ -338,12 +389,20 @@ public class Association extends ModelElement implements IAssociation {
 	}
 
 	/**
-	 * Returns the links of a binary association as pairs in the order of its
-	 * ends, without the column of an association class and without the
-	 * undefined values that stand for the missing links of a 0..1 end.
+	 * Returns the navigation links of a binary association as pairs in the
+	 * order of its ends, without the column of an association class and
+	 * without the undefined values that stand for the missing links of a 0..1
+	 * end.
 	 */
 	static Expression links(IAssociation association) {
-		Expression links = association.relation();
+		return pairs(association, association.navigationLinks());
+	}
+
+	/**
+	 * Restricts links of a binary association to pairs of objects of its
+	 * ends' classes, without the column of an association class.
+	 */
+	private static Expression pairs(IAssociation association, Expression links) {
 		if (association.associationClass() != null) {
 			links = Expression.UNIV.join(links);
 		}

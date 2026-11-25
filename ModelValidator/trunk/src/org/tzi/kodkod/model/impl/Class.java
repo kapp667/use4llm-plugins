@@ -282,6 +282,13 @@ public class Class extends ModelElement implements IClass {
 			}
 		}
 		
+		// the links of a redefining composition are among those of the one it redefines
+		List<IAssociation> redefiningAssocs = new ArrayList<IAssociation>();
+		for(IAssociation assoc : assocs){
+			redefiningAssocs.addAll(assoc.redefiningAssociations());
+		}
+		assocs.removeAll(redefiningAssocs);
+		
 		if(assocs.size() < 2){
 			return Formula.TRUE;
 		}
@@ -302,7 +309,7 @@ public class Class extends ModelElement implements IClass {
 			Formula current = Formula.TRUE;
 			for(int j = 0; j < assocs.size(); j++){
 				IAssociation assoc = assocs.get(j);
-				Expression joined = assoc.relation().join(self);
+				Expression joined = assoc.navigationLinks().join(self);
 				
 				if(i == j){
 					current = current.and(joined.eq(undefined).not());
