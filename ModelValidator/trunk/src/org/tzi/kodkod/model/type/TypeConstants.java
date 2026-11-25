@@ -28,9 +28,9 @@ public class TypeConstants {
 
 	public static final String TRUE = "true";
 
-	public static final String STRING_TRUE = "String_True";
+	public static final String STRING_TRUE = "String_true";
 
-	public static final String STRING_FALSE = "String_False";
+	public static final String STRING_FALSE = "String_false";
 
 	public static final String TO_STRING_MAP = "ToStringMap";
 
