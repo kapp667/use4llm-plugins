@@ -9,12 +9,13 @@ import kodkod.ast.IntToExprCast;
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
 
+import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
+import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.uml.ocl.expr.ExpStdOp;
-import org.tzi.use.uml.ocl.type.CollectionType;
+import org.tzi.use.uml.ocl.type.Type;
 import org.tzi.use.uml.ocl.type.Type.VoidHandling;
-import org.tzi.use.util.StringUtil;
 
 /**
  * Extension of DefaultExpressionVisitor to visit the general operation
@@ -47,7 +48,7 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 			object_type_nav = object_type_nav || visitor.isObject_type_nav();
 		}
 		
-		printSumWarning(exp);
+		refuseWhatSetsDoNotKeep(exp);
 
 		if (exp.opname().equals("-") && !set && arguments.size() == 1) {
 			handleMinus();
@@ -57,18 +58,21 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 	}
 
 	/**
-	 * Prints a warning if the expression is a sum operation executed on a Bag or Sequence.
+	 * Refuses an operation whose result depends on the duplicates of its source, or
+	 * a comparison of collections that are not both sets.
 	 */
-	private void printSumWarning(ExpStdOp exp) {
-		if (exp.opname().equals("sum")
-				&& exp.args().length > 0
-				&& exp.args()[0] != null
-				&& (exp.args()[0].type().isKindOfBag(VoidHandling.EXCLUDE_VOID) || exp.args()[0].type().isKindOfSequence(VoidHandling.EXCLUDE_VOID))
-				&& ((CollectionType) exp.args()[0].type()).elemType().isKindOfInteger(VoidHandling.EXCLUDE_VOID)) {
-			LOG.warn("The evaluation of sum expression "
-					+ StringUtil.inQuotes(exp.toString())
-					+ " might be wrong if source contains duplicates (Collection is interpreted as Set).");
+	private void refuseWhatSetsDoNotKeep(ExpStdOp exp) {
+		String opname = exp.opname();
+		if ((opname.equals("size") || opname.equals("count") || opname.equals("sum")) && canHoldDuplicates(exp.args()[0].type())) {
+			throw new TransformationException(LogMessages.collectionDuplicatesError(exp.toString()));
 		}
+		if ((opname.equals("=") || opname.equals("<>")) && (isCollectionButNotSet(exp.args()[0].type()) || isCollectionButNotSet(exp.args()[1].type()))) {
+			throw new TransformationException(LogMessages.collectionComparisonError(exp.toString()));
+		}
+	}
+
+	private static boolean isCollectionButNotSet(Type type) {
+		return type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !type.isTypeOfSet();
 	}
 
 	private void handleMinus() {
