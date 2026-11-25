@@ -83,7 +83,7 @@ public class VariableOperationGroup extends OCLOperationGroup {
 		res = ConstraintHelper.univLeftN(res, toRole - 1);
 		res = ConstraintHelper.univRightN(res, totalArity - toRole);
 		
-		returnsSet = true;
+		returnsSet = false;
 		return src.eq(undefined).thenElse(undefined, res);
 	}
 	
