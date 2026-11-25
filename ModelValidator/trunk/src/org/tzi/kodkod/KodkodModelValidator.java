@@ -22,13 +22,19 @@ public abstract class KodkodModelValidator {
 	protected Evaluator evaluator;
 
 	/**
-	 * Validates the given model.
+	 * Validates the given model. If an element of the model could not be
+	 * transformed, it logs an error naming every such element and returns
+	 * without solving: a solution would ignore those elements.
 	 * 
 	 * @param model
 	 */
 	public void validate(IModel model) {
 		this.model = model;
 		evaluator = null;
+
+		if (refusesUntransformedElements(model)) {
+			return;
+		}
 		
 		KodkodSolver kodkodSolver = new KodkodSolver();
 		try {
@@ -68,6 +74,21 @@ public abstract class KodkodModelValidator {
 		if(KodkodQueryCache.INSTANCE.isQueryEnabled()){
 			KodkodQueryCache.INSTANCE.setEvaluator(evaluator);
 		}
+	}
+
+	/**
+	 * Logs an error naming every element of the model that could not be
+	 * transformed, if there is any.
+	 * 
+	 * @param model
+	 * @return true if the model has such elements and must not be validated.
+	 */
+	protected boolean refusesUntransformedElements(IModel model) {
+		if (model.transformationErrors().isEmpty()) {
+			return false;
+		}
+		LOG.error(LogMessages.untransformedElementsError(model.transformationErrors()));
+		return true;
 	}
 
 	private void storeEvaluator(KodkodSolver kodkodSolver) {

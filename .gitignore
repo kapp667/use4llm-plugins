@@ -17,3 +17,6 @@ Thumbs.db
 
 # Logs written by USE, Kodkod or the tests
 *.log
+
+# Claude Code session files (settings, hooks, handoffs, local skills): personal to each clone
+.claude/

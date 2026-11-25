@@ -38,6 +38,12 @@ public interface IModelFactory {
 	public IAssociation createDerivedAssociation(IModel model, String name);
 
 	/**
+	 * Creates a binary association with union ends, whose links are those of
+	 * its subsetting associations.
+	 */
+	public IAssociation createUnionAssociation(IModel model, String name);
+
+	/**
 	 * Creates an instance of IAssociationEnd.
 	 */
 	public IAssociationEnd createAssociationEnd(String name, Multiplicity multiplicity, int aggregationKind, IClass associatedClass);

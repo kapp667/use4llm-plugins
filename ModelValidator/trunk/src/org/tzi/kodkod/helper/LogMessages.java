@@ -1,6 +1,7 @@
 package org.tzi.kodkod.helper;
 
 import java.io.File;
+import java.util.List;
 
 import org.tzi.kodkod.model.config.impl.DefaultConfigurationValues;
 import org.tzi.kodkod.model.iface.IInvariant;
@@ -111,6 +112,41 @@ public final class LogMessages {
 
 	public static String invTransformError(String name) {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
+	}
+
+	public static String untransformedElementsError(List<String> errors) {
+		return "Cannot validate the model: the following elements cannot be transformed, and a solution would ignore them.\n"
+				+ String.join("\n", errors);
+	}
+
+	public static String subsetsNotBinaryError(String end, String subsettedEnd) {
+		return "Cannot transform the constraint " + inQuotes("subsets " + subsettedEnd) + " on association end " + inQuotes(end)
+				+ ": only binary associations are supported.";
+	}
+
+	public static String subsetsDerivedError(String end, String subsettedEnd) {
+		return "Cannot transform the constraint " + inQuotes("subsets " + subsettedEnd) + " on association end " + inQuotes(end)
+				+ ": derived associations are not supported.";
+	}
+
+	public static String unionNotBinaryError(String association) {
+		return "Cannot transform the union ends of association " + inQuotes(association) + ": only binary associations are supported.";
+	}
+
+	public static String unionAssociationClassError(String associationClass) {
+		return "Cannot transform the union ends of association class " + inQuotes(associationClass) + ": association classes are not supported.";
+	}
+
+	public static String modelTransformStoppedError(String name, String reason) {
+		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
+	}
+
+	/**
+	 * Some exceptions, a NullPointerException for one, have no message: their
+	 * class name is the only reason there is to report.
+	 */
+	public static String exceptionReason(Exception exception) {
+		return exception.getMessage() != null ? exception.getMessage() : exception.toString();
 	}
 
 	public static String invTransformSuccessful(String name) {
