@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 # Build the ModelValidator and Filmstrip plugin jars against a USE install, then run the
 # ModelValidator JUnit suite. Uses javac, jar and java from PATH.
-# Usage: ci/build-and-test.sh <USE install dir> <JUnit jar dir> <output dir>
+# Usage: ci/build-and-test.sh <USE install dir> <JUnit jar dir> <output dir> [<JaCoCo jar dir>]
 #   USE install dir: the unpacked USE binary release (searched for lib/use-core-*.jar and lib/use-gui.jar)
 #   JUnit jar dir:   holds junit-4.13.2.jar and hamcrest-core-1.3.jar
-# Outputs: <output dir>/ModelValidatorPlugin.jar and <output dir>/use-filmstrip.jar
+#   JaCoCo jar dir:  optional, holds org.jacoco.agent-*-runtime.jar and org.jacoco.cli-*-nodeps.jar;
+#                    when given, the JUnit run is measured and a report is written
+# Outputs: <output dir>/ModelValidatorPlugin.jar and <output dir>/use-filmstrip.jar,
+#          plus <output dir>/coverage (html/, coverage.csv, coverage.xml) with a JaCoCo dir
 set -euo pipefail
 
-[ "$#" -eq 3 ] || { sed -n '2,8p' "$0" >&2; exit 2; }
+[ "$#" -eq 3 ] || [ "$#" -eq 4 ] || { sed -n '2,10p' "$0" >&2; exit 2; }
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 usedir="$(cd "$1" && pwd)"
 junit="$(cd "$2" && pwd)"
 mkdir -p "$3"
 out="$(cd "$3" && pwd)"
+jacoco=""
+if [ "$#" -eq 4 ]; then jacoco="$(cd "$4" && pwd)"; fi
 
 # The release zip may or may not have a top folder: look for the jars instead of assuming a path.
 usecore="$(find "$usedir" -path '*/lib/use-core-*.jar' -not -path '*/plugins/*' | sort | sed -n 1p)"
@@ -56,9 +61,29 @@ run_junit() {
   find "$mv/test" -name '*.java' >"$out/mv/test-sources.txt"
   javac -nowarn -encoding UTF-8 --release 21 -proc:none -cp "$cp" -d "$tc" @"$out/mv/test-sources.txt"
   echo "[junit] test sources compiled"
+  local agent=() status=0 report=0
+  if [ -n "$jacoco" ]; then
+    agent=("-javaagent:$(find "$jacoco" -name 'org.jacoco.agent-*-runtime.jar' | sort | sed -n 1p)=destfile=$out/jacoco.exec")
+  fi
   # The tests read their models relative to the working directory.
   cd "$mv"
-  java -Djava.awt.headless=true -cp "$tc:$mv/test:$cp" org.junit.runner.JUnitCore org.tzi.use.kodkod.transform.ocl.TestSuite
+  java "${agent[@]}" -Djava.awt.headless=true -cp "$tc:$mv/test:$cp" org.junit.runner.JUnitCore org.tzi.use.kodkod.transform.ocl.TestSuite || status=$?
+  if [ -n "$jacoco" ]; then
+    report_coverage || report=$?
+    [ "$status" -ne 0 ] || status="$report"
+  fi
+  return "$status"
+}
+
+# The report runs even when JUnit fails; run_junit still returns JUnit's status.
+# Only the plugin's own packages (org/tzi) are measured, not the libraries unpacked into the same folder.
+# The Filmstrip plugin has no tests, so it is left out.
+report_coverage() {
+  local mv="$root/ModelValidator/trunk" cli
+  cli="$(find "$jacoco" -name 'org.jacoco.cli-*-nodeps.jar' | sort | sed -n 1p)"
+  mkdir -p "$out/coverage"
+  java -jar "$cli" report "$out/jacoco.exec" --classfiles "$out/mv/classes/org/tzi" --sourcefiles "$mv/src" \
+    --html "$out/coverage/html" --csv "$out/coverage/coverage.csv" --xml "$out/coverage/coverage.xml"
 }
 
 build_mv
