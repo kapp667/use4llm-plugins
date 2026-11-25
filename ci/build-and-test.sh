@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Build the ModelValidator and Filmstrip plugin jars against a USE install, then run the
-# ModelValidator JUnit suite. Uses javac, jar and java from PATH.
+# ModelValidator JUnit suite, unless --build-only is given. Uses javac, jar and java from PATH.
 # Usage: ci/build-and-test.sh <USE install dir> <JUnit jar dir> <output dir> [<JaCoCo jar dir>]
+#        ci/build-and-test.sh --build-only <USE install dir> <output dir>
 #   USE install dir: the unpacked USE binary release (searched for lib/use-core-*.jar and lib/use-gui.jar)
 #   JUnit jar dir:   holds junit-4.13.2.jar and hamcrest-core-1.3.jar
 #   JaCoCo jar dir:  optional, holds org.jacoco.agent-*-runtime.jar and org.jacoco.cli-*-nodeps.jar;
@@ -10,10 +11,18 @@
 #          plus <output dir>/coverage (html/, coverage.csv, coverage.xml) with a JaCoCo dir
 set -euo pipefail
 
-[ "$#" -eq 3 ] || [ "$#" -eq 4 ] || { sed -n '2,10p' "$0" >&2; exit 2; }
+build_only=0
+if [ "${1:-}" = --build-only ]; then
+  build_only=1
+  shift
+  [ "$#" -eq 2 ] || { sed -n '2,11p' "$0" >&2; exit 2; }
+  set -- "$1" "" "$2"
+fi
+[ "$#" -eq 3 ] || [ "$#" -eq 4 ] || { sed -n '2,11p' "$0" >&2; exit 2; }
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 usedir="$(cd "$1" && pwd)"
-junit="$(cd "$2" && pwd)"
+junit=""
+if [ "$build_only" -eq 0 ]; then junit="$(cd "$2" && pwd)"; fi
 mkdir -p "$3"
 out="$(cd "$3" && pwd)"
 jacoco=""
@@ -88,4 +97,4 @@ report_coverage() {
 
 build_mv
 build_fs
-run_junit
+[ "$build_only" -eq 1 ] || run_junit

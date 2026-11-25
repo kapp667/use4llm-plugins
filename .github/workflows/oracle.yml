@@ -1,0 +1,70 @@
+name: Oracle
+
+# Runs the ModelValidator end to end on the examples of the USE release, and fails only when
+# USE's check rejects an object diagram the validator returned as a solution.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'ci/oracle/**'
+      - '.github/workflows/oracle.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      USE_VERSION: 7.5.0
+      # SHA-256 of use-7.5.0-use-bin.zip
+      USE_ZIP_SHA256: 9b5a49d1d2345e65d1da8518008887e8bc12df388b6eef08228c5a1052618d10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Restore USE binary release
+        id: use-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/use
+          key: use-${{ env.USE_VERSION }}-bin
+
+      - name: Download USE binary release
+        if: steps.use-cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "v${USE_VERSION}" --repo useocl/use \
+            --pattern "use-${USE_VERSION}-use-bin.zip" --dir "$RUNNER_TEMP"
+          echo "${USE_ZIP_SHA256}  ${RUNNER_TEMP}/use-${USE_VERSION}-use-bin.zip" | sha256sum --check
+          unzip -q "${RUNNER_TEMP}/use-${USE_VERSION}-use-bin.zip" -d "${RUNNER_TEMP}/use"
+
+      - name: Build plugins
+        run: ci/build-and-test.sh --build-only "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build"
+
+      # The release zip may or may not have a top folder: the corpus is its examples folder.
+      - name: Run the oracle
+        run: |
+          examples="$(find "${RUNNER_TEMP}/use" -type d -name examples -not -path '*/examples/*' | sort | sed -n 1p)"
+          [ -n "$examples" ] || { echo "examples folder not found" >&2; exit 1; }
+          ci/oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/build" "$examples" "${RUNNER_TEMP}/oracle"
+
+      - name: Upload oracle results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle
+          path: |
+            ${{ runner.temp }}/oracle/oracle.tsv
+            ${{ runner.temp }}/oracle/cases/*/output.txt
+            ${{ runner.temp }}/oracle/cases/*/*.properties
+          if-no-files-found: ignore
