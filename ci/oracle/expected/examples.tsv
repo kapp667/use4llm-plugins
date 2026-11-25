@@ -79,8 +79,8 @@ Others/AB/AB.use	default	SAT	ok
 Others/AB/AB.use	wide	SAT	ok
 Others/CallSequence/CallSequence.use	default	SAT	ok
 Others/CallSequence/CallSequence.use	wide	SAT	ok
-Others/CarRental/CarRental2.use	default	UNSAT	n/a
-Others/CarRental/CarRental2.use	wide	SAT	ok
+Others/CarRental/CarRental2.use	default	ERROR	n/a
+Others/CarRental/CarRental2.use	wide	ERROR	n/a
 Others/CarRental/CarRental3.use	default	ERROR	n/a
 Others/CarRental/CarRental3.use	wide	ERROR	n/a
 Others/Date/Date.use	default	SAT	ok
@@ -145,8 +145,8 @@ Papers/1998/WarmerAndKleppe/RoyalAndLoyal.use	default	UNSAT	n/a
 Papers/1998/WarmerAndKleppe/RoyalAndLoyal.use	wide	SAT	ok
 Papers/1999/RichtersAndGogolla/OCLmetamodel.use	default	ERROR	n/a
 Papers/1999/RichtersAndGogolla/OCLmetamodel.use	wide	ERROR	n/a
-Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	default	UNSAT	n/a
-Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	wide	SAT	ok
+Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	default	ERROR	n/a
+Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	wide	ERROR	n/a
 Papers/2001/RichtersPhDThesis/NestedOperationCalls/NestedOperationCalls.use	default	SAT	ok
 Papers/2001/RichtersPhDThesis/NestedOperationCalls/NestedOperationCalls.use	wide	SAT	ok
 Papers/2003/Ziemann_2003_FMICS/bart.use	default	ERROR	n/a
