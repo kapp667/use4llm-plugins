@@ -29,7 +29,7 @@ Documentation/AggregationsAndCompositions/noshare06.use	default	UNSAT	n/a
 Documentation/AggregationsAndCompositions/noshare06.use	wide	SAT	ok
 Documentation/AggregationsAndCompositions/noshare07.use	default	UNSAT	n/a
 Documentation/AggregationsAndCompositions/noshare07.use	wide	SAT	ok
-Documentation/AssociationClass/AssociationClass.use	default	UNSAT	n/a
+Documentation/AssociationClass/AssociationClass.use	default	SAT	ok
 Documentation/AssociationClass/AssociationClass.use	wide	SAT	ok
 Documentation/Cars/Cars.use	default	SAT	ok
 Documentation/Cars/Cars.use	wide	SAT	ok
