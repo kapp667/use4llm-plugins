@@ -1,7 +1,8 @@
 name: Oracle
 
-# Runs the ModelValidator end to end on the examples of the USE release, and fails only when
-# USE's check rejects an object diagram the validator returned as a solution.
+# Runs the ModelValidator end to end on the examples of the USE release, with the default bounds
+# and then with wide ones, and fails only when USE's check rejects an object diagram the
+# validator returned as a solution.
 on:
   schedule:
     - cron: '17 3 * * *'
@@ -66,5 +67,6 @@ jobs:
           path: |
             ${{ runner.temp }}/oracle/oracle.tsv
             ${{ runner.temp }}/oracle/cases/*/output.txt
+            ${{ runner.temp }}/oracle/cases/*/wide.txt
             ${{ runner.temp }}/oracle/cases/*/*.properties
           if-no-files-found: ignore
