@@ -1,9 +1,11 @@
 name: Oracle
 
 # Runs the ModelValidator end to end on two corpora, the examples of the USE release and the
-# test files of USE's sources at the same release, with the default bounds and then with wide
-# ones, and fails only when USE's check rejects an object diagram the validator returned as a
-# solution, or when a verdict differs from the expected ones committed in ci/oracle/expected.
+# test files of USE's sources at the same release, with the default bounds, with wide ones and,
+# for a model with a witness state, with the exact sizes of that state. Fails only when USE's
+# check rejects an object diagram the validator returned as a solution, when the validator finds
+# no solution within the sizes of a state USE's check accepts, or when a verdict differs from the
+# expected ones committed in ci/oracle/expected.
 on:
   schedule:
     - cron: '17 3 * * *'
@@ -92,5 +94,7 @@ jobs:
             ${{ runner.temp }}/oracle/*/oracle.tsv
             ${{ runner.temp }}/oracle/*/cases/*/output.txt
             ${{ runner.temp }}/oracle/*/cases/*/wide.txt
+            ${{ runner.temp }}/oracle/*/cases/*/replay.txt
+            ${{ runner.temp }}/oracle/*/cases/*/witness.txt
             ${{ runner.temp }}/oracle/*/cases/*/*.properties
           if-no-files-found: ignore
