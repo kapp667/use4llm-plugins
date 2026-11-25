@@ -18,6 +18,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 @SuiteClasses({ AnyTestSuite.class, AttributeAccess_Test.class, BooleanTestSuite.class, AllInstances_Test.class, IfThenElse_Test.class,
 		IntegerTestSuite.class, SetConstructor_Test.class, Navigation_Test.class, Let_Test.class, SetTestSuite.class, ObjectDiagram_Test.class,
 		UntransformedInvariant_Test.class, PartialModel_Test.class,
-		SubsetsAssociationEnd_Test.class, UnionAssociationEnd_Test.class })
+		SubsetsAssociationEnd_Test.class, UnionAssociationEnd_Test.class,
+		RedefinesAssociationEnd_Test.class })
 public class TestSuite {
 }

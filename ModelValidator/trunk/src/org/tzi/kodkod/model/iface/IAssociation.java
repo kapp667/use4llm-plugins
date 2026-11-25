@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.tzi.kodkod.model.config.IConfigurator;
 
+import kodkod.ast.Expression;
+
 /**
  * Instances of the type IAssocation represent associations in a model.
  * 
@@ -52,6 +54,33 @@ public interface IAssociation extends IModelElement {
 	 * @param subsettedEnd the subsetted end
 	 */
 	public void addSubsettedEnd(IAssociationEnd end, IAssociation subsettedAssociation, IAssociationEnd subsettedEnd);
+
+	/**
+	 * Adds a binary association that redefines this binary association. This
+	 * association then has no link to an object of the redefining association's
+	 * class at an end where that class differs from its own, and navigation,
+	 * multiplicities, subsets and unions through its ends also go through the
+	 * redefining links. The caller adds every redefining association, directly
+	 * or not.
+	 * 
+	 * @param redefiningAssociation the redefining association
+	 */
+	public void addRedefiningAssociation(IAssociation redefiningAssociation);
+
+	/**
+	 * Returns the associations that redefine this association, directly or
+	 * not.
+	 */
+	public List<IAssociation> redefiningAssociations();
+
+	/**
+	 * Returns the links that navigation, multiplicities, subsets and unions go
+	 * through: those of the relation and, if this association is redefined,
+	 * those of the redefining associations.
+	 * 
+	 * @return the links, with the arity of the relation
+	 */
+	public Expression navigationLinks();
 
 	/**
 	 * Sets the configurator.

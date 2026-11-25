@@ -293,7 +293,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 
 		List<Object> arguments = new ArrayList<Object>();
 		arguments.add(object);
-		arguments.add(association.relation());
+		arguments.add(association.navigationLinks());
 		arguments.add(fromRole);
 		arguments.add(toRole);
 		arguments.add(isAssociationClass);
