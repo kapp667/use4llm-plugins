@@ -22,7 +22,9 @@ public abstract class KodkodModelValidator {
 	protected Evaluator evaluator;
 
 	/**
-	 * Validates the given model.
+	 * Validates the given model. If an invariant of the model could not be
+	 * transformed, it logs an error naming every such invariant and returns
+	 * without solving: a solution would ignore those invariants.
 	 * 
 	 * @param model
 	 */
@@ -30,8 +32,7 @@ public abstract class KodkodModelValidator {
 		this.model = model;
 		evaluator = null;
 
-		if (!model.invariantTransformationErrors().isEmpty()) {
-			LOG.error(LogMessages.untransformedInvariantsError(model.invariantTransformationErrors()));
+		if (refusesUntransformedInvariants(model)) {
 			return;
 		}
 		
@@ -73,6 +74,21 @@ public abstract class KodkodModelValidator {
 		if(KodkodQueryCache.INSTANCE.isQueryEnabled()){
 			KodkodQueryCache.INSTANCE.setEvaluator(evaluator);
 		}
+	}
+
+	/**
+	 * Logs an error naming every invariant of the model that could not be
+	 * transformed, if there is any.
+	 * 
+	 * @param model
+	 * @return true if the model has such invariants and must not be validated.
+	 */
+	protected boolean refusesUntransformedInvariants(IModel model) {
+		if (model.invariantTransformationErrors().isEmpty()) {
+			return false;
+		}
+		LOG.error(LogMessages.untransformedInvariantsError(model.invariantTransformationErrors()));
+		return true;
 	}
 
 	private void storeEvaluator(KodkodSolver kodkodSolver) {
