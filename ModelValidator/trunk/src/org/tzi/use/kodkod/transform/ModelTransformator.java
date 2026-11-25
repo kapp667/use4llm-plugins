@@ -88,6 +88,8 @@ public class ModelTransformator {
 
 			transformSimpleAssociations(model, simpleAssociations);
 
+			transformRedefinitions(model, mModel.associations());
+
 			transformSubsets(model, mModel.associations());
 
 			transformUnions(model, mModel.associations());
@@ -210,6 +212,38 @@ public class ModelTransformator {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Gives each redefined association the associations that redefine it,
+	 * directly or not. It runs before the subsets, whose constraints are built
+	 * at once from the redefining links.
+	 */
+	private void transformRedefinitions(IModel model, Collection<MAssociation> mAssociations) {
+		for (MAssociation mAssociation : mAssociations) {
+			for (MAssociation mRedefiningAssociation : mAssociation.getRedefinedByClosure()) {
+				refuseRedefinitionInvolving(mAssociation, mAssociation, mRedefiningAssociation);
+				refuseRedefinitionInvolving(mRedefiningAssociation, mAssociation, mRedefiningAssociation);
+				model.getAssociation(mAssociation.name()).addRedefiningAssociation(model.getAssociation(mRedefiningAssociation.name()));
+			}
+		}
+	}
+
+	private void refuseRedefinitionInvolving(MAssociation mAssociation, MAssociation mRedefined, MAssociation mRedefining) {
+		String redefined = mRedefined.name();
+		String redefining = mRedefining.name();
+		if (mAssociation.associationEnds().size() != 2) {
+			throw new TransformationException(LogMessages.redefinesNotBinaryError(redefined, redefining));
+		}
+		if (mAssociation instanceof MAssociationClass) {
+			throw new TransformationException(LogMessages.redefinesAssociationClassError(redefined, redefining));
+		}
+		if (mAssociation.isDerived()) {
+			throw new TransformationException(LogMessages.redefinesDerivedError(redefined, redefining));
+		}
+		if (mAssociation.isUnion()) {
+			throw new TransformationException(LogMessages.redefinesUnionError(redefined, redefining));
 		}
 	}
 
