@@ -133,7 +133,7 @@ public class InvariantTransformator {
 				transformAndAdd(model, inv);
 			} catch (Exception exception) {
 				printTransformationError(inv, exception);
-				model.addInvariantTransformationError(StringUtil.inQuotes(inv.toString()) + ": " + exception.getMessage());
+				model.addInvariantTransformationError(StringUtil.inQuotes(inv.toString()) + ": " + reason(exception));
 			}
 		}
 		if (model.invariantTransformationErrors().isEmpty()) {
@@ -145,7 +145,15 @@ public class InvariantTransformator {
 		if (LOG.isDebugEnabled()) {
 			LOG.error(LogMessages.invTransformError(inv.toString()), exception);
 		} else {
-			LOG.error(LogMessages.invTransformError(inv.toString()) + " " + exception.getMessage());
+			LOG.error(LogMessages.invTransformError(inv.toString()) + " " + reason(exception));
 		}
+	}
+
+	/**
+	 * Some exceptions, a NullPointerException for one, have no message: their
+	 * class name is the only reason there is to report.
+	 */
+	private static String reason(Exception exception) {
+		return exception.getMessage() != null ? exception.getMessage() : exception.toString();
 	}
 }
