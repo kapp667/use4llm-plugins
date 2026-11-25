@@ -25,6 +25,7 @@ import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.impl.Range;
+import org.tzi.kodkod.model.impl.UnionAssociation;
 import org.tzi.kodkod.model.type.ConfigurableType;
 import org.tzi.kodkod.model.type.IntegerType;
 import org.tzi.kodkod.model.type.RealType;
@@ -341,8 +342,14 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 		if(values.size() > 0){
 			configurator.setSpecificValues(values);
 		}
-		configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, DefaultConfigurationValues.linksPerAssocMin, false),
-				readSize(association.name() + PropertyEntry.linksMax, DefaultConfigurationValues.linksPerAssocMax, false));
+		if (association instanceof UnionAssociation) {
+			// its links follow from its subsetting associations: no default number of links
+			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, 0, false),
+					readSize(association.name() + PropertyEntry.linksMax, -1, false));
+		} else {
+			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, DefaultConfigurationValues.linksPerAssocMin, false),
+					readSize(association.name() + PropertyEntry.linksMax, DefaultConfigurationValues.linksPerAssocMax, false));
+		}
 		association.setConfigurator(configurator);
 	}
 

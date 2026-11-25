@@ -14,7 +14,6 @@ import org.tzi.kodkod.model.impl.DerivedAssociation;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd.Parameter;
 import org.tzi.kodkod.model.impl.DerivedAttribute;
-import org.tzi.kodkod.model.impl.UnionAssociation;
 import org.tzi.kodkod.model.type.ObjectType;
 import org.tzi.kodkod.model.type.TypeLiterals;
 import org.tzi.use.kodkod.transform.TransformationException;
@@ -165,8 +164,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				}
 				
 				handleDerivedAssociationNavigation(exp, (DerivedAssociation) association, from, to);
-			} else if(association instanceof UnionAssociation) {
-				handleUnionAssociationNavigation(exp, (UnionAssociation) association, source, destination);
 			} else {
 				handleRegularAssociationNavigation(exp, association, source, destination);
 			}
@@ -273,11 +270,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		}
 	}
 	
-	private void handleUnionAssociationNavigation(ExpNavigation exp, UnionAssociation association, MNavigableElement source, MNavigableElement destination) {
-		// TODO Auto-generated method stub
-		throw new TransformationException("Union association ends for n-ary associations are not supported yet.");
-	}
-
 	private void handleRegularAssociationNavigation(ExpNavigation exp, IAssociation association, MNavigableElement source,
 			MNavigableElement destination) {
 		boolean isAssociationClass = association.associationClass() != null;

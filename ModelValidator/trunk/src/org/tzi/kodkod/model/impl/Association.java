@@ -333,14 +333,23 @@ public class Association extends ModelElement implements IAssociation {
 	 * the undefined values that stand for the missing links of a 0..1 end.
 	 */
 	private static Expression navigation(IAssociation association, IAssociationEnd end) {
+		Expression links = links(association);
+		return association.associationEnds().indexOf(end) == 1 ? links : links.transpose();
+	}
+
+	/**
+	 * Returns the links of a binary association as pairs in the order of its
+	 * ends, without the column of an association class and without the
+	 * undefined values that stand for the missing links of a 0..1 end.
+	 */
+	static Expression links(IAssociation association) {
 		Expression links = association.relation();
 		if (association.associationClass() != null) {
 			links = Expression.UNIV.join(links);
 		}
 		List<IAssociationEnd> ends = association.associationEnds();
-		links = links.intersection(ends.get(0).associatedClass().inheritanceOrRegularRelation().product(
+		return links.intersection(ends.get(0).associatedClass().inheritanceOrRegularRelation().product(
 				ends.get(1).associatedClass().inheritanceOrRegularRelation()));
-		return ends.indexOf(end) == 1 ? links : links.transpose();
 	}
 
 	@Override
