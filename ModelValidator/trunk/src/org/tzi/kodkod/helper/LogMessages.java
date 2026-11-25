@@ -1,6 +1,7 @@
 package org.tzi.kodkod.helper;
 
 import java.io.File;
+import java.util.List;
 
 import org.tzi.kodkod.model.config.impl.DefaultConfigurationValues;
 import org.tzi.kodkod.model.iface.IInvariant;
@@ -111,6 +112,11 @@ public final class LogMessages {
 
 	public static String invTransformError(String name) {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
+	}
+
+	public static String untransformedInvariantsError(List<String> errors) {
+		return "Cannot validate the model: the following invariants cannot be transformed, and a solution would ignore them.\n"
+				+ String.join("\n", errors);
 	}
 
 	public static String invTransformSuccessful(String name) {
