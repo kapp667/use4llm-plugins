@@ -152,8 +152,8 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->excludesAll(argExpr)
 
-	public Formula excludesAll(Expression src, Expression arg) {
-		return src.eq(undefined_Set).not().and(arg.eq(undefined_Set).not()).and(src.intersection(arg).no());
+	public Expression excludesAll(Expression src, Expression arg) {
+		return src.eq(undefined_Set).or(arg.eq(undefined_Set)).thenElse(undefined, src.intersection(arg).no().thenElse(booleanTrue, booleanFalse));
 	}
 
 	// OCL: srcExpr->excluding(argExpr)
@@ -206,8 +206,8 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->includesAll(argExpr)
 
-	public Formula includesAll(Expression src, Expression arg) {
-		return src.eq(undefined_Set).not().and(arg.eq(undefined_Set).not()).and(arg.in(src));
+	public Expression includesAll(Expression src, Expression arg) {
+		return src.eq(undefined_Set).or(arg.eq(undefined_Set)).thenElse(undefined, arg.in(src).thenElse(booleanTrue, booleanFalse));
 	}
 
 	// OCL: srcExpr->including(argExpr)
@@ -239,11 +239,11 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->isEmpty()
 
-	public final Formula isEmpty(Expression src, Boolean object_type_nav) {
+	public final Expression isEmpty(Expression src, Boolean object_type_nav) {
 		if (object_type_nav)
-			return src.eq(undefined);
+			return src.eq(undefined).thenElse(booleanTrue, booleanFalse);
 		else
-			return src.no();
+			return src.eq(undefined_Set).thenElse(undefined, src.no().thenElse(booleanTrue, booleanFalse));
 	}
 
 	// OCL: srcExpr->isUnique(v | bodyExpr)
@@ -284,11 +284,11 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->notEmpty()
 
-	public final Formula notEmpty(Expression src, Boolean object_type_nav) {
+	public final Expression notEmpty(Expression src, Boolean object_type_nav) {
 		if (object_type_nav)
-			return src.eq(undefined).not();
+			return src.eq(undefined).thenElse(booleanFalse, booleanTrue);
 		else
-			return src.eq(undefined_Set).not().and(src.some());
+			return src.eq(undefined_Set).thenElse(undefined, src.some().thenElse(booleanTrue, booleanFalse));
 	}
 
 	public Expression oclAsType(Expression src, Expression cls) {
@@ -317,12 +317,12 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->one(var | bodyExpr)
 
-	public Formula one(Expression src, Formula body, Variable var) {
+	public Expression one(Expression src, Formula body, Variable var) {
 		final Expression select = select(src, body, var);
-		return src.eq(undefined_Set).not().and(select.one());
+		return src.eq(undefined_Set).thenElse(undefined, select.one().thenElse(booleanTrue, booleanFalse));
 	}
 
-	public Formula one(Expression src, Expression body, Variable var) {
+	public Expression one(Expression src, Expression body, Variable var) {
 		return one(src, body.eq(booleanTrue), var);
 	}
 
