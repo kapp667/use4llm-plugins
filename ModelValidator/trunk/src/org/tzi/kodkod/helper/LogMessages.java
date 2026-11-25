@@ -129,6 +129,14 @@ public final class LogMessages {
 				+ ": derived associations are not supported.";
 	}
 
+	public static String unionNotBinaryError(String association) {
+		return "Cannot transform the union ends of association " + inQuotes(association) + ": only binary associations are supported.";
+	}
+
+	public static String unionAssociationClassError(String associationClass) {
+		return "Cannot transform the union ends of association class " + inQuotes(associationClass) + ": association classes are not supported.";
+	}
+
 	public static String modelTransformStoppedError(String name, String reason) {
 		return "Model " + inQuotes(name) + ", whose transformation stopped: " + reason;
 	}
