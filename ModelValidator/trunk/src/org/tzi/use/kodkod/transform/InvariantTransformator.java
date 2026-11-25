@@ -133,28 +133,12 @@ public class InvariantTransformator {
 				transformAndAdd(model, inv);
 			} catch (Exception exception) {
 				printTransformationError(inv, exception);
+				model.addInvariantTransformationError(StringUtil.inQuotes(inv.toString()) + ": " + exception.getMessage());
 			}
 		}
-		LOG.info(LogMessages.invTransformSuccessful);
-	}
-
-	/**
-	 * Transformation of all given invariants.
-	 */
-	public List<IInvariant> transform(IModel model, List<MClassInvariant> classInvariants) {
-		List<IInvariant> invariants = new ArrayList<IInvariant>();
-
-		for (MClassInvariant inv : classInvariants) {
-			try {
-				IInvariant invariant = transform(model, inv);
-				invariants.add(invariant);
-
-			} catch (TransformationException exception) {
-				printTransformationError(inv, exception);
-			}
+		if (model.invariantTransformationErrors().isEmpty()) {
+			LOG.info(LogMessages.invTransformSuccessful);
 		}
-		LOG.info(LogMessages.invTransformSuccessful);
-		return invariants;
 	}
 
 	private void printTransformationError(MClassInvariant inv, Exception exception) {

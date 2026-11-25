@@ -1,7 +1,9 @@
 package org.tzi.kodkod.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import kodkod.ast.Formula;
@@ -31,6 +33,7 @@ public final class Model implements IModel {
     private Map<String, IClass> classes = new LinkedHashMap<String, IClass>();
     private Map<String, IInvariant> invariants = new LinkedHashMap<String, IInvariant>();
     private Map<String, IAssociation> associations = new LinkedHashMap<String, IAssociation>();
+    private List<String> invariantTransformationErrors = new ArrayList<String>();
     private IModelFactory modelFactory;
     private TypeFactory typeFactory;
     private IConfigurator<IModel> configurator;
@@ -105,6 +108,16 @@ public final class Model implements IModel {
 	@Override
 	public Collection<IInvariant> classInvariants() {
 		return invariants.values();
+	}
+
+	@Override
+	public void addInvariantTransformationError(String error) {
+		invariantTransformationErrors.add(error);
+	}
+
+	@Override
+	public List<String> invariantTransformationErrors() {
+		return invariantTransformationErrors;
 	}
 	
 	@Override
