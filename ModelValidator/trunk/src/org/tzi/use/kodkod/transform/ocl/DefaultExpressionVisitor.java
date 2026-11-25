@@ -27,6 +27,7 @@ import org.tzi.use.uml.ocl.expr.ExpConstEnum;
 import org.tzi.use.uml.ocl.expr.ExpConstInteger;
 import org.tzi.use.uml.ocl.expr.ExpConstReal;
 import org.tzi.use.uml.ocl.expr.ExpConstString;
+import org.tzi.use.uml.ocl.expr.ExpEmptyCollection;
 import org.tzi.use.uml.ocl.expr.ExpIf;
 import org.tzi.use.uml.ocl.expr.ExpIsKindOf;
 import org.tzi.use.uml.ocl.expr.ExpIsTypeOf;
@@ -218,6 +219,13 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		TypeLiterals stringType = model.typeFactory().stringType();
 		stringType.addTypeLiteral(exp.value());
 		object = stringType.getTypeLiteral(exp.value());
+	}
+
+	@Override
+	public void visitEmptyCollection(ExpEmptyCollection exp) {
+		super.visitEmptyCollection(exp);
+		sourceType = exp.type();
+		invokeMethod("setLiteral", new ArrayList<Object>(), false);
 	}
 
 	@Override
