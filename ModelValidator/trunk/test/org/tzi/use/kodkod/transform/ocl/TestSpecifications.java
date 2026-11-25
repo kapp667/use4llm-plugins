@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.tzi.kodkod.model.config.impl.PropertyConfigurationVisitor;
 import org.tzi.kodkod.model.iface.IModel;
@@ -80,8 +81,16 @@ final class TestSpecifications {
 	 * would, and fails the test if the configuration reports a problem.
 	 */
 	static IModel configure(IModel model, Map<String, Object> properties) {
+		return configure(model, new MapConfiguration(properties));
+	}
+
+	/**
+	 * Configures the model with the given configuration, and fails the test if the
+	 * configuration reports a problem.
+	 */
+	static IModel configure(IModel model, Configuration configuration) {
 		StringWriter warnings = new StringWriter();
-		PropertyConfigurationVisitor configurationVisitor = new PropertyConfigurationVisitor(new MapConfiguration(properties),
+		PropertyConfigurationVisitor configurationVisitor = new PropertyConfigurationVisitor(configuration,
 				new PrintWriter(warnings, true));
 		model.accept(configurationVisitor);
 		if (configurationVisitor.containErrors() || warnings.getBuffer().length() > 0) {

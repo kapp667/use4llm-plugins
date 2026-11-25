@@ -39,7 +39,7 @@ Documentation/Datatypes/Currency.use	default	ERROR	n/a
 Documentation/Datatypes/Currency.use	wide	ERROR	n/a
 Documentation/Demo/Demo.use	default	SAT	ok
 Documentation/Demo/Demo.use	wide	SAT	ok
-Documentation/Employee/Employee.use	default	UNSAT	n/a
+Documentation/Employee/Employee.use	default	SAT	ok
 Documentation/Employee/Employee.use	wide	SAT	ok
 Documentation/Fruits/Fruits.use	default	ERROR	n/a
 Documentation/Fruits/Fruits.use	wide	ERROR	n/a
@@ -93,7 +93,7 @@ Others/Ex/ex.use	default	SAT	ok
 Others/Ex/ex.use	wide	SAT	ok
 Others/Grammar/Grammar.use	default	ERROR	n/a
 Others/Grammar/Grammar.use	wide	ERROR	n/a
-Others/Job/Job.use	default	UNSAT	n/a
+Others/Job/Job.use	default	SAT	ok
 Others/Job/Job.use	wide	SAT	ok
 Others/Lists/Lists.use	default	ERROR	n/a
 Others/Lists/Lists.use	wide	ERROR	n/a

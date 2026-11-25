@@ -313,7 +313,7 @@ use-gui/src/it/resources/testfiles/shell/t089.use	default	UNSAT	n/a
 use-gui/src/it/resources/testfiles/shell/t089.use	wide	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t090.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t090.use	wide	SAT	ok
-use-gui/src/it/resources/testfiles/shell/t092.use	default	UNSAT	n/a
+use-gui/src/it/resources/testfiles/shell/t092.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t092.use	wide	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t093.use	default	ERROR	n/a
 use-gui/src/it/resources/testfiles/shell/t093.use	wide	ERROR	n/a
@@ -351,7 +351,7 @@ use-gui/src/it/resources/testfiles/shell/t109.use	default	ERROR	n/a
 use-gui/src/it/resources/testfiles/shell/t109.use	wide	ERROR	n/a
 use-gui/src/it/resources/testfiles/shell/t110.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t110.use	wide	SAT	ok
-use-gui/src/it/resources/testfiles/shell/t111.use	default	UNSAT	n/a
+use-gui/src/it/resources/testfiles/shell/t111.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t111.use	wide	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t112.use	default	UNSAT	n/a
 use-gui/src/it/resources/testfiles/shell/t112.use	wide	SAT	ok

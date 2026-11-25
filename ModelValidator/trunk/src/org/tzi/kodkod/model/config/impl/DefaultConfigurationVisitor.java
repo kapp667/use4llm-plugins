@@ -96,15 +96,18 @@ public class DefaultConfigurationVisitor extends SimpleVisitor {
 
 	@Override
 	public void visitRealType(RealType realType) {
+		write(realType.name() + PropertyEntry.realValuesMin, DefaultConfigurationValues.realMin);
+		write(realType.name() + PropertyEntry.realValuesMax, DefaultConfigurationValues.realMax);
+		write(realType.name() + PropertyEntry.realStep, DefaultConfigurationValues.realStep);
 	}
 
 	/**
-	 * Writes the given int value with the given name to the configuration file.
+	 * Writes the given value with the given name to the configuration file.
 	 * 
 	 * @param name
 	 * @param value
 	 */
-	private void write(String name, int value) {
+	private void write(String name, Number value) {
 		try {
 			pc.setProperty(name, value);
 		} catch (Exception e) {
