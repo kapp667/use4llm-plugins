@@ -42,6 +42,18 @@ public interface IAssociation extends IModelElement {
 	public boolean isBinaryAssociation();
 
 	/**
+	 * Adds the constraint of a {@code subsets} on an association end of this
+	 * binary association: every link through the end is a link through the
+	 * subsetted end of the other binary association, between the same objects
+	 * at the corresponding ends.
+	 * 
+	 * @param end the subsetting end of this association
+	 * @param subsettedAssociation the association of the subsetted end
+	 * @param subsettedEnd the subsetted end
+	 */
+	public void addSubsettedEnd(IAssociationEnd end, IAssociation subsettedAssociation, IAssociationEnd subsettedEnd);
+
+	/**
 	 * Sets the configurator.
 	 */
 	public void setConfigurator(IConfigurator<IAssociation> configurator);
