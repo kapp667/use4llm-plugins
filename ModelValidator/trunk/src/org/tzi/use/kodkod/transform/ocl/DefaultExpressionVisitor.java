@@ -165,6 +165,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitAsType(ExpAsType exp) {
 		super.visitAsType(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		try {
 			visitTypeOperation("oclAsType", exp.getSourceExpr(), exp.getTargetType(), true);
 		} catch (NoSuchMethodError e) {
@@ -176,6 +177,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitAttrOp(ExpAttrOp exp) {
 		super.visitAttrOp(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		visitVariableOperation(exp);
 	}
 
@@ -218,11 +220,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitConstReal(ExpConstReal exp) {
 		super.visitConstReal(exp);
-
-		Double value = new Double(exp.value());
-		LOG.warn(LogMessages.constRealWarning(value));
-
-		visitConstInteger(value.intValue());
+		throw new TransformationException(LogMessages.realValueError(exp.toString()));
 	}
 
 	@Override
@@ -238,6 +236,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitEmptyCollection(ExpEmptyCollection exp) {
 		super.visitEmptyCollection(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		sourceType = exp.type();
 		invokeMethod("setLiteral", new ArrayList<Object>(), false);
 	}
@@ -246,6 +245,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitObjOp(ExpObjOp exp) {
 		super.visitObjOp(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		DefaultExpressionVisitor visitor = new OperationExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
@@ -362,6 +362,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitSelectByKind(ExpSelectByKind expSelectByKind) {
 		super.visitSelectByKind(expSelectByKind);
 		refuseCollectionOfCollections(expSelectByKind);
+		refuseReal(expSelectByKind);
 		visitTypeOperation("selectByKind", expSelectByKind.getSourceExpression(), expSelectByKind.type().elemType(), true);
 	}
 	
@@ -369,6 +370,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitExpSelectByType(ExpSelectByType expSelectByType) {
 		super.visitExpSelectByType(expSelectByType);
 		refuseCollectionOfCollections(expSelectByType);
+		refuseReal(expSelectByType);
 		visitTypeOperation("selectByType", expSelectByType.getSourceExpression(), expSelectByType.type().elemType(), false);
 	}
 
@@ -412,6 +414,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitUndefined(ExpUndefined exp) {
 		super.visitUndefined(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		if (exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
 			object = undefined_Set;
 		} else {
@@ -423,6 +426,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitVariable(ExpVariable exp) {
 		super.visitVariable(exp);
 		refuseCollectionOfCollections(exp);
+		refuseReal(exp);
 		visitVariableOperation(exp);
 	}
 
@@ -511,6 +515,9 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		if (isCollectionOfCollections(targetType)) {
 			throw new TransformationException(LogMessages.collectionOfCollectionsError(targetType.toString()));
 		}
+		if (mentionsReal(targetType)) {
+			throw new TransformationException(LogMessages.realValueError(targetType.toString()));
+		}
 		List<Object> arguments = new ArrayList<Object>();
 
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
@@ -546,6 +553,25 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		if (!collectionOfCollectionsAccepted && isCollectionOfCollections(exp.type())) {
 			throw new TransformationException(LogMessages.collectionOfCollectionsError(exp.toString()));
 		}
+	}
+
+	/**
+	 * Refuses an expression whose value is a Real or a collection of Reals, since
+	 * the transformation does not compute with Real values. An operation that USE
+	 * types as Real only because an operand is undefined computes with integers and
+	 * is not refused.
+	 */
+	private void refuseReal(org.tzi.use.uml.ocl.expr.Expression exp) {
+		if (mentionsReal(exp.type())) {
+			throw new TransformationException(LogMessages.realValueError(exp.toString()));
+		}
+	}
+
+	private static boolean mentionsReal(Type type) {
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
+			return mentionsReal(((CollectionType) type).elemType());
+		}
+		return type.isTypeOfReal();
 	}
 
 	private static boolean isCollectionOfCollections(Type type) {
