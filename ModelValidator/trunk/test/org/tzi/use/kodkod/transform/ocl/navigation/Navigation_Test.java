@@ -371,15 +371,15 @@ public class Navigation_Test extends OCLTest {
 
 	@Test
 	public void test53() {
-		String ocl = "jobBobIbm.employeeAC";
-		String expected = "(Job_AC_jobBobIbm = Undefined) => Undefined else ((Job_AC_jobBobIbm . Job_AC_assoc) . univ) ";
+		String ocl = "jobDanIbm.employeeAC";
+		String expected = "(Job_AC_jobDanIbm = Undefined) => Undefined else ((Job_AC_jobDanIbm . Job_AC_assoc) . univ) ";
 		test("test53", ocl, expected);
 	}
 
 	@Test
 	public void test54() {
-		String ocl = "jobBobIbm.employerAC";
-		String expected = "(Job_AC_jobBobIbm = Undefined) => Undefined else (univ . (Job_AC_jobBobIbm . Job_AC_assoc)) ";
+		String ocl = "jobDanIbm.employerAC";
+		String expected = "(Job_AC_jobDanIbm = Undefined) => Undefined else (univ . (Job_AC_jobDanIbm . Job_AC_assoc)) ";
 		test("test54", ocl, expected);
 	}
 
