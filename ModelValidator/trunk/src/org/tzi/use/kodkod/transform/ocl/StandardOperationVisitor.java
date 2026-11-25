@@ -38,6 +38,9 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 
 		for (org.tzi.use.uml.ocl.expr.Expression expArg : exp.args()) {
 			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+			if (exp.opname().equals("flatten")) {
+				visitor.acceptCollectionOfCollections();
+			}
 			expArg.processWithVisitor(visitor);
 			arguments.add(visitor.getObject());
 			set = set || visitor.isSet();
