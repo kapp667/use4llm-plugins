@@ -126,8 +126,8 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 				typeUpperUndefined.add(tupleFactory.tuple(TypeConstants.UNDEFINED_SET));
 			}
 
-			if(attribute.type().isInteger()){
-				IntegerType t = (IntegerType) attribute.type();
+			if(attribute.type().isInteger() || attribute.type().isIntegerCollection()){
+				IntegerType t = (IntegerType) (attribute.type().isInteger() ? attribute.type() : ((SetType) attribute.type()).elemType());
 				
 				final int lowerBound;
 				final int upperBound;
