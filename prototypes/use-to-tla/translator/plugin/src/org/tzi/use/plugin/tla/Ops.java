@@ -55,6 +55,20 @@ final class Ops {
 	private final Map<MOperation, String> done = new LinkedHashMap<>();
 	private final Map<MOperation, Translator.Refusal> refused = new HashMap<>();
 
+	/**
+	 * A deliberate bug of the action translation (environment variable TLA_OPS_MUTANT), to show
+	 * the behaviour checks can fail. mutated counts the places it changed the translation, so that
+	 * a run tells a mutant no model exercises from one the checks miss.
+	 */
+	static final String MUTANT = System.getenv().getOrDefault("TLA_OPS_MUTANT", "");
+	int mutated = 0;
+
+	private boolean mutant(String name) {
+		if (!MUTANT.equals(name)) return false;
+		mutated++;
+		return true;
+	}
+
 	Ops(MModel model, Settings set) {
 		this.model = model;
 		this.set = set;
@@ -154,6 +168,21 @@ final class Ops {
 				report.add(row("step", s.toString().substring(5), "refused", r.construct, r.getMessage()));
 			}
 		}
+		for (String q : set.contracts) {
+			String[] cq = q.split("::");
+			MClass cc = model.getClass(cq[0]);
+			MOperation op = cc == null ? null : cc.operation(cq[1], true);
+			if (op == null) {
+				report.add(row("contract", q, "refused", "settings: no operation", q));
+				continue;
+			}
+			try {
+				contract(op);
+				report.add(row("contract", qn(op), "translated", "", ""));
+			} catch (Translator.Refusal r) {
+				report.add(row("contract", qn(op), "refused", r.construct, r.getMessage()));
+			}
+		}
 		for (Map.Entry<MOperation, String> e : done.entrySet()) report.add(row("operation", qn(e.getKey()), "translated", "", ""));
 		for (Map.Entry<MOperation, Translator.Refusal> e : refused.entrySet())
 			report.add(row("operation", qn(e.getKey()), "refused", e.getValue().construct, e.getValue().getMessage()));
@@ -185,7 +214,9 @@ final class Ops {
 			}
 		}
 		for (MAssociation as : model.associations()) multiplicity(as, mark, inv);
-		for (MOperation op : done.keySet()) {
+		List<MOperation> withPosts = new ArrayList<>(done.keySet());
+		for (MOperation op : contracts.keySet()) if (!done.containsKey(op)) withPosts.add(op);
+		for (MOperation op : withPosts) {
 			inv.append(postText.get(op));
 			for (String[] c : postChecks.get(op)) {
 				if (c[0] != null) checks.put(c[0], "postcondition " + c[1]);
@@ -212,6 +243,56 @@ final class Ops {
 
 	String cfg;
 	private final Map<MClass, Translator.Refusal> refusedNew = new HashMap<>();
+
+	/**
+	 * What a trace tool needs to read and write the values of this spec (types.tsv): the pools, the
+	 * classes and enumerations, the stored attributes and associations of the state with their
+	 * types, the parameters and results of the translated operations and contracts, every
+	 * operation the model declares (body, query or none), and the precondition each PreC_
+	 * operator checks. Call after module().
+	 */
+	String types() {
+		StringBuilder t = new StringBuilder("kind\tname\tindex\tdetail\ttype\n");
+		for (Map.Entry<MClass, List<String>> e : pools.entrySet())
+			t.append("pool\t").append(e.getKey().name()).append("\t\t").append(String.join(" ", e.getValue())).append("\t\n");
+		Map<String, MClass> byName = new TreeMap<>();
+		for (MClass c : model.classes()) byName.put(c.name(), c);
+		for (MClass c : byName.values()) {
+			List<String> ps = new ArrayList<>();
+			for (MClass p : c.allParents()) ps.add(p.name());
+			java.util.Collections.sort(ps);
+			t.append("class\t").append(c.name()).append("\t\t").append(String.join(" ", ps)).append('\t').append(c.isAbstract() ? "abstract" : "")
+					.append('\n');
+		}
+		Map<String, EnumType> enums = new TreeMap<>();
+		for (EnumType e : model.enumTypes()) enums.put(e.name(), e);
+		for (EnumType e : enums.values())
+			t.append("enum\t").append(e.name()).append("\t\t").append(String.join(" ", e.getLiterals())).append("\t\n");
+		for (Map.Entry<String, MAttribute> e : attrs.entrySet())
+			t.append("attribute\t").append(e.getKey()).append("\t\t\t").append(e.getValue().type()).append('\n');
+		for (Map.Entry<String, MAssociation> e : assocs.entrySet()) {
+			List<String> ends = new ArrayList<>();
+			for (MAssociationEnd end : e.getValue().associationEnds()) ends.add(end.cls().name());
+			t.append("association\t").append(e.getKey()).append("\t\t").append(String.join(" ", ends)).append("\t\n");
+		}
+		Set<MOperation> ops = new java.util.LinkedHashSet<>(done.keySet());
+		ops.addAll(contracts.keySet());
+		for (MOperation op : ops) {
+			t.append("operation\t").append(qn(op)).append("\t\t").append(done.containsKey(op) ? "body" : "contract").append("\t\n");
+			for (int i = 0; i < op.paramList().size(); i++) {
+				VarDecl d = op.paramList().varDecl(i);
+				t.append("param\t").append(qn(op)).append('\t').append(i + 1).append('\t').append(d.name()).append('\t').append(d.type()).append('\n');
+			}
+			if (op.hasResultType()) t.append("result\t").append(qn(op)).append("\t\t\t").append(op.resultType()).append('\n');
+		}
+		for (MClass c : byName.values())
+			for (MOperation op : c.operations())
+				t.append("declared\t").append(qn(op)).append("\t\t").append(op.hasStatement() ? "body" : op.hasExpression() ? "query" : "none")
+						.append("\t\n");
+		for (Map.Entry<String, String> e : preNames.entrySet())
+			t.append("pre\t").append(e.getKey()).append("\t\t").append(e.getValue()).append("\t\n");
+		return t.toString();
+	}
 
 	private String cfg(List<String> consts, boolean bound) {
 		StringBuilder c = new StringBuilder("CONSTANT Undef = Undef\nCONSTANT Fail = Fail\nCONSTANT Unset = Unset\n");
@@ -305,7 +386,8 @@ final class Ops {
 			String n = "Mult_" + id(as.name() + "_" + to.nameAsRolename());
 			List<String> ranges = new ArrayList<>();
 			for (MMultiplicity.Range r : to.multiplicity().getRanges())
-				ranges.add(r.getUpper() == MMultiplicity.MANY ? "n >= " + r.getLower() : "(n >= " + r.getLower() + " /\\ n <= " + r.getUpper() + ")");
+				ranges.add(r.getUpper() == MMultiplicity.MANY ? "n >= " + r.getLower()
+						: "(n >= " + r.getLower() + " /\\ n <= " + (r.getUpper() + (mutant("mult") ? 1 : 0)) + ")"); // mult: an upper bound one too high
 			inv.append("\\* ").append(as.name()).append(": each ").append(from.cls().name()).append(" has ").append(to.multiplicity())
 					.append(" ").append(to.nameAsRolename()).append("\n");
 			inv.append(n).append(" == ").append(mark).append("\\A o \\in {x \\in st.objs : st.cls[x] \\in ").append(Translator.classSet(from.cls()))
@@ -345,8 +427,10 @@ final class Ops {
 		if (!c.getAllOwnedProtocolStateMachines().isEmpty()) throw new Translator.Refusal("class with a protocol state machine", c.name());
 		List<MAttribute> init = new ArrayList<>();
 		for (MAttribute a : c.allAttributes()) if (a.getInitExpression().isPresent()) init.add(a);
+		if (!init.isEmpty() && mutant("init")) init.clear(); // init: the init expressions are not applied
 		init.sort((x, y) -> Integer.compare(x.getPositionInModel(), y.getPositionInModel()));
-		StringBuilder b = new StringBuilder("\\* new " + c.name() + "\nNew_" + c.name() + "(s, p) ==\n  LET s0 == [s EXCEPT !.objs = @ \\cup {p}] IN\n");
+		String objs = mutant("frame-objs") ? "{p}" : "@ \\cup {p}"; // frame-objs: the other objects are forgotten
+		StringBuilder b = new StringBuilder("\\* new " + c.name() + "\nNew_" + c.name() + "(s, p) ==\n  LET s0 == [s EXCEPT !.objs = " + objs + "] IN\n");
 		String prev = "s0";
 		Translator.Unit u = tr.begin();
 		try {
@@ -388,7 +472,11 @@ final class Ops {
 		// USE runs the operation the runtime class resolves (MObjectOperationCallStatement).
 		List<MClass> classes = new ArrayList<>(s.kind.equals("new-call") ? List.of(c) : concrete(c));
 		Map<MOperation, Set<String>> impls = new LinkedHashMap<>();
-		for (MClass k : classes) impls.computeIfAbsent(k.operation(s.op, true), z -> new TreeSet<>()).add(k.name());
+		for (MClass k : classes) {
+			MOperation impl = k.operation(s.op, true);
+			if (impl != op && mutant("dispatch")) impl = op; // dispatch: an override is not run
+			impls.computeIfAbsent(impl, z -> new TreeSet<>()).add(k.name());
+		}
 		for (MOperation impl : impls.keySet()) operation(impl);
 		List<String> ps = new ArrayList<>(op.paramNames());
 		List<String> doms = new ArrayList<>();
@@ -415,7 +503,7 @@ final class Ops {
 		} else {
 			a = call + "Step_" + tag + "(p" + args + ") ==\n  LET s1 == New_" + c.name() + "(st, p) IN\n  LET x == Call_" + tag + "(s1, p" + args
 					+ ") IN\n  /\\ x.r # Fail\n  /\\ st' = x.r.s\n  /\\ last' = [step |-> \"new+call\", op |-> x.op"
-					+ rec.replace("self |-> self", "self |-> p") + ", pre |-> s1" + out + "]\n\n";
+					+ rec.replace("self |-> self", "self |-> p") + ", pre |-> " + (mutant("atpre-new") ? "st" : "s1") + out + "]\n\n"; // atpre-new: @pre before new
 			StringBuilder qf = new StringBuilder("\\E p \\in Pool_" + c.name() + " \\ st.objs : LET s1 == New_" + c.name() + "(st, p) IN \\E ");
 			if (ps.isEmpty()) quant = "\\E p \\in Pool_" + c.name() + " \\ st.objs : Step_" + tag + "(p)";
 			else {
@@ -543,13 +631,7 @@ final class Ops {
 			String sig = "(" + String.join(", ", params) + ")";
 			StringBuilder b = new StringBuilder("\\* " + qn(op) + "\n");
 			// Preconditions: USE refuses the call unless each is true (MSystem.evaluatePreConditions).
-			Map<String, String> penv = new HashMap<>();
-			penv.put("self", "self");
-			for (String p : op.paramNames()) penv.put(p, "a_" + p);
-			List<String> pres = new ArrayList<>();
-			for (MPrePostCondition pc : op.preConditions())
-				pres.add("(" + expr(pc.expression(), "s", null, penv) + ") = TRUE  \\* pre " + pc.name());
-			b.append("Pre_").append(n).append(sig).append(" ==").append(pres.isEmpty() ? " TRUE\n" : "\n  /\\ " + String.join("\n  /\\ ", pres) + "\n");
+			b.append(pres(op, n, sig));
 			// The body, from the configuration at entry.
 			StringBuilder c0 = new StringBuilder("[s |-> s");
 			for (String v : vars) {
@@ -560,7 +642,7 @@ final class Ops {
 			String body = stmt(op.getStatement(), "c0", vars, "  ");
 			b.append("Body_").append(n).append(sig).append(" ==\n  LET c0 == ").append(c0).append(" IN\n").append(body).append("\n");
 			// A declared result must be assigned (MSystem.assertResultValueValid).
-			String fin = op.hasResultType() ? "IF r = Fail THEN Fail ELSE IF r.v_result = Unset THEN Fail ELSE r" : "r";
+			String fin = op.hasResultType() && !mutant("result") ? "IF r = Fail THEN Fail ELSE IF r.v_result = Unset THEN Fail ELSE r" : "r"; // result: an unset result is no failure
 			b.append("Run_").append(n).append(sig).append(" == IF Pre_").append(n).append(sig).append(" THEN (LET r == Body_")
 					.append(n).append(sig).append(" IN ").append(fin).append(") ELSE Fail\n\n");
 			posts(op);
@@ -574,6 +656,57 @@ final class Ops {
 		}
 	}
 
+	/** Pre_n: USE refuses the call unless each precondition is true (MSystem.evaluatePreConditions);
+	 * PreC_n_name: one precondition, for the verdicts a trace compares. */
+	private String pres(MOperation op, String n, String sig) {
+		Map<String, String> penv = new HashMap<>();
+		penv.put("self", "self");
+		for (String p : op.paramNames()) penv.put(p, "a_" + p);
+		StringBuilder b = new StringBuilder();
+		List<String> pres = new ArrayList<>();
+		for (MPrePostCondition pc : op.preConditions()) {
+			String pn = "PreC_" + n + "_" + id(pc.name());
+			b.append(pn).append(sig).append(" == (").append(expr(pc.expression(), "s", null, penv)).append(") = TRUE\n");
+			pres.add(pn + sig);
+			preNames.put(pn, qn(op) + "::" + pc.name());
+		}
+		if (!pres.isEmpty() && mutant("guard")) pres.clear(); // guard: the preconditions are ignored
+		b.append("Pre_").append(n).append(sig).append(" ==").append(pres.isEmpty() ? " TRUE\n" : "\n  /\\ " + String.join("\n  /\\ ", pres) + "\n");
+		return b.toString();
+	}
+
+	/** PreC_ operator -> the precondition it checks, C::op::name. */
+	final Map<String, String> preNames = new LinkedHashMap<>();
+
+	/**
+	 * The contract of op, for a trace that enters and exits it (openter, opexit): Pre_ and the
+	 * postconditions, read on a step whose last.op is op. No step of Next runs a contract: the
+	 * states after the call are those the postconditions allow, which TLC cannot enumerate.
+	 */
+	private void contract(MOperation op) {
+		if (done.containsKey(op)) { // a step translated it: Pre_ and the posts exist
+			contracts.put(op, done.get(op));
+			return;
+		}
+		String n = id(op.cls().name() + "_" + op.name());
+		Translator.Unit u = tr.begin();
+		try {
+			if (!(op.cls() instanceof MClass)) throw new Translator.Refusal("operation of a non-class", qn(op));
+			for (VarDecl d : op.paramList()) Translator.kind(d.type());
+			if (op.hasResultType()) Translator.kind(op.resultType());
+			List<String> params = new ArrayList<>(List.of("s", "self"));
+			for (String p : op.paramNames()) params.add("a_" + p);
+			String text = "\\* contract " + qn(op) + "\n" + pres(op, n, "(" + String.join(", ", params) + ")") + "\n";
+			posts(op);
+			defs.append(text);
+			contracts.put(op, n);
+		} finally {
+			tr.end();
+		}
+	}
+
+	private final Map<MOperation, String> contracts = new LinkedHashMap<>();
+
 	/** The variables the posts of the operations read in their final value: result and assigned parameters. */
 	private String outRecord(Set<MOperation> impls) {
 		Set<String> out = new TreeSet<>();
@@ -586,7 +719,7 @@ final class Ops {
 
 	private static Set<String> outVars(MOperation op) {
 		Set<String> assigned = new TreeSet<>();
-		collect(op.getStatement(), new LinkedHashSet<>(), assigned);
+		if (op.hasStatement()) collect(op.getStatement(), new LinkedHashSet<>(), assigned);
 		Set<String> out = new TreeSet<>();
 		if (op.hasResultType()) out.add("result");
 		for (String p : op.paramNames()) if (assigned.contains(p)) out.add(p);
@@ -619,7 +752,7 @@ final class Ops {
 			}
 			String n = "Post_" + id(op.cls().name() + "_" + op.name() + "_" + pc.name());
 			try {
-				String e = expr(pc.expression(), "st", "last.pre", env);
+				String e = expr(pc.expression(), "st", mutant("atpre") ? "st" : "last.pre", env); // atpre: @pre reads the state after the call
 				inv.append("\\* post ").append(key).append('\n').append(n).append(" == last.op = ").append(q(qn(op))).append(" => (")
 						.append(e).append(") = TRUE\n\n");
 				rows.add(new String[] { n, key });
@@ -641,6 +774,7 @@ final class Ops {
 	private String stmt(MStatement s, String c, Set<String> vars, String ind) {
 		Map<String, String> env = envOf(c, vars);
 		String state = c + ".s";
+		String read = !c.equals("c0") && reads(s) && mutant("stale-read") ? "c0.s" : state; // stale-read: a statement reads the state at entry
 		if (s instanceof MEmptyStatement) return ind + c;
 		if (s instanceof MSequenceStatement) {
 			List<MStatement> l = ((MSequenceStatement) s).getStatements();
@@ -654,7 +788,7 @@ final class Ops {
 				}
 				String nx = fresh("c");
 				b.append(ind).append("LET ").append(nx).append(" ==\n").append(stmt(l.get(i), prev, vars, ind + "    ")).append("\n")
-						.append(ind).append("IN IF ").append(nx).append(" = Fail THEN Fail ELSE\n");
+						.append(ind).append("IN IF ").append(nx).append(" = Fail THEN ").append(mutant("nofail") ? prev : "Fail").append(" ELSE\n"); // nofail: a failed statement is skipped
 				prev = nx;
 			}
 			return b.toString();
@@ -676,7 +810,7 @@ final class Ops {
 				String[] made = create(ns, state, ind);
 				return made[0] + ind + "[" + c + " EXCEPT !.s = " + made[1] + ", !.v_" + va.getVariableName() + " = " + made[2] + "]";
 			}
-			return ind + "[" + c + " EXCEPT !.v_" + va.getVariableName() + " = " + rvalue(rv, state, env) + "]";
+			return ind + "[" + c + " EXCEPT !.v_" + va.getVariableName() + " = " + rvalue(rv, read, env) + "]";
 		}
 		if (s instanceof MNewObjectStatement) {
 			String[] made = create((MNewObjectStatement) s, state, ind);
@@ -689,14 +823,20 @@ final class Ops {
 			if (a.isDerived()) throw new Translator.Refusal("assignment to a derived attribute", key);
 			if (!attrs.containsKey(key)) throw new Translator.Refusal("assignment to an attribute the state does not hold", key);
 			String o = fresh("o");
-			return ind + "LET " + o + " == " + expr(aa.getObject(), state, null, env) + " IN IF " + o + " = Undef THEN Fail ELSE [" + c
-					+ " EXCEPT !.s.att[" + q(key) + "][" + o + "] = " + rvalue(aa.getRValue(), state, env) + "]";
+			String target = expr(aa.getObject(), read, null, env);
+			String v = rvalue(aa.getRValue(), read, env);
+			String head = ind + "LET " + o + " == " + target + " IN IF " + o + " = Undef THEN ";
+			if (mutant("frame-att")) // frame-att: the other objects lose their value of the attribute
+				return head + "Fail ELSE [" + c + " EXCEPT !.s.att[" + q(key) + "] = [x \\in DOMAIN @ |-> IF x = " + o + " THEN " + v + " ELSE Undef]]";
+			return head + (mutant("undef-target") ? c : "Fail") + " ELSE [" + c // undef-target: an undefined object is no failure
+					+ " EXCEPT !.s.att[" + q(key) + "][" + o + "] = " + v + "]";
 		}
 		if (s instanceof MConditionalExecutionStatement) {
 			// An undefined condition runs the else branch (MConditionalExecutionStatement.execute).
 			MConditionalExecutionStatement ce = (MConditionalExecutionStatement) s;
 			String b = fresh("b");
-			return ind + "LET " + b + " == " + expr(ce.getCondition(), state, null, env) + " IN\n" + ind + "IF " + b + " = TRUE THEN\n"
+			return ind + "LET " + b + " == " + expr(ce.getCondition(), read, null, env) + " IN\n" + ind + "IF " + b
+					+ (mutant("ifundef") ? " # FALSE THEN\n" : " = TRUE THEN\n") // ifundef: an undefined condition runs the then branch
 					+ stmt(ce.getThenStatement(), c, vars, ind + "  ") + "\n" + ind + "ELSE\n" + stmt(ce.getElseStatement(), c, vars, ind + "  ");
 		}
 		if (s instanceof MLinkInsertionStatement || s instanceof MLinkDeletionStatement) {
@@ -711,13 +851,15 @@ final class Ops {
 			for (MRValue rv : parts) {
 				String p = fresh("p");
 				ps.add(p);
-				lets.append(lets.length() == 0 ? "" : " ").append(p).append(" == ").append(rvalue(rv, state, env));
+				lets.append(lets.length() == 0 ? "" : " ").append(p).append(" == ").append(rvalue(rv, read, env));
 				undef.append(undef.length() == 0 ? "" : " \\/ ").append(p).append(" = Undef");
 			}
 			String t = "<<" + String.join(", ", ps) + ">>";
 			String links = state + ".lnk[" + q(as.name()) + "]";
-			return ind + "LET " + lets + " IN IF " + undef + " THEN Fail ELSE IF " + t + (ins ? " \\in " : " \\notin ") + links + " THEN Fail ELSE ["
-					+ c + " EXCEPT !.s.lnk[" + q(as.name()) + "] = @ " + (ins ? "\\cup" : "\\") + " {" + t + "}]";
+			String dup = mutant("dup-link") ? c : "Fail"; // dup-link: a link already there, or missing, is no failure
+			String upd = ins && mutant("frame-link") ? "{" + t + "}" : "@ " + (ins ? "\\cup" : "\\") + " {" + t + "}"; // frame-link: the other links are lost
+			return ind + "LET " + lets + " IN IF " + undef + " THEN Fail ELSE IF " + t + (ins ? " \\in " : " \\notin ") + links + " THEN " + dup + " ELSE ["
+					+ c + " EXCEPT !.s.lnk[" + q(as.name()) + "] = " + upd + "]";
 		}
 		if (s instanceof MIterationStatement) {
 			Translator.K k = Translator.kind(((MIterationStatement) s).getRange().type());
@@ -730,6 +872,12 @@ final class Ops {
 		if (s instanceof MNewLinkObjectStatement) throw new Translator.Refusal("new link object in a body", s.toString());
 		if (s instanceof MLibraryOperationCallStatement) throw new Translator.Refusal("library operation call (ReadLine, WriteLine...)", s.toString());
 		throw new Translator.Refusal("statement " + s.getClass().getSimpleName(), s.toString());
+	}
+
+	/** Whether statement s reads the state through an expression of its own (stale-read changes those). */
+	private static boolean reads(MStatement s) {
+		return s instanceof MVariableAssignmentStatement || s instanceof MAttributeAssignmentStatement || s instanceof MConditionalExecutionStatement
+				|| s instanceof MLinkInsertionStatement || s instanceof MLinkDeletionStatement;
 	}
 
 	private String rvalue(MRValue rv, String state, Map<String, String> env) {
@@ -748,7 +896,7 @@ final class Ops {
 		if (refusedNew.containsKey(k)) throw refusedNew.get(k);
 		String f = fresh("f");
 		String pre = ind + "IF Pool_" + k.name() + " \\ " + state + ".objs = {} THEN Fail ELSE\n" + ind + "LET " + f + " == CHOOSE x \\in Pool_"
-				+ k.name() + " \\ " + state + ".objs : TRUE IN\n";
+				+ k.name() + (mutant("new-fresh") ? "" : " \\ " + state + ".objs") + " : TRUE IN\n"; // new-fresh: may take a live object
 		return new String[] { pre, "New_" + k.name() + "(" + state + ", " + f + ")", f };
 	}
 }

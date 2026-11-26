@@ -513,7 +513,7 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 	 * associative). A chain of n @@ makes SANY's level checking quadratic once the keys are declared
 	 * constants (model values): t101's 5,967 objects ran it out of memory.
 	 */
-	private static String fn(Map<String, String> m, String empty) {
+	static String fn(Map<String, String> m, String empty) {
 		if (m.isEmpty()) return empty;
 		List<String> parts = new ArrayList<>();
 		for (Map.Entry<String, String> e : m.entrySet()) parts.add(e.getKey() + " :> " + e.getValue());
@@ -586,6 +586,11 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 	}
 
 	private String value(Value v) {
+		return value(v, n -> ids.get(n));
+	}
+
+	/** The TLA+ text of a state value; id gives the model value of an object name, or null for an object of no state. */
+	static String value(Value v, java.util.function.Function<String, String> id) {
 		if (v.isUndefined()) return "Undef";
 		if (v instanceof BooleanValue) return ((BooleanValue) v).value() ? "TRUE" : "FALSE";
 		if (v instanceof IntegerValue) {
@@ -595,25 +600,25 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 		if (v instanceof StringValue) return Translator.quote(((StringValue) v).value());
 		if (v instanceof EnumValue) return Translator.quote(((EnumType) v.type()).name() + "::" + ((EnumValue) v).value());
 		if (v instanceof ObjectValue) {
-			String id = ids.get(((ObjectValue) v).value().name());
-			if (id == null) throw new Translator.Refusal("state value: object of no state", v.toString());
-			return id;
+			String o = id.apply(((ObjectValue) v).value().name());
+			if (o == null) throw new Translator.Refusal("state value: object of no state", v.toString());
+			return o;
 		}
 		if (v instanceof SetValue) {
 			Set<String> s = new TreeSet<>();
-			for (Value e : (CollectionValue) v) s.add(value(e));
+			for (Value e : (CollectionValue) v) s.add(value(e, id));
 			return "{" + String.join(", ", s) + "}";
 		}
 		if (v instanceof BagValue) {
 			Map<String, String> m = new TreeMap<>();
 			Map<String, Integer> cnt = new LinkedHashMap<>();
-			for (Value e : (CollectionValue) v) cnt.merge(value(e), 1, Integer::sum);
+			for (Value e : (CollectionValue) v) cnt.merge(value(e, id), 1, Integer::sum);
 			for (Map.Entry<String, Integer> e : cnt.entrySet()) m.put(e.getKey(), e.getValue().toString());
 			return fn(m, "EmptyBag");
 		}
 		if (v instanceof SequenceValue || v instanceof OrderedSetValue) {
 			List<String> l = new ArrayList<>();
-			for (Value e : (CollectionValue) v) l.add(value(e));
+			for (Value e : (CollectionValue) v) l.add(value(e, id));
 			return "<<" + String.join(", ", l) + ">>";
 		}
 		throw new Translator.Refusal("state value " + v.getClass().getSimpleName(), v.toString());

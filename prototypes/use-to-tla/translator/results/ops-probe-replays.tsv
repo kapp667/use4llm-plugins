@@ -1,0 +1,20 @@
+case	run	steps	states_compared	states_equal	use_errors	tlc_end	use_end	verdicts_compared	verdicts_agree	result	detail
+holes.use	cover-C1__link	3	4	4	0	reached C1__link	accepted	0	0	agree	
+holes.use	cover-C1__linkThenSet	3	4	4	0	reached C1__linkThenSet	accepted	0	0	agree	
+holes.use	cover-C1__setOther	2	3	3	0	reached C1__setOther	accepted	0	0	agree	
+holes.use	cover-C1__setTwice	2	3	3	0	reached C1__setTwice	accepted	0	0	agree	
+holes.use	cover-C1__unlink	4	5	5	0	reached C1__unlink	accepted	0	0	agree	
+holes.use	violation	5	6	6	0	multiplicity A1::E1	mult A1::E1	9	9	agree	
+statements.use	cover-C1__cond	2	4	4	0	reached C1__cond	accepted	0	0	agree	
+statements.use	cover-C1__condUndef	2	4	4	0	reached C1__condUndef	accepted	0	0	agree	
+statements.use	cover-C1__failEnter	0	0	0	0	not reached in 11405 states		0	0	not reached	
+statements.use	cover-C1__failExit	0	0	0	0	not reached in 11405 states		0	0	not reached	
+statements.use	cover-C1__link	3	4	4	0	reached C1__link	accepted	0	0	agree	
+statements.use	cover-C1__makeC1	2	3	3	0	reached C1__makeC1	accepted	0	0	agree	
+statements.use	cover-C1__newObject	2	4	4	0	reached C1__newObject	accepted	0	0	agree	
+statements.use	cover-C1__s1	2	4	4	0	reached C1__s1	accepted	0	0	agree	
+statements.use	cover-C1__s2	2	3	3	0	reached C1__s2	accepted	0	0	agree	
+statements.use	cover-C1__setInt	2	3	3	0	reached C1__setInt	accepted	0	0	agree	
+statements.use	cover-C1__unlink	4	5	5	0	reached C1__unlink	accepted	0	0	agree	
+statements.use	cover-C1__varAssign	2	4	4	0	reached C1__varAssign	accepted	0	0	agree	
+statements.use	violation	2	3	3	0	postcondition C1::failExit::alwaysFails	post alwaysFails	3	3	agree	

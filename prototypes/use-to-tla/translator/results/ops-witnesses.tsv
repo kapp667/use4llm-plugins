@@ -1,0 +1,50 @@
+spec	witness	states	bounds_keys	objects	use_check	mv_verdict	mv_seconds	result	note
+civstat atomic-birth	w1	385	4	2	ok	ERROR	1.4	validator error	ERROR: Cannot transform invariant `Person::nameCapitalThenSmallLetters'. OCL operation substring is not supported.
+civstat atomic-birth	w2	385	4	2	ok	ERROR	1.7	validator error	ERROR: Cannot transform invariant `Person::nameCapitalThenSmallLetters'. OCL operation substring is not supported.
+civstat atomic-birth	w3	385	4	1	ok	ERROR	1.2	validator error	ERROR: Cannot transform invariant `Person::nameCapitalThenSmallLetters'. OCL operation substring is not supported.
+civstat atomic-birth	w4	385	4	0	ok	n/a	0	SKIPPED	no object
+holes.use	w1	485	25	4	ok	SAT	1.8	agree	
+holes.use	w2	485	25	4	ok	SAT	1.4	agree	
+holes.use	w3	485	25	4	ok	SAT	1.8	agree	
+holes.use	w4	485	25	4	ok	SAT	1.2	agree	
+holes.use	w5	485	25	4	ok	SAT	0.9	agree	
+soil_civstat_civstat.use	w1	1	1	0	ok	n/a	0	SKIPPED	no object
+soil_projectworld_projectworld.use	w1	5	3	2	ok	SAT	1.7	agree	
+soil_projectworld_projectworld.use	w2	5	3	1	ok	SAT	1.7	agree	
+soil_projectworld_projectworld.use	w3	5	3	0	ok	n/a	0	SKIPPED	no object
+statements.use	w1	6461	54	4	ok	SAT	1.1	agree	
+statements.use	w2	6461	54	4	ok	SAT	0.9	agree	
+statements.use	w3	6461	54	4	ok	SAT	0.8	agree	
+statements.use	w4	6461	54	4	ok	SAT	0.7	agree	
+statements.use	w5	6461	54	4	ok	SAT	0.8	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21b.use	w1	17	3	2	ok	SAT	1.3	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21b.use	w2	17	3	1	ok	SAT	1.8	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21b.use	w3	17	3	0	ok	n/a	0	SKIPPED	no object
+use-core_src_test_resources_org_tzi_use_parser_t21c.use	w1	17	3	2	ok	SAT	1.7	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21c.use	w2	17	3	1	ok	SAT	1.4	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21c.use	w3	17	3	0	ok	n/a	0	SKIPPED	no object
+use-core_src_test_resources_org_tzi_use_parser_t22b.use	w1	5	3	2	ok	SAT	1.3	agree	
+use-core_src_test_resources_org_tzi_use_parser_t22b.use	w2	5	3	1	ok	SAT	1.2	agree	
+use-core_src_test_resources_org_tzi_use_parser_t22b.use	w3	5	3	0	ok	n/a	0	SKIPPED	no object
+use-gui_src_it_resources_testfiles_shell_t052.use	w1	13	3	2	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t052.use	w2	13	3	1	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t052.use	w3	13	3	0	ok	n/a	0	SKIPPED	no object
+use-gui_src_it_resources_testfiles_shell_t084.use	w1	17	3	2	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t084.use	w2	17	3	1	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t084.use	w3	17	3	0	ok	n/a	0	SKIPPED	no object
+use-gui_src_it_resources_testfiles_shell_t094.use	w1	5	3	2	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t094.use	w2	5	3	1	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t094.use	w3	5	3	0	ok	n/a	0	SKIPPED	no object
+use-gui_src_it_resources_testfiles_shell_t095.use	w1	5	3	2	ok	SAT	1.5	agree	
+use-gui_src_it_resources_testfiles_shell_t095.use	w2	5	3	1	ok	SAT	1.5	agree	
+use-gui_src_it_resources_testfiles_shell_t095.use	w3	5	3	0	ok	n/a	0	SKIPPED	no object
+use-gui_src_it_resources_testfiles_shell_t105.use	w1	325	25	4	ok	SAT	1.5	agree	
+use-gui_src_it_resources_testfiles_shell_t105.use	w2	325	25	4	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t105.use	w3	325	25	4	ok	SAT	1.4	agree	
+use-gui_src_it_resources_testfiles_shell_t105.use	w4	325	25	4	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t105.use	w5	325	25	3	ok	SAT	1.5	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	w1	25	10	2	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	w2	25	10	2	ok	SAT	1.7	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	w3	25	10	2	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	w4	25	10	2	ok	SAT	1.3	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	w5	25	10	2	ok	SAT	1.1	agree	

@@ -1,0 +1,8 @@
+part	rows	agree	other	seconds
+civstat	3	3		18
+corpus	20		model did not load 3; translated 17	18
+replays	23	17	not reached 6	12
+probe-replays	19	17	not reached 2	22
+scenarios	31	29	TLC error 1; negative control caught 1	32
+witnesses	49	36	SKIPPED 10; validator error 3	40
+total				142

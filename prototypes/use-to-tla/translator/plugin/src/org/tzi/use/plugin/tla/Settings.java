@@ -33,6 +33,9 @@ import org.tzi.use.uml.mm.MOperation;
  *   step new C                   create an object of C, nothing else
  *   step call C::op              call op on an existing object of C or of a subclass
  *   step new C call op           create an object of C and call op on it, in one step
+ *   contract C::op               translate the preconditions and postconditions of op, with or
+ *                                without a body, for a trace that enters and exits it (openter,
+ *                                opexit); no step of Next runs it
  *   invariants every-state       invariants and multiplicities hold in every state (default)
  *   invariants after-calls       ... in the initial state and after every step but "new C"
  *   invariants after C::op...    ... in the initial state and after a call of one of these
@@ -69,6 +72,7 @@ final class Settings {
 	final Map<String, List<String>> domains = new TreeMap<>();
 	final Map<String, List<String>> params = new TreeMap<>();
 	final List<Step> steps = new ArrayList<>();
+	final Set<String> contracts = new TreeSet<>();
 	String invariants = "every-state";
 	final Set<String> after = new TreeSet<>();
 	final Set<String> skip = new TreeSet<>();
@@ -139,6 +143,11 @@ final class Settings {
 			} else if (w.size() == 5 && w.get(1).equals("new") && w.get(3).equals("call"))
 				steps.add(new Step("new-call", w.get(2), w.get(4)));
 			else throw new IllegalArgumentException("step new C | step call C::op | step new C call op");
+			return;
+		case "contract":
+			need(w, 2, 2);
+			if (!w.get(1).contains("::")) throw new IllegalArgumentException("contract C::op");
+			contracts.add(w.get(1));
 			return;
 		case "invariants":
 			need(w, 2, Integer.MAX_VALUE);
@@ -215,6 +224,7 @@ final class Settings {
 					.append(String.join(" ", e.getValue())).append('\n');
 		}
 		for (Step st : steps) sb.append(st).append('\n');
+		for (String c : contracts) sb.append("contract ").append(c).append('\n');
 		sb.append("invariants ").append(invariants).append(after.isEmpty() ? "" : " " + String.join(" ", after)).append('\n');
 		if (!skip.isEmpty()) sb.append("skip ").append(String.join(" ", skip)).append('\n');
 		for (Map.Entry<String, List<String>> e : bounds.entrySet())

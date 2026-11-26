@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Reproduce the hand probe's results with the generated spec: tlaops translates civstat.use under
 # settings/civstat*.settings, TLC checks it, the refinement modules in match/ check it against
-# Civstat.tla in both directions, and USE replays TLC's counterexamples.
+# Civstat.tla in both directions, and USE replays TLC's counterexamples step by step, its state
+# compared with TLC's at each step.
 # Usage: ops-probe/check-generated.sh <out dir>   Output: <out dir>/civstat-checks.tsv
 # Needs USE_HOME (USE 7.5.0) and TLA2TOOLS. FULL=1 also runs 4 persons (about 1 min) and 5 with
 # symmetry (about 2 min).
@@ -38,7 +39,7 @@ gen() { # <name> <model> <settings>
 }
 tlc() { # <name> [<module>]: TLC on <name>/UseOps or a module copied there; prints the log path
   local m="${2:-UseOps}"
-  (cd "$out/$1" && java -XX:+UseParallelGC -cp "$tla" tlc2.TLC -workers 1 -metadir "states-$m" -dumpTrace json "trace-$m.json" \
+  (cd "$out/$1" && java -XX:+UseParallelGC -cp "$tla" tlc2.TLC -workers 1 -metadir "states-$m" \
     -config "$m.cfg" "$m" </dev/null >"tlc-$m.txt" 2>&1) || true
   echo "$out/$1/tlc-$m.txt"
 }
@@ -49,12 +50,14 @@ summary() { # <log>
   printf '%s\t%s\t%s\t%s\n' "$r" "$(grep -oE '[0-9,]+ distinct states found' "$f" | tail -1 | grep -oE '^[0-9,]+' || echo '?')" \
     "$(grep -oE 'search is [0-9]+' "$f" | grep -oE '[0-9]+' || echo '?')" "$(grep -oE 'Finished in .* at' "$f" | sed 's/Finished in //; s/ at$//')"
 }
-replay() { # <name> <model>: USE replays the counterexample; prints USE's verdict
-  python3 -I "$tr/scripts/trace2soil.py" "$out/$1/trace-UseOps.json" "$out/$1/UseOps.cfg" >"$out/$1/replay.cmd"
-  echo exit >>"$out/$1/replay.cmd"
-  usecmd "$2" "$out/$1/replay.cmd" >"$out/$1/replay.txt" || true
-  { grep -oE "^checking invariant \([0-9]+\) \`[^']+': FAILED" "$out/$1/replay.txt" | sed 's/.*`//; s/'"'"': FAILED/ FAILED/'
-    grep -A1 'postcondition.* does not hold' "$out/$1/replay.txt" | tail -1 | sed 's/^ *//; s/:.*/ does not hold/'; } | paste -sd ';' -
+replay() { # <name> <model>: USE replays the counterexample step by step (scripts/replay.py); prints
+  # USE's verdict on the last state, the states equal to TLC's, and whether USE and TLC agree
+  local d="$out/$1"
+  rm -f "$d/dump.tsv"
+  python3 -I "$tr/scripts/replay.py" commands "$d/tlc-UseOps.txt" "$d" "$d/dump.tsv" >"$d/replay.cmd"
+  usecmd "$2" "$d/replay.cmd" >"$d/replay.txt" || true
+  python3 -I "$tr/scripts/replay.py" compare "$d/tlc-UseOps.txt" "$d" "$d/dump.tsv" "$d/replay.txt" "$d/UseOps.cfg" "$1" \
+    | awk -F'\t' '{ printf "%s; %s of %s states equal; %s", $7, $4, $3, $10; if ($11 != "") printf ": %s", $11; print "" }'
 }
 gen atomic civstat.use "$s/civstat.settings"
 gen every civstat.use "$s/civstat-every-state.settings"

@@ -1,0 +1,38 @@
+-- Closing probes, written after the mutant rounds of B5 showed that no check caught some bugs of
+-- the action translation. Each operation varies a case of USE's StatementEffectTest
+-- (use-core/src/test/java/org/tzi/use/uml/sys/soil/StatementEffectTest.java) on its TestSystem
+-- model; the comment names the case, what varies, and the mutant it closes. holes.cmd calls them.
+model StatementHoles
+
+class C1
+attributes
+  int : Integer
+operations
+  -- testAttributeAssignment, basic attribute assignment (42, then 43), both in one body, the
+  -- second reading what the first wrote (stale-read)
+  setTwice()
+    begin self.int := 42; self.int := self.int + 1 end
+  -- testAttributeAssignment with an undefined object: USE fails the call (undef-target)
+  setOther(o : C1)
+    begin o.int := 1 end
+  -- testLinkInsertion when the link exists, testLinkDeletion when it does not: USE fails the
+  -- call (dup-link)
+  link(c : C2)
+    begin insert (self, c) into A1 end
+  unlink(c : C2)
+    begin delete (self, c) from A1 end
+  -- testLinkInsertion when the link exists, then testAttributeAssignment: USE rolls the whole
+  -- call back, the assignment too (nofail)
+  linkThenSet(c : C2)
+    begin insert (self, c) into A1; self.int := 7 end
+end
+
+class C2
+attributes
+  str : String
+end
+
+association A1 between
+  C1 [0..1] role E1
+  C2 [0..1] role E2
+end

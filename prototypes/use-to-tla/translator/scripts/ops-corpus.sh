@@ -2,7 +2,8 @@
 # Translate the operations of every corpus model with a SOIL body under the default settings
 # (Settings.defaults) and run TLC twice: with every check, for the first violation, and with none,
 # for the size of the bounded state space.
-# Usage: scripts/ops-corpus.sh <out dir> <results dir>
+# Usage: scripts/ops-corpus.sh <out dir> <results dir> [<model root>]
+#   model root: translate every model with a SOIL body under it instead of the two corpora
 # Output: <results dir>/ops-corpus.tsv (one row per model) and ops-refusals.tsv (operations and
 # steps refused, by construct). Needs USE_HOME, USE_SRC and TLA2TOOLS. JOBS (4) runs in parallel,
 # TLC_TIMEOUT (120 s) bounds each TLC run.
@@ -16,10 +17,14 @@ rm -rf "$out"; mkdir -p "$out/use" "$res"
 cp -r "$use/lib" "$use/etc" "$use/oclextensions" "$out/use/"
 rm -f "$out/use/lib/plugins"/ModelValidatorPlugin-*.jar
 cp "$here/build/use2tla.jar" "$out/use/lib/plugins/"
-{
-  (cd "$use/examples" && grep -rl --include='*.use' -w begin . | sed 's|^\./||' | LC_ALL=C sort | sed "s|^|$use/examples\t|")
-  (cd "$USE_SRC" && grep -rl --include='*.use' -w begin use-core/src/test/resources use-gui/src/it/resources | LC_ALL=C sort | sed "s|^|$USE_SRC\t|")
-} >"$out/models.tsv"
+if [ -n "${3:-}" ]; then
+  (cd "$3" && grep -rl --include='*.use' -w begin . | sed 's|^\./||' | LC_ALL=C sort | sed "s|^|$3\t|") >"$out/models.tsv"
+else
+  {
+    (cd "$use/examples" && grep -rl --include='*.use' -w begin . | sed 's|^\./||' | LC_ALL=C sort | sed "s|^|$use/examples\t|")
+    (cd "$USE_SRC" && grep -rl --include='*.use' -w begin use-core/src/test/resources use-gui/src/it/resources | LC_ALL=C sort | sed "s|^|$USE_SRC\t|")
+  } >"$out/models.tsv"
+fi
 echo "candidates: $(wc -l <"$out/models.tsv") models with a 'begin'"
 
 one() { # <root> <model>

@@ -14,5 +14,11 @@
 			class="org.tzi.use.plugin.tla.TlaOpsCommand"
 			id="org.tzi.use.plugin.tla.TlaOpsCommand">
 		</command>
+		<command shellcmd="infotla"
+			label="infotla"
+			help="Usage: infotla 'file' 'label' [expr ;; expr ...]; appends the label, the current state in the state shape of tlaops and the value of each expression to 'file'. Runs while an evaluation is paused."
+			class="org.tzi.use.plugin.tla.InfoTlaCommand"
+			id="org.tzi.use.plugin.tla.InfoTlaCommand">
+		</command>
 	</commands>
 </plugin>

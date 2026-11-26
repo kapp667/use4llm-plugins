@@ -52,20 +52,20 @@ Validation par l'auteur : A1 et A2 (PR publiques) et G (passage au vrai plugin).
 
 - [x] Changement : corps SOIL -> action avec `UNCHANGED` pour le reste, `pre` -> garde, `post` vérifié avec `@pre`. Refus explicite de ce qui n'est pas traduit.
 - [x] Vérification sur `civstat`. TLC trouve `nameIsUnique`, détecte le `marry()` cassé, et compte 11 161 états (3 personnes) et 524 545 états (4 personnes) sans symétrie, comme la version à la main.
-- [x] Mesure sur les 18 modèles du corpus qui ont des corps SOIL : nombre traduits, refus par construction.
+- [x] Mesure sur les 20 modèles du corpus qui ont des corps SOIL, dont 17 se chargent dans USE : nombre traduits, refus par construction.
 
 ## B4. Oracle de comportement, dans les deux sens
 
-- [ ] Chaque contre-exemple de TLC est rejoué dans USE, pas à pas. USE doit accepter chaque pas et constater la même violation.
-- [ ] Chaque scénario existant (18 scripts d'exemples, 10 tests shell avec pre/post) doit être une exécution que la spec autorise.
-- [ ] Les états atteints par TLC servent de témoins au ModelValidator, qui doit trouver une solution.
-- [ ] Budget : rester dans l'ordre des 11 minutes de l'oracle actuel.
+- [x] Chaque contre-exemple de TLC est rejoué dans USE, pas à pas. USE doit accepter chaque pas et constater la même violation. Fait pour 9 contre-exemples et 28 traces de couverture (une par opération), l'état de USE égal à celui de TLC à chaque pas.
+- [x] Chaque scénario existant (18 scripts d'exemples, 9 tests shell avec pre/post, et non 10 : t093 n'a que « 0 pre-/postconditions ») doit être une exécution que la spec autorise. 26 sur 27, avec 3 046 verdicts d'accord. t095 arrête TLC sur un `Assert` (navigation sur une multiplicité violée).
+- [x] Les états atteints par TLC servent de témoins au ModelValidator, qui doit trouver une solution. 36 solutions, aucun UNSAT ; 3 erreurs du validateur (`substring`).
+- [x] Budget : rester dans l'ordre des 11 minutes de l'oracle actuel. 142 s.
 
 ## B5. Sondes de comportement et bugs volontaires
 
-- [ ] Sondes dérivées des 23 tests `StatementEffectTest` et des 10 tests shell de contrats, pas inventées.
-- [ ] Bugs volontaires dans la traduction des actions : cadre oublié, garde ignorée, `@pre` lu dans le mauvais état, etc.
-- [ ] Critère : chaque bug volontaire est détecté. Un bug non détecté est un trou de couverture à combler.
+- [x] Sondes dérivées des 23 tests `StatementEffectTest` et des 10 tests shell de contrats, pas inventées. Le test a 32 cas, dont 15 ont une sonde de comportement ; les 9 tests shell de contrat sont les scénarios de B4.
+- [x] Bugs volontaires dans la traduction des actions : cadre oublié, garde ignorée, `@pre` lu dans le mauvais état, etc. 16 bugs, mesurés avant toute sonde : 9 détectés.
+- [x] Critère : chaque bug volontaire est détecté. Un bug non détecté est un trou de couverture à combler. 10 sur 16 avec les sondes dérivées, 16 sur 16 après deux corrections de l'oracle et des sondes de fermeture écrites après coup (REPORT, section 8).
 
 ## G. Décision de publication (à toi)
 

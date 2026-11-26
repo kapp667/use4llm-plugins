@@ -1,0 +1,92 @@
+-- Behaviour probes from USE's StatementEffectTest (use-core/src/test/java/org/tzi/use/uml/sys/soil/
+-- StatementEffectTest.java), on the model of its TestSystem (use-core/src/test/java/org/tzi/use/
+-- TestSystem.java) without the association class AC1. Each case runs its statement at the top
+-- level; here it is the body of an operation, so that tlaops translates it, and statements.cmd
+-- calls the operations in the order of the cases. The comment of each operation names its case.
+model StatementEffect
+
+class C1
+attributes
+  int : Integer
+operations
+  -- TestSystem's operations: s1 (testVariableAssignment, assignment of return value), s2,
+  -- failEnter and failExit (testOperationCall), proxyFail (proxy fail), u1 and u2 (testOpEnterOpExit)
+  s1(p1 : Integer) : Integer
+    begin result := 42 end
+  s2()
+    begin end
+  failEnter()
+    begin end
+  failExit()
+    begin end
+  proxyFail()
+    begin self.failExit() end
+  u1() : String
+  u2(p1 : Integer)
+  -- testVariableAssignment, simple variable assignment: x := 42, then overwritten with 43
+  varAssign() : Integer
+    begin result := 42; result := 43 end
+  -- testVariableAssignment, assignment of new object: x := new C1, an object that did not exist
+  newObject() : C1
+    begin result := new C1 end
+  -- testAttributeAssignment, basic attribute assignment: o1.int := 42, then o1.int := 43
+  setInt(v : Integer)
+    begin self.int := v end
+  -- testObjectCreation, basic object creation: new C1
+  makeC1()
+    begin new C1 end
+  -- testObjectCreation, object creation with mandatory object name: new C1('a')
+  createNamed()
+    begin new C1('a') end
+  -- testObjectDestruction, basic object destruction: destroy o1
+  destroyOther(o : C1)
+    begin destroy o end
+  -- testLinkInsertion, basic link insertion: insert (o1, o2) into A1
+  link(c : C2)
+    begin insert (self, c) into A1 end
+  -- testLinkDeletion, basic link deletion: delete (o3, o4) from A1
+  unlink(c : C2)
+    begin delete (self, c) from A1 end
+  -- testConditional, condition = true and condition = false: v is 42, then the branch's value
+  cond(b : Boolean) : Integer
+    begin
+      declare v : Integer;
+      v := 42;
+      if b then v := 41 else v := 43 end;
+      result := v
+    end
+  -- testConditional, condition = oclUndefined(Boolean): the else branch
+  condUndef() : Integer
+    begin
+      declare v : Integer;
+      v := 42;
+      if oclUndefined(Boolean) then v := 41 else v := 43 end;
+      result := v
+    end
+  -- testIteration, silly example: sum := 0; for x in Sequence{1..10} do sum := sum + x end
+  sum() : Integer
+    begin
+      declare s : Integer;
+      s := 0;
+      for x in Sequence{1..10} do s := s + x end;
+      result := s
+    end
+end
+
+class C2
+attributes
+  str : String
+end
+
+association A1 between
+  C1 [0..1] role E1
+  C2 [0..1] role E2
+end
+
+constraints
+
+context C1::failEnter()
+  pre alwaysFails: false
+
+context C1::failExit()
+  post alwaysFails: false

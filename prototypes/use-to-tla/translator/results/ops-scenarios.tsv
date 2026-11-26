@@ -1,0 +1,32 @@
+scenario	model	commands	steps	new	call	contract	env	unchecked	allowed	verdicts_compared	verdicts_agree	result	detail
+examples/Documentation/Employee/Employee.cmd	Employee.use	14	14	2	0	2	6	2	yes	25	25	agree	unchecked: Real
+examples/Documentation/Graph/Graph.cmd	Graph.use	11	11	1	0	0	4	6	yes	14	14	agree	unchecked: postcondition: operation oclIsNew on OBJ
+examples/Documentation/HowToCheckUMLAndOCLModelsWithUSE/abcd_assl.cmd	civstat.use	20	20	4	0	4	4	0	yes	157	157	agree	
+examples/Documentation/HowToCheckUMLAndOCLModelsWithUSE/abcd_cmd.cmd	civstat.use	48	48	4	0	8	28	0	yes	169	169	agree	
+examples/Documentation/NestedOperationCalls/NestedOperationCalls.cmd	NestedOperationCalls.use	7	7	1	0	0	3	3	yes	0	0	agree	unchecked: postcondition: query operation with pre/postconditions
+examples/Documentation/tollcoll/tollcoll01.cmd	tollcoll.use	98	98	6	0	24	44	0	yes	488	488	agree	
+examples/Others/AB/AB.cmd	AB.use	11	11	2	0	1	7	0	yes	17	17	agree	
+examples/Others/CallSequence/CallSequence.cmd	CallSequence.use	10	10	2	0	4	0	0	yes	0	0	agree	
+examples/Others/Math/Math.cmd	Math.use	11	11	1	0	5	0	0	yes	5	5	agree	
+examples/Others/Polygon/Polygon.cmd	Polygon.use	28	28	4	0	0	16	8	yes	0	0	agree	unchecked: Real
+examples/Others/SwapLinks/SwapLinks.cmd	SwapLinks.use	12	12	3	0	1	7	0	yes	30	30	agree	
+examples/Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.cmd	EmployeeExtended.use	26	26	5	0	0	19	2	yes	275	275	agree	unchecked: Real
+examples/Papers/2001/RichtersPhDThesis/EmployeeExtended/SplitCommands/EmployeeExtendedRaiseSalary.cmd	EmployeeExtended.use	26	26	5	0	0	19	2	yes	275	275	agree	unchecked: Real
+examples/Papers/2001/RichtersPhDThesis/NestedOperationCalls/NestedOperationCalls.cmd	NestedOperationCalls.use	7	7	1	0	0	3	3	yes	0	0	agree	unchecked: postcondition: query operation with pre/postconditions
+examples/Papers/2006/GogollaBuettnerRichters/abcd_assl.cmd	civstat.use	20	20	4	0	4	4	0	yes	157	157	agree	
+examples/Papers/2006/GogollaBuettnerRichters/abcd_cmd.cmd	civstat.use	48	48	4	0	8	28	0	yes	169	169	agree	
+examples/soil/civstat/prepare.soil	civstat.use	5	5	2	3	0	0	0	yes	49	49	agree	
+examples/soil/projectworld/projects2.soil	projectworld.use	10	10	4	0	0	1	5	yes	170	170	agree	unchecked: for over an unordered collection (USE iterates in hash order)
+negative control: prepare.soil, Ada named Adb after birth	civstat.use	5	5	2	3	0	0	0	no, step 3	12	12	negative control caught	step 3 (! Ada.birth('Ada', #female);) not allowed: spec vs USE: none (the trace module's state differs from USE's dump)
+probes/holes.cmd	holes.use	12	12	4	7	0	1	0	yes	24	24	agree	
+probes/shell/t105.in	t105.use	6	6	2	2	0	2	0	yes	0	0	agree	
+probes/statements.cmd	statements.use	28	31	6	13	1	5	4	yes	52	52	agree	unchecked: destroy in a body; for over a sequence; new with an object name; operation call statement in a body
+shell/t042.in	t042.use	5	5	1	0	0	1	3	yes	0	0	agree	unchecked: Tuple
+shell/t052.in	t052.use	16	16	3	3	2	6	0	yes	12	12	agree	
+shell/t078.in	t078.use	96	96	8	0	22	44	0	yes	806	806	agree	
+shell/t080.in	library.use	59	59	9	0	12	26	0	yes	196	196	agree	
+shell/t084.in	t084.use	7	9	1	1	0	5	2	yes	1	1	agree	unchecked: call of an operation with a SOIL body inside a body
+shell/t095.in	t095.use	8	9	3	2	0	4	0	TLC error	23	23	TLC error	Error: The first argument of Assert evaluated to FALSE; the second argument was:
+shell/t107.in	t107.use	4	4	1	0	0	1	2	yes	6	6	agree	unchecked: postcondition: operation oclIsNew on OBJ
+shell/t121.in	t121.use	4	5	1	2	0	2	0	yes	2	2	agree	
+shell/t124.in	t124.use	1	1	1	0	0	0	0	yes	0	0	agree	

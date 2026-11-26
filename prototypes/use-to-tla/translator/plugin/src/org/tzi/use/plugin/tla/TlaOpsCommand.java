@@ -13,7 +13,8 @@ import org.tzi.use.util.Log;
  * Shell command "tlaops (settings file | default) outdir [module]": translates the loaded model's
  * operations under the settings into outdir/module.tla and .cfg (module defaults to UseOps), and
  * writes ops.tsv (what was translated or refused, and why), checks.tsv (TLC invariant -> what it
- * checks) and settings.txt (the settings used).
+ * checks), types.tsv (the pools and the types of the state's values and of the operations'
+ * parameters, which a trace tool reads) and settings.txt (the settings used).
  */
 public class TlaOpsCommand implements IPluginShellCmdDelegate {
 
@@ -48,7 +49,9 @@ public class TlaOpsCommand implements IPluginShellCmdDelegate {
 			StringBuilder c = new StringBuilder("operator\tchecks\n");
 			for (java.util.Map.Entry<String, String> e : ops.checks.entrySet()) c.append(e.getKey()).append('\t').append(e.getValue()).append('\n');
 			TlaCommand.write(dir, "checks.tsv", c.toString());
-			out.println("tlaops: " + ok + " operations translated, " + no + " refused, " + ops.checks.size() + " checks, written to " + dir);
+			TlaCommand.write(dir, "types.tsv", ops.types());
+			out.println("tlaops: " + ok + " operations translated, " + no + " refused, " + ops.checks.size() + " checks, written to " + dir
+					+ (Ops.MUTANT.isEmpty() ? "" : ", mutant " + Ops.MUTANT + " applied " + ops.mutated + " times"));
 		} catch (IOException | IllegalArgumentException ex) {
 			out.println("tlaops: " + ex.getMessage());
 		}

@@ -1,10 +1,10 @@
 run	settings	tlc	distinct_states	depth	time	USE replay
-every-state	civstat-every-state.settings	Error: Invariant Inv_Person_attributesDefined is violated	2	2	00s	Person::attributesDefined FAILED;Person::nameCapitalThenSmallLetters FAILED
-atomic-birth	civstat.settings	Error: Invariant Inv_Person_nameIsUnique is violated	14	3	00s	Person::nameIsUnique FAILED
+every-state	civstat-every-state.settings	Error: Invariant Inv_Person_attributesDefined is violated	2	2	00s	inv Person::attributesDefined; inv Person::nameCapitalThenSmallLetters; 2 of 2 states equal; agree
+atomic-birth	civstat.settings	Error: Invariant Inv_Person_nameIsUnique is violated	14	3	00s	inv Person::nameIsUnique; 5 of 5 states equal; agree
 rest-3	civstat.settings + skip nameIsUnique	no error	11161	11	02s	
-generated refines hand (3)	rest-3	no error	11161	11	04s	
+generated refines hand (3)	rest-3	no error	11161	11	03s	
 hand refines generated (3)	rest-3	no error	11161	11	03s	
 negative control: wrong mapping	rest-3	Error: Action property line 118, col 17 to line 118, col 29 of module Civstat is violated	4	2	00s	
-broken-marry	rest-3 on civstat-broken.use	Error: Invariant Post_Person_marry_maleHasMarriedWife is violated	138	4	00s	maleHasMarriedWife does not hold
-rest-4	rest-3 + objects Person 4	no error	524545	15	01min 08s	
-sym-5	rest-3 + objects Person 5 + symmetry	no error	215729	19	01min 56s	
+broken-marry	rest-3 on civstat-broken.use	Error: Invariant Post_Person_marry_maleHasMarriedWife is violated	138	4	00s	post maleHasMarriedWife; 6 of 6 states equal; agree
+rest-4	rest-3 + objects Person 4	no error	524545	15	01min 15s	
+sym-5	rest-3 + objects Person 5 + symmetry	no error	215729	19	01min 47s	

@@ -1,0 +1,3 @@
+# Shell tests of USE (use-gui/src/it/resources/testfiles/shell) run as probe scenarios.
+# t105: a call through a variable of the superclass runs the override of the object's class (dispatch).
+t105.in
