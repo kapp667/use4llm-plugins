@@ -1,0 +1,48 @@
+class	case	S0_result	S0_all_true_in_USE	S0_distinct_states	S0_seconds	violating_state	tlc_reported	reported_is_use_false	viol_seconds
+V	V__Documentation_Cars_Cars.use	no violation	yes	1	1.49	S1	Car::MileageNotNegative	yes	1.52
+V	V__Documentation_Demo_Demo.use	no violation	yes	1	1.45	S4	Project::BudgetWithinDepartmentBudget	yes	1.57
+V	V__Documentation_Imports_Meetings.use	no violation	yes	1	1.48	S1	Meeting::TitleLengthLimit	yes	1.38
+V	V__Others_Ex_ex.use	no violation	yes	1	1.90	S4	Project::i1c	yes	1.67
+V	V__use-core_src_test_resources_org_tzi_use_parser_bug0009.use	no violation	yes	1	1.24	S1	foo::OK1	yes	1.43
+V	V__use-core_src_test_resources_org_tzi_use_parser_t11.use	no violation	yes	1	1.34	none			
+V	V__use-core_src_test_resources_org_tzi_use_parser_t15.use	no violation	yes	1	1.34	S2	A::inv1	yes	1.40
+V	V__use-core_src_test_resources_org_tzi_use_parser_t4.use	no violation	yes	1	1.50	none			
+V	V__use-gui_src_it_resources_testfiles_shell_imports_t127_import.use	no violation	yes	1	1.41	none			
+V	V__use-gui_src_it_resources_testfiles_shell_t016.use	no violation	yes	1	1.53	S2	B::inv1	yes	1.23
+V	V__use-gui_src_it_resources_testfiles_shell_t027.use	no violation	yes	1	1.32	none			
+V	V__use-gui_src_it_resources_testfiles_shell_t048.use	no violation	yes	1	1.43	S1	Person::chiefExists	yes	1.36
+V	V__use-gui_src_it_resources_testfiles_shell_t049.use	no violation	yes	1	1.28	S4	Person::nameUnique	yes	1.23
+V	V__use-gui_src_it_resources_testfiles_shell_t075.use	no violation	yes	1	1.62	S1	Test::testValue1	yes	1.84
+V	V__use-gui_src_it_resources_testfiles_shell_t094.use	no violation	yes	1	1.61	none			
+V	V__use-gui_src_it_resources_testfiles_shell_t095.use	no violation	yes	1	1.54	none			
+V	V__use-gui_src_it_resources_testfiles_shell_t097.use	no violation	yes	1	1.38	S2	B::linkExists	yes	1.54
+V	V__use-gui_src_it_resources_testfiles_shell_t106.use	no violation	yes	1	1.42	none			
+V	V__use-gui_src_it_resources_testfiles_shell_t127.use	no violation	yes	1	1.17	none			
+W-	W__Documentation_Cars_Cars.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |-> {"bigCar", "smallCar"},	no	?	1.51	S0	Car::MileageNotNegative	yes	1.42
+W-	W__Documentation_Demo_Demo.use	violation: Error: Invariant MCInv_2 is violated by the initial state: st = [ objs |-> {"cs", "frank", "john", "research", "teaching"},	no	?	1.34	S0	Project::BudgetWithinDepartmentBudget	yes	1.58
+W-	W__Metamodels_UML23_UML2MM.use	no violation	yes	1	2.05	S2	PackageableElement::visibilityDefined	yes	2.08
+W-	W__Metamodels_actionsemantics_actionsemantics.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [lnk |-> [AssociationEnd_Classifier1 |-> {}, Association_AssociationEnd |-> <<>>, Generalization_GeneralizableElement1 |-> {}, Generalization_GeneralizableElement2 |-> {}, Namespace_ModelElement |-> {}, Package_ModelElement |-> {}, Clas	no	?	4.88	S0	ActionExecutionSnapshot::ActionExecution_identities	yes	4.61
+W-	W__Others_CarRental_CarRental2.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |->	no	?	1.23	S0	Branch::Branch1	yes	1.45
+W-	W__Others_CarRental_CarRental3.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |->	no	?	1.69	S0	Branch::Branch1	yes	2.47
+W-	W__Others_Ex_ex.use	violation: Error: Invariant MCInv_5 is violated by the initial state: st = [ objs |-> {"cs", "frank", "john", "research", "teaching"},	no	?	1.70	S0	Project::i4	yes	1.74
+W-	W__Others_Grammar_Grammar.use	no violation	yes	1	1.59	S8	Grammar::UniqueSymbols	yes	2.04
+W-	W__Others_Lists_Lists.use	violation: Error: Invariant MCInv_5 is violated by the initial state: st = [lnk |-> [Next_List |-> {<<"l1", "l2">>, <<"l2", "l3">>, <<"l3", "el">>, <<"lm", "el">>}, Map_List |-> {<<"m1", "lm">>}, List_Element |-> {<<"lm", "p">>}, Pair_Key |-> {<<"p", "o1">>}, Pair_Value |-> {<<"p", "o2">>}], cls |-> [p |-> "Pa	no	?	1.73	S0	List::NoListElement	yes	1.57
+W-	W__Others_Subsets_composition_2.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [objs |-> {"b1", "e1", "p1"}, cls |-> [b1 |-> "Boat", e1 |-> "Engine", p1 |-> "Propeller"], lnk |-> [powers |-> {<<"e1", "p1">>}, C_InBoat_P |-> {<<"b1", "p1">>}, C_InCarAsBack_Back |-> {}, C_InCarAsFront_Front |-> {}, C_InVehicle_Part 	no	?	1.40	S0	Engine::noOverkill	yes	1.38
+W-	W__Others_Tree_Tree.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ lnk |->	no	?	1.39	S0	TreeNode::AcyclicParentship	yes	1.28
+W-	W__Papers_2001_RichtersPhDThesis_EmployeeExtended_EmployeeExtended.use	violation: Error: Invariant MCInv_5 is violated by the initial state: st = [ objs |-> {"cs", "frank", "john", "research", "teaching"},	no	?	1.68	S0	Project::i4	yes	1.54
+P	W__home_user_proto-use2tla_translator_probes_semantics_Probe.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |-> {"p1", "p2", "p3", "p4"},	no	?	1.03	S0	P::andU	yes	1.00
+W-	W__use-gui_src_it_resources_testfiles_shell_t003.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [objs |-> {"a1", "a2", "b1"}, cls |-> [a1 |-> "A", a2 |-> "A", b1 |-> "B"], lnk |-> [A_B |-> {<<"a1", "b1">>}], att |-> <<>>]	no	?	1.50	S0	A::i1	yes	1.40
+W-	W__use-gui_src_it_resources_testfiles_shell_t015.use	violation: Error: Invariant MCInv_6 is violated by the initial state: st = [ lnk |->	no	?	1.46	S0	Zug::Kette	yes	1.64
+W-	W__use-gui_src_it_resources_testfiles_shell_t016.use	violation: Error: The first argument of Assert evaluated to FALSE; the second argument was: "multiplicity violation at end a"	no	1	1.43	S2	B::inv1	yes	1.34
+W-	W__use-gui_src_it_resources_testfiles_shell_t048.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |-> {"p1", "p2"},	no	?	1.43	S0	Person::chiefExists	yes	1.42
+W-	W__use-gui_src_it_resources_testfiles_shell_t049.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |-> {"ada", "ada2", "bob", "cyd"},	no	?	1.43	S0	Person::nameUnique	yes	1.51
+W-	W__use-gui_src_it_resources_testfiles_shell_t051.use	violation: Error: Invariant MCInv_0 is violated by the initial state: st = [ objs |->	no	?	2.26	S0	ActiviteNotee::A1	yes	1.69
+W	W__use-gui_src_it_resources_testfiles_shell_t075.use	no violation	yes	1	1.43	S1	Test::testValue1	yes	1.78
+W	W__use-gui_src_it_resources_testfiles_shell_t078.use	no violation	yes	1	1.90	S2	Copy::signatureFormatOk	yes	2.11
+W	W__use-gui_src_it_resources_testfiles_shell_t094.use	no violation	yes	1	1.66	none			
+W-	W__use-gui_src_it_resources_testfiles_shell_t101.use	no violation	yes	1	20.89	none			
+W-	W__use-gui_src_it_resources_testfiles_shell_t109.use	no violation	yes	1	2.49	S1	Session::ActionsPermitted	yes	2.35
+W-	W__use-gui_src_it_resources_testfiles_shell_t113.use	no violation	yes	1	2.06	S11	Property::derivedUnionIsDerived	yes	1.69
+W	W__use-gui_src_it_resources_testfiles_shell_t118.use	no violation	yes	1	1.60	none			
+W	W__use-gui_src_it_resources_testfiles_shell_t127.use	no violation	yes	1	1.42	none			
+W	W__use-gui_src_it_resources_testfiles_shell_t133_imports.use	no violation	yes	1	1.39	S1	Vermietung::kapazitaetNichtUeberschritten	yes	1.21

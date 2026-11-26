@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Plugin-Name: Use2TlaPlugin
+Plugin-Version: 0.1
+Main-Class: org.tzi.use.plugin.tla.TlaPlugin
+Plugin-Publisher: prototype

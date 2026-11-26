@@ -1,0 +1,85 @@
+-- Probe of the USE semantics the translator must match where the corpus may not exercise them:
+-- undefined propagation, Java div/mod, Set->collect as a Bag, to-one navigation, ordered ends.
+model Probe
+
+enum Color { red, green }
+
+class P
+attributes
+  i : Integer
+  j : Integer
+  b : Boolean
+  s : String
+  c : Color
+  q : P
+operations
+  twice(x : Integer) : Integer = x * 2
+  fact(n : Integer) : Integer = if n <= 1 then 1 else n * self.fact(n - 1) endif
+end
+
+class Q < P
+end
+
+association Link between
+  P [0..1] role owner
+  P [*] role items ordered
+end
+
+association Pair between
+  P [0..1] role left
+  P [0..1] role right
+end
+
+constraints
+
+context P
+  inv divmod: (i div j) * j + i.mod(j) = i
+  inv divNeg: (i div 2) >= -3
+  inv modVal: i.mod(3) <> 2
+  inv modNeg: i.mod(3) >= 0
+  inv andU: (i > 0) and b
+  inv orU: (i > 0) or b
+  inv impU: b implies i > 0
+  inv xorU: b xor (i > 0)
+  inv notU: not b
+  inv eqU: q.i = i
+  inv eqUU: q.q = right
+  inv neqU: q <> self
+  inv kindU: q.oclIsKindOf(Q)
+  inv typeU: q.oclIsTypeOf(P)
+  inv asTypeU: q.oclAsType(Q).isDefined()
+  inv isUndef: q.isUndefined() or q.j > 0
+  inv navOne: right.isDefined() implies right.left = self
+  inv navUndefMany: q.items->size() >= 0
+  inv navUndefIncl: q.items->includes(self) or q.items->excludes(self)
+  inv navUndefEmpty: q.items->isEmpty()
+  inv exclNull: Set{q, right}->excluding(null)->size() <= 1
+  inv inclNull: Set{q}->including(null)->size() = 2
+  inv collectBag: P.allInstances->collect(x | x.i)->sum() = P.allInstances->collect(x | x.i)->asSet()->sum()
+  inv collectSize: P.allInstances->collect(x | x.b)->size() = P.allInstances->size()
+  inv collectNested: P.allInstances->collect(x | x.items)->size() >= 2
+  inv selectU: P.allInstances->select(x | x.b)->size() >= 2
+  inv rejectU: P.allInstances->reject(x | x.b)->size() <= 1
+  inv forallU: P.allInstances->forAll(x | x.b or x.i > 0)
+  inv existsU: P.allInstances->exists(x | x.b and x.i < 0)
+  inv oneU: P.allInstances->one(x | x.b)
+  inv uniqueU: P.allInstances->isUnique(x | x.j)
+  inv countU: P.allInstances->collect(x | x.i)->count(i) = 1
+  inv ifU: (if b then 1 else 2 endif) = 1
+  inv ifUndef: b.isUndefined() implies (if b then 1 else 2 endif).isUndefined()
+  inv letU: let k = i * 2 in k > j
+  inv strCat: s.concat('x').size() = s.size() + 1
+  inv strEq: s = 'a'
+  inv enumEq: c = Color::red
+  inv opInline: self.twice(i) > j
+  inv opRec: self.fact(j) >= 1
+  inv ordFirst: items->first().isDefined() implies items->first().owner = self
+  inv ordAt: items->at(2).isUndefined() or items->at(1) <> items->at(2)
+  inv ordOrder: items->notEmpty() implies items->first().i < items->last().i
+  inv ordCollect: items->collect(x | x.i)->sum() >= 0
+  inv closureU: Set{self}->closure(x | x.right)->size() >= 2
+  inv sumUndef: P.allInstances->collect(x | x.j)->sum() > 0
+  inv rangeLit: Set{1..i}->size() = i
+  inv rangeSeq: Sequence{j..i}->size() >= 1
+  inv anyRefused: P.allInstances->any(x | x.b).isDefined()
+  inv realRefused: i / 2 > 1

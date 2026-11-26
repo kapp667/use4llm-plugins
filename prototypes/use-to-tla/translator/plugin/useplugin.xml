@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?use version="3.1.0"?>
+<plugin name="Use2TlaPlugin" version="0.1">
+	<commands>
+		<command shellcmd="tla"
+			label="tla"
+			help="Usage: tla 'outdir' [K] [seed]; writes K mutated states of the current state, USE's invariant values on them, and a TLA+ translation of the model's invariants and states to 'outdir'."
+			class="org.tzi.use.plugin.tla.TlaCommand"
+			id="org.tzi.use.plugin.tla.TlaCommand">
+		</command>
+	</commands>
+</plugin>
