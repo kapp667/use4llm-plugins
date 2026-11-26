@@ -29,6 +29,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		RealAtom_Test.class,
 		AttributeValueBounds_Test.class,
 		AssociationClassMultiplicity_Test.class,
-		IntegerArithmetic_Test.class })
+		IntegerArithmetic_Test.class,
+		IntegerCollectionBounds_Test.class })
 public class TestSuite {
 }
