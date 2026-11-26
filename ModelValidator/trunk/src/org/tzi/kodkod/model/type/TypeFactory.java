@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import kodkod.ast.Expression;
 import kodkod.ast.IntExpression;
 
 import org.tzi.kodkod.model.iface.IClass;
@@ -21,6 +22,7 @@ public abstract class TypeFactory {
 
 	private Map<String, Type> buildInTypes;
 	private final Set<IntExpression> singleIntegerReads = Collections.newSetFromMap(new IdentityHashMap<IntExpression, Boolean>());
+	private final Map<Expression, IntExpression[]> integerRanges = new IdentityHashMap<Expression, IntExpression[]>();
 
 	public TypeFactory() {
 		buildInTypes = createBuildInTypes();
@@ -34,6 +36,16 @@ public abstract class TypeFactory {
 	 */
 	public Set<IntExpression> singleIntegerReads() {
 		return singleIntegerReads;
+	}
+
+	/**
+	 * Returns, for the comprehension of the elements of each Integer range
+	 * the translation builds, the integer expressions of its first and its
+	 * last value, as {first, last}; the translation adds to it. IntegerRanges
+	 * reads it for the atoms a range holds and the values it needs as atoms.
+	 */
+	public Map<Expression, IntExpression[]> integerRanges() {
+		return integerRanges;
 	}
 
 	/**

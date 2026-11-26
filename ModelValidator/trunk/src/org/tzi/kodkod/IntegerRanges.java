@@ -7,6 +7,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import kodkod.ast.BinaryExpression;
 import kodkod.ast.BinaryIntExpression;
@@ -42,7 +43,9 @@ import kodkod.instance.Tuple;
  * of a formula. The intervals come from the Integer atoms the bounds allow
  * in each relation and from the number of tuples each expression may hold;
  * they may be wider than the values the expressions take, never narrower
- * wherever a value can change the truth of the formula.
+ * wherever a value can change the truth of the formula. It also returns the
+ * Integer values that the formula may read as an atom and the bounds hold
+ * no atom for.
  */
 public final class IntegerRanges {
 
@@ -57,10 +60,14 @@ public final class IntegerRanges {
 	private final long universeSize;
 	private final Map<Variable, Expression> declarations = new IdentityHashMap<Variable, Expression>();
 	private final Map<Node, long[]> intervals = new IdentityHashMap<Node, long[]>();
+	private final List<IntToExprCast> casts = new ArrayList<IntToExprCast>();
+	private final List<Comprehension> comprehensions = new ArrayList<Comprehension>();
+	private final Map<Expression, IntExpression[]> integerRanges;
 
-	private IntegerRanges(Bounds bounds, Set<IntExpression> singleReads) {
+	private IntegerRanges(Bounds bounds, Set<IntExpression> singleReads, Map<Expression, IntExpression[]> integerRanges) {
 		this.bounds = bounds;
 		this.singleReads = singleReads;
+		this.integerRanges = integerRanges;
 		universeSize = bounds.universe().size();
 		long[] integers = null;
 		for (Object atom : bounds.universe()) {
@@ -78,8 +85,9 @@ public final class IntegerRanges {
 	 * one atom wherever the sum can change the truth of the formula; each
 	 * counts as one value.
 	 */
-	public static int requiredBitwidth(Formula formula, Bounds bounds, Set<IntExpression> singleReads) {
-		IntegerRanges ranges = new IntegerRanges(bounds, singleReads);
+	public static int requiredBitwidth(Formula formula, Bounds bounds, Set<IntExpression> singleReads,
+			Map<Expression, IntExpression[]> integerRanges) {
+		IntegerRanges ranges = new IntegerRanges(bounds, singleReads, integerRanges);
 		int bitwidth = bitsFor(ranges.universeIntegers);
 		for (IntExpression e : ranges.collect(formula)) {
 			bitwidth = Math.max(bitwidth, bitsFor(ranges.interval(e)));
@@ -88,8 +96,62 @@ public final class IntegerRanges {
 	}
 
 	/**
-	 * Returns the integer expressions of the formula and records the
-	 * declaration of each variable.
+	 * Returns the Integer values the bounds hold no atom for and the formula
+	 * may read as an atom: the values of the interval of each integer cast to
+	 * an atom and, for each range the formula holds, those from the lowest
+	 * value its first end can take to the highest value its last end can
+	 * take. integerRanges holds the ends of each range. Returns null when
+	 * more than limit values are missing. Leaves out each interval that
+	 * reaches beyond the int range: requiredBitwidth then returns a bitwidth
+	 * above 32, which the solver refuses.
+	 */
+	public static Set<Integer> missingIntegers(Formula formula, Bounds bounds, Set<IntExpression> singleReads,
+			Map<Expression, IntExpression[]> integerRanges, int limit) {
+		IntegerRanges ranges = new IntegerRanges(bounds, singleReads, integerRanges);
+		ranges.collect(formula);
+		List<long[]> needed = new ArrayList<long[]>();
+		for (IntToExprCast cast : ranges.casts) {
+			needed.add(ranges.interval(cast.intExpr()));
+		}
+		for (Comprehension range : ranges.comprehensions) {
+			if (integerRanges.containsKey(range) && ranges.rangeHull(range) != null) {
+				needed.add(ranges.rangeHull(range));
+			}
+		}
+		TreeSet<Long> atoms = new TreeSet<Long>();
+		for (Object atom : bounds.universe()) {
+			if (atom instanceof Integer) {
+				atoms.add(Long.valueOf((Integer) atom));
+			}
+		}
+		Set<Integer> missing = new TreeSet<Integer>();
+		for (long[] interval : needed) {
+			if (interval[0] > interval[1] || interval[0] < Integer.MIN_VALUE || interval[1] > Integer.MAX_VALUE) {
+				continue;
+			}
+			long absent = interval[1] - interval[0] + 1 - atoms.subSet(interval[0], true, interval[1], true).size();
+			if (absent > limit) {
+				return null;
+			}
+			if (absent == 0) {
+				continue;
+			}
+			for (long value = interval[0]; value <= interval[1]; value++) {
+				if (!atoms.contains(value)) {
+					missing.add((int) value);
+				}
+			}
+			if (missing.size() > limit) {
+				return null;
+			}
+		}
+		return missing;
+	}
+
+	/**
+	 * Returns the integer expressions of the formula, and records, once each,
+	 * the declaration of each variable, each integer cast to an atom and each
+	 * comprehension.
 	 */
 	private List<IntExpression> collect(Formula formula) {
 		final List<IntExpression> integers = new ArrayList<IntExpression>();
@@ -110,6 +172,22 @@ public final class IntegerRanges {
 			@Override
 			public void visit(IntConstant e) {
 				integers.add(e);
+			}
+
+			@Override
+			public void visit(Comprehension e) {
+				if (!seen.contains(e)) {
+					comprehensions.add(e);
+				}
+				super.visit(e);
+			}
+
+			@Override
+			public void visit(IntToExprCast e) {
+				if (e.op() == IntCastOperator.INTCAST && !seen.contains(e)) {
+					casts.add(e);
+				}
+				super.visit(e);
 			}
 
 			@Override
@@ -285,6 +363,12 @@ public final class IntegerRanges {
 		}
 		if (e instanceof BinaryExpression) {
 			BinaryExpression binary = (BinaryExpression) e;
+			if (binary.op() == ExprOperator.JOIN && binary.left().arity() == 1) {
+				return atoms(binary.right());
+			}
+			if (binary.op() == ExprOperator.JOIN && binary.right().arity() == 1) {
+				return atoms(binary.left());
+			}
 			return union(atoms(binary.left()), atoms(binary.right()));
 		}
 		if (e instanceof NaryExpression) {
@@ -303,6 +387,9 @@ public final class IntegerRanges {
 		if (e instanceof IfExpression) {
 			IfExpression choice = (IfExpression) e;
 			return union(atoms(choice.thenExpr()), atoms(choice.elseExpr()));
+		}
+		if (integerRanges.containsKey(e)) {
+			return intersection(rangeHull((Comprehension) e), universeIntegers);
 		}
 		if (e instanceof Comprehension) {
 			long[] result = null;
@@ -360,6 +447,10 @@ public final class IntegerRanges {
 		if (e instanceof IfExpression) {
 			IfExpression choice = (IfExpression) e;
 			return Math.max(size(choice.thenExpr()), size(choice.elseExpr()));
+		}
+		if (integerRanges.containsKey(e)) {
+			long[] hull = rangeHull((Comprehension) e);
+			return hull == null ? 0 : Math.min(bounds.ints().size(), hull[1] - hull[0] + 1);
 		}
 		if (e instanceof Comprehension) {
 			long result = 1;
@@ -432,6 +523,18 @@ public final class IntegerRanges {
 			return a;
 		}
 		return new long[] { Math.min(a[0], b[0]), Math.max(a[1], b[1]) };
+	}
+
+	/**
+	 * Returns the interval from the lowest value the first end of the range
+	 * can take to the highest value its last end can take, null when it holds
+	 * none.
+	 */
+	private long[] rangeHull(Comprehension range) {
+		IntExpression[] ends = integerRanges.get(range);
+		long first = interval(ends[0])[0];
+		long last = interval(ends[1])[1];
+		return first > last ? null : new long[] { first, last };
 	}
 
 	private static long[] intersection(long[] a, long[] b) {
