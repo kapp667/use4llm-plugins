@@ -1,8 +1,10 @@
 package org.tzi.kodkod;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.helper.LogMessages;
@@ -40,8 +42,10 @@ public class KodkodSolver {
 			throw new IOException("No solver loaded. Load a solver using the configuration command. See command `plugins' for help.");
 		}
 		
+		((IntegerType) model.typeFactory().integerType()).setComputedValues(Collections.<Integer>emptySet());
 		Bounds bounds = createBounds(model);
 		Formula constraint = createConstraint(model);
+		bounds = addComputedIntegers(model, constraint, bounds, configuration.maxComputedIntegers());
 		
 		if(configuration.isDebugBoundsPrint()){
 			LOG.info(bounds);
@@ -50,7 +54,8 @@ public class KodkodSolver {
 		final Solver solver = new Solver();
 		solver.options().setLogTranslation(1);
 		
-		int needed = IntegerRanges.requiredBitwidth(constraint, bounds, model.typeFactory().singleIntegerReads());
+		int needed = IntegerRanges.requiredBitwidth(constraint, bounds, model.typeFactory().singleIntegerReads(),
+				model.typeFactory().integerRanges());
 		if (needed > Math.max(configuration.bitwidth(), configuration.maxBitwidth())) {
 			throw new IllegalStateException(LogMessages.bitwidthAboveMaximum(needed, configuration.maxBitwidth()));
 		}
@@ -86,6 +91,36 @@ public class KodkodSolver {
 		Formula constraint = constraintVisitor.getFormula();
 
 		return constraint;
+	}
+
+	/**
+	 * Sets on the Integer type of the model the values that the Integer
+	 * expressions of the constraint may compute and read as an atom, up to
+	 * max such values, and returns the bounds built with an atom for each.
+	 * Throws IllegalStateException for a model that needs more.
+	 */
+	private Bounds addComputedIntegers(IModel model, Formula constraint, Bounds bounds, int max) {
+		Set<Integer> computed = new TreeSet<Integer>();
+		Set<Integer> missing;
+		while (!(missing = missingIntegers(model, constraint, bounds, max - computed.size())).isEmpty()) {
+			computed.addAll(missing);
+			((IntegerType) model.typeFactory().integerType()).setComputedValues(computed);
+			bounds = createBounds(model);
+		}
+		if (!computed.isEmpty()) {
+			LOG.info(LogMessages.addedComputedIntegers(computed.size()));
+		}
+		return bounds;
+	}
+
+	private Set<Integer> missingIntegers(IModel model, Formula constraint, Bounds bounds, int limit) {
+		Set<Integer> missing = IntegerRanges.missingIntegers(constraint, bounds, model.typeFactory().singleIntegerReads(),
+				model.typeFactory().integerRanges(), limit);
+		if (missing == null) {
+			throw new IllegalStateException(LogMessages.computedIntegersAboveMaximum(
+					KodkodModelValidatorConfiguration.getInstance().maxComputedIntegers()));
+		}
+		return missing;
 	}
 
 	/**
