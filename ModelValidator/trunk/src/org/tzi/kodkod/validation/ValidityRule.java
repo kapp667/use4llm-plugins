@@ -363,6 +363,25 @@ public enum ValidityRule {
 	}
 
 	/**
+	 * Returns whether a violation of the rule leaves the model validator nothing
+	 * sound to search with: a setting is missing, invalid or contradicts another.
+	 * A superfluous or imperfect setting does not.
+	 * 
+	 * @return Whether a violation of the rule makes the configuration unusable.
+	 */
+	public boolean breaksTheConfiguration() {
+		switch (level) {
+		case INCOMPLETE:
+		case INVALID:
+		case INTER_CONTRADICTION:
+		case INTRA_CONTRADICTION:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	/**
 	 * Sorts rules ascending by their ordinal value. If rules have the same ordinal,
 	 * they are ordered like in the argument.
 	 * 
