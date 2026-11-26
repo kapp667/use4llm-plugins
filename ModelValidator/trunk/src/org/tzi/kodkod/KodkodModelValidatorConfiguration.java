@@ -102,14 +102,12 @@ public class KodkodModelValidatorConfiguration {
 	private KodkodModelValidatorConfiguration() {
 		iniSaveFile = new File(PathHelper.getPluginPath() + FOLDER_NAME, INI_FILENAME);
 
-		LOG.info("Use `modelvalidator -downloadSolvers' to automatically download and install additional solver libraries.");
-		
 		addSolverFolders();
 		readFile();
 	}
 
 	/**
-	 * Adds the folders with the extracted solver libraries to the
+	 * Adds the solver library folder for this JVM's architecture to the
 	 * 'java.library.path'.
 	 */
 	private void addSolverFolders() {
