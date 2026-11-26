@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map.Entry;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -35,8 +34,8 @@ public abstract class ConfigurablePlugin extends AbstractPlugin {
 	 * Configuration of the model with the data from the given configuration.
 	 * 
 	 * @throws ConfigurationException
-	 *             If the configuration breaks a validity rule, after an error
-	 *             naming each broken rule is logged.
+	 *             If the configuration is refused, after an error that says why
+	 *             is logged.
 	 */
 	protected void configureModel(Configuration config, PrintWriter warningsOut) throws ConfigurationException {
 		checkConfiguration(config);
@@ -64,27 +63,27 @@ public abstract class ConfigurablePlugin extends AbstractPlugin {
 	}
 	
 	/**
-	 * Checks the configuration against the validity rules whose violation makes it
-	 * unusable: every rule of mv -vc except those of superfluous or imperfect settings.
+	 * Checks the configuration against the rules of
+	 * {@link ValidityRule#stoppingTheSearch()}.
 	 * 
 	 * @throws ConfigurationException
-	 *             If a rule is broken or a value cannot be read, after an error
-	 *             that says why is logged.
+	 *             If a rule is broken, a value cannot be read or the check fails,
+	 *             after an error that says why is logged.
 	 */
 	private void checkConfiguration(Configuration config) throws ConfigurationException {
 		SettingsConfiguration settings = new SettingsConfiguration(model());
 		SortedMap<ValidityRule, ValidityRuleViolence[]> violations;
 		try {
 			ChangeConfiguration.toSettings(model(), config, settings);
-			violations = new TreeMap<>(new ValidityRuleValidator().validate(settings, model(), extractInvariants()));
-		} catch (ConversionException e) {
+			violations = new ValidityRuleValidator(ValidityRule.stoppingTheSearch()).validate(settings, model(),
+					extractInvariants());
+		} catch (ConversionException | NumberFormatException e) {
 			LOG.error(LogMessages.configurationValueError + ": " + e.getMessage());
 			throw new ConfigurationException(LogMessages.configurationRefused);
 		} catch (Exception e) {
 			LOG.error(LogMessages.configurationCheckError, e);
 			throw new ConfigurationException(LogMessages.configurationRefused);
 		}
-		violations.keySet().removeIf(rule -> !rule.breaksTheConfiguration());
 		if (!violations.isEmpty()) {
 			LOG.error(LogMessages.configurationInvalid + "\n" + describeViolations(violations));
 			throw new ConfigurationException(LogMessages.configurationRefused);
@@ -92,11 +91,7 @@ public abstract class ConfigurablePlugin extends AbstractPlugin {
 	}
 
 	/**
-	 * Describes each violated rule with its violations and the fixes they offer.
-	 * 
-	 * @param violationsByValidityRules
-	 *            The violations of validity rules for the rules.
-	 * @return The description, a line for each rule, violation and fix.
+	 * Describes each violated rule, its violations and their fixes, one line each.
 	 */
 	static String describeViolations(SortedMap<ValidityRule, ValidityRuleViolence[]> violationsByValidityRules) {
 		String logString = "";

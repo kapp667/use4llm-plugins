@@ -19,6 +19,29 @@ import org.tzi.use.uml.ocl.expr.Expression;
 abstract class AbstractValidityRuleValidator {
 
 	/**
+	 * The rules to evaluate, or null for every rule.
+	 */
+	private final Set<ValidityRule> evaluated;
+
+	/**
+	 * Constructs a validator that evaluates every rule.
+	 */
+	AbstractValidityRuleValidator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a validator that evaluates only the given rules. Any other rule
+	 * counts as satisfied, so it neither runs nor hides a rule that depends on it.
+	 * 
+	 * @param evaluated
+	 *            The rules to evaluate.
+	 */
+	AbstractValidityRuleValidator(Set<ValidityRule> evaluated) {
+		this.evaluated = evaluated;
+	}
+
+	/**
 	 * Validated whether a rule is not violated.
 	 * 
 	 * @param config
@@ -140,7 +163,7 @@ abstract class AbstractValidityRuleValidator {
 			}
 		}
 		if (unsatisfied.isEmpty() && rule.level != ValidityRuleLevel.INTERNAL
-				&& !isSatisfied(config, model, rule, invariants)) {
+				&& (evaluated == null || evaluated.contains(rule)) && !isSatisfied(config, model, rule, invariants)) {
 			return new ValidityRule[] { rule };
 		}
 		return unsatisfied.toArray(new ValidityRule[unsatisfied.size()]);
