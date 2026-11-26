@@ -107,7 +107,7 @@ public class KodkodModelValidatorConfiguration {
 	}
 
 	/**
-	 * Adds the folders with the extracted solver libraries to the
+	 * Adds the solver library folder for this JVM's architecture to the
 	 * 'java.library.path'.
 	 */
 	private void addSolverFolders() {
