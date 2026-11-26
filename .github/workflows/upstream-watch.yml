@@ -1,0 +1,59 @@
+name: Upstream watch
+
+# Every Monday, opens an issue with ci/upstream-watch.sh's report since the day seven days
+# earlier, or an issue with its error output when it fails. The report also goes to the run's
+# summary, so it is kept when the issue cannot be opened.
+on:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'First day to report, YYYY-MM-DD (default: seven days ago)'
+        required: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report and open the issue
+        env:
+          # Code search does not accept the workflow's own token: the script runs with a
+          # fine-grained token that reads public repositories, stored as UPSTREAM_WATCH_TOKEN.
+          WATCH_TOKEN: ${{ secrets.UPSTREAM_WATCH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          SINCE: ${{ inputs.since }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          since="${SINCE:-$(date -u -d '7 days ago' +%F)}"
+          status=0
+          if [ -z "$WATCH_TOKEN" ]; then
+            echo "the secret UPSTREAM_WATCH_TOKEN is not set" >"$RUNNER_TEMP/error.txt"
+            status=1
+          else
+            GH_TOKEN="$WATCH_TOKEN" ci/upstream-watch.sh "$since" >"$RUNNER_TEMP/report.md" 2>"$RUNNER_TEMP/error.txt" ||
+              status=$?
+          fi
+          # The report goes inside a fence, so its links and names mention nothing upstream.
+          if [ "$status" -eq 0 ]; then
+            title="Upstream changes since $since"
+            intro="Changes since $since in the official USE repositories and the public projects that carry the model validator, listed by [this run]($RUN_URL)."
+            content="$RUNNER_TEMP/report.md"
+          else
+            title="Upstream watch failed for the period since $since"
+            intro="ci/upstream-watch.sh failed with exit status $status in [this run]($RUN_URL). Its error output is below. There is no report since $since."
+            content="$RUNNER_TEMP/error.txt"
+          fi
+          { echo "$intro"; echo; echo '~~~~~~'; head -c 60000 "$content"; echo; echo '~~~~~~'
+            if [ "$(wc -c <"$content")" -gt 60000 ]; then echo; echo "Cut at 60000 characters: the run's summary holds all of it."; fi
+          } >"$RUNNER_TEMP/body.md"
+          { echo "## $title"; echo; echo '~~~~~~'; cat "$content"; echo '~~~~~~'; } >>"$GITHUB_STEP_SUMMARY"
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          exit "$status"
