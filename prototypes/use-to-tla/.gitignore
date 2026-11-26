@@ -7,3 +7,4 @@ translator/results/dev/
 ops-probe/civstat.use
 ops-probe/states/
 *_TTrace_*
+decisions.tsv

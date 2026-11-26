@@ -1,0 +1,10 @@
+# ops-probe/Civstat.tla with AtomicBirth = FALSE: new Person and birth() are separate steps.
+objects Person 3
+domain String 'Ada' 'Bob'
+domain Person objects undefined
+step new Person
+step call Person::birth
+step call Person::marry
+step call Person::divorce
+step call Person::death
+invariants every-state

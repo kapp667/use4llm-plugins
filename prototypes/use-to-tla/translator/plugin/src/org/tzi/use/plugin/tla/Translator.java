@@ -48,6 +48,19 @@ final class Translator {
 	static final String MUTANT = System.getProperty("tla.mutant", "");
 
 	private int counter = 0;
+	/** The TLA+ names of the state an expression reads, and of the state @pre reads (null outside a
+	 * postcondition). Invariants read s; an operation's guard, body and postconditions read others. */
+	String cur = "s", pre = null;
+	/** Inside operations: a call on an object that does not exist in the state it reads is undefined
+	 * (ExpObjOp.eval). Invariants keep the translation the corpus comparison checked. */
+	boolean live = false;
+
+	/** The state expression e reads. */
+	private String st(Expression e) {
+		if (!e.isPre()) return cur;
+		if (pre == null) throw new Refusal("@pre outside a postcondition", e.toString());
+		return pre;
+	}
 	private final Deque<Object> inlining = new ArrayDeque<>();
 	/** A translation unit, an invariant or a query operation: the stored attributes it reads, as
 	 * Owner::name, and the operations it calls. */
@@ -97,7 +110,7 @@ final class Translator {
 		return res;
 	}
 
-	private String fresh(String p) {
+	String fresh(String p) {
 		return p + "_" + (++counter);
 	}
 
@@ -237,14 +250,14 @@ final class Translator {
 			String o = fresh("o"), l = fresh("l"), x = fresh("x");
 			int last = as.associationEnds().size() + 1;
 			return "(LET " + o + " == " + tr(n.getObjectExpression(), env) + " IN IF " + o + " = Undef THEN Undef ELSE CHOOSE "
-					+ x + " \\in {" + l + "[" + index(as, dst) + "] : " + l + " \\in {" + l + " \\in s.lnk[" + quote(as.name())
+					+ x + " \\in {" + l + "[" + index(as, dst) + "] : " + l + " \\in {" + l + " \\in " + st(e) + ".lnk[" + quote(as.name())
 					+ "] : " + l + "[" + last + "] = " + o + "}} : TRUE)";
 		}
 		if (e instanceof ExpAllInstances) {
 			MClassifier c = ((ExpAllInstances) e).getSourceType();
 			if (!(c instanceof MClass)) throw new Refusal("allInstances of a non-class", c.name());
 			String o = fresh("o");
-			return "{" + o + " \\in s.objs : s.cls[" + o + "] \\in " + classSet(c) + "}";
+			return "{" + o + " \\in " + st(e) + ".objs : " + st(e) + ".cls[" + o + "] \\in " + classSet(c) + "}";
 		}
 		if (e instanceof ExpIsKindOf || e instanceof ExpIsTypeOf || e instanceof ExpAsType) return typeTest(e, env);
 		if (e instanceof ExpObjAsSet) {
@@ -278,6 +291,8 @@ final class Translator {
 		if (at.isDerived()) {
 			if (inlining.contains(at)) throw new Refusal("recursive derived attribute", at.toString());
 			inlining.push(at);
+			String saved = cur;
+			cur = st(a); // a derived attribute read @pre is evaluated in the pre-state (ExpAttrOp.eval)
 			try {
 				String self = fresh("self");
 				String body = tr(at.getDeriveExpression(), bind(new HashMap<>(), "self", self));
@@ -285,10 +300,11 @@ final class Translator {
 						+ " IN " + body + ")";
 			} finally {
 				inlining.pop();
+				cur = saved;
 			}
 		}
 		units.peek().attrs.add(at.owner().name() + "::" + at.name());
-		return "(LET " + o + " == " + src + " IN IF " + o + " = Undef THEN Undef ELSE s.att["
+		return "(LET " + o + " == " + src + " IN IF " + o + " = Undef THEN Undef ELSE " + st(a) + ".att["
 				+ quote(at.owner().name() + "::" + at.name()) + "][" + o + "])";
 	}
 
@@ -317,7 +333,7 @@ final class Translator {
 			throw new Refusal("navigation yielding " + rk, as.name() + " to " + dst.nameAsRolename() + " : " + n.type());
 		int si = index(as, src), di = index(as, dst);
 		String o = fresh("o"), l = fresh("l"), t = fresh("t"), x = fresh("x"), m = fresh("m"), i = fresh("i");
-		String links = "s.lnk[" + quote(as.name()) + "]";
+		String links = st(n) + ".lnk[" + quote(as.name()) + "]";
 		String targets;
 		if (as.isOrdered()) {
 			// The links of an association with an ordered end are a sequence in USE's insertion order.
@@ -362,11 +378,11 @@ final class Translator {
 		String desc = classSet((MClass) target);
 		if (e instanceof ExpIsKindOf) // USE: an undefined value has type OclVoid, which conforms to every type
 			return "(LET " + o + " == " + v + " IN IF " + o + " = Undef THEN " + (MUTANT.equals("kindof") ? "FALSE" : "TRUE")
-					+ " ELSE s.cls[" + o + "] \\in " + desc + ")";
+					+ " ELSE " + st(e) + ".cls[" + o + "] \\in " + desc + ")";
 		if (e instanceof ExpIsTypeOf)
-			return "(LET " + o + " == " + v + " IN IF " + o + " = Undef THEN FALSE ELSE s.cls[" + o + "] = "
+			return "(LET " + o + " == " + v + " IN IF " + o + " = Undef THEN FALSE ELSE " + st(e) + ".cls[" + o + "] = "
 					+ quote(((MClass) target).name()) + ")";
-		return "(LET " + o + " == " + v + " IN IF " + o + " # Undef /\\ s.cls[" + o + "] \\in " + desc + " THEN " + o
+		return "(LET " + o + " == " + v + " IN IF " + o + " # Undef /\\ " + st(e) + ".cls[" + o + "] \\in " + desc + " THEN " + o
 				+ " ELSE Undef)";
 	}
 
@@ -520,19 +536,31 @@ final class Translator {
 		K bk = kind(q.getQueryExpression().type());
 		String r = fresh("r"), v = fresh("v"), f = fresh("f"), j = fresh("j"), b = fresh("b");
 		String body = tr(q.getQueryExpression(), bind(env, q.getVariableDeclarations().varDecl(0).name(), v));
+		String objs = pre == null ? cur + ".objs" : "(" + cur + ".objs \\cup " + pre + ".objs)";
 		// The body's value is added as one element, or element-wise if it is a collection; an
 		// undefined value is an element (USE's evalClosureAux). The result holds the range itself.
 		String step = isColl(bk) ? "LET " + b + " == " + body + " IN IF " + b + " = Undef THEN {Undef} ELSE " + elems(bk, b)
 				: "{" + body + "}";
 		return "(LET " + r + " == " + tr(q.getRangeExpression(), env) + " IN IF " + r + " = Undef THEN Undef ELSE LET " + f + "["
-				+ j + " \\in 0..(Cardinality(s.objs) + 1)] == IF " + j + " = 0 THEN " + r + " ELSE LET " + b + "_prev == " + f + "["
+				+ j + " \\in 0..(Cardinality(" + objs + ") + 1)] == IF " + j + " = 0 THEN " + r + " ELSE LET " + b + "_prev == " + f + "["
 				+ j + " - 1] IN " + b + "_prev \\cup UNION {" + step + " : " + v + " \\in " + b + "_prev} IN " + f
-				+ "[Cardinality(s.objs) + 1])";
+				+ "[Cardinality(" + objs + ") + 1])";
 	}
 
 	// ---------------------------------------------------------------- query operations
 
 	private String call(ExpObjOp c, Map<String, String> env) {
+		if (!c.isPre()) return callIn(c, env);
+		String saved = cur;
+		cur = st(c);
+		try {
+			return callIn(c, env);
+		} finally {
+			cur = saved;
+		}
+	}
+
+	private String callIn(ExpObjOp c, Map<String, String> env) {
 		MOperation op = c.getOperation();
 		Expression[] args = c.getArguments();
 		if (kind(args[0].type()) != K.OBJ) throw new Refusal("operation call on non-object", op.toString());
@@ -550,7 +578,7 @@ final class Translator {
 		}
 		String o = fresh("o");
 		List<String> names = new ArrayList<>();
-		names.add("s");
+		names.add(cur);
 		names.add(o);
 		StringBuilder lets = new StringBuilder();
 		for (int i = 1; i < args.length; i++) {
@@ -563,12 +591,13 @@ final class Translator {
 		for (Map.Entry<MOperation, Set<String>> en : impls.entrySet()) {
 			StringBuilder set = new StringBuilder("{");
 			for (String n : en.getValue()) set.append(set.length() > 1 ? ", " : "").append(quote(n));
-			branches.add("s.cls[" + o + "] \\in " + set + "} -> " + operation(en.getKey()) + argList);
+			branches.add(cur + ".cls[" + o + "] \\in " + set + "} -> " + operation(en.getKey()) + argList);
 		}
 		if (branches.isEmpty()) throw new Refusal("operation call on a class without concrete subclass", op.toString());
 		String dispatch = branches.size() == 1 ? branches.get(0).substring(branches.get(0).indexOf("-> ") + 3)
 				: "CASE " + String.join(" [] ", branches);
-		return "(LET " + o + " == " + tr(args[0], env) + " " + lets + "IN IF " + o + " = Undef THEN Undef ELSE " + dispatch + ")";
+		return "(LET " + o + " == " + tr(args[0], env) + " " + lets + "IN IF " + o + " = Undef" + (live ? " \\/ " + o + " \\notin " + cur + ".objs" : "")
+				+ " THEN Undef ELSE " + dispatch + ")";
 	}
 
 	/** The name of the TLA+ operator of a query operation, translating it on first use. */
@@ -582,6 +611,9 @@ final class Translator {
 		Unit u = new Unit();
 		opUnits.put(r, u);
 		units.push(u);
+		String savedCur = cur, savedPre = pre;
+		cur = "s";
+		pre = null;
 		try {
 			if (!r.hasExpression()) throw new Refusal("operation without OCL body (SOIL or none)", r.toString());
 			if (!r.preConditions().isEmpty() || !r.postConditions().isEmpty())
@@ -613,6 +645,8 @@ final class Translator {
 			throw ex;
 		} finally {
 			units.pop();
+			cur = savedCur;
+			pre = savedPre;
 		}
 	}
 

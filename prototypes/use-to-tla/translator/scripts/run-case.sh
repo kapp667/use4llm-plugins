@@ -30,16 +30,17 @@ tlc() { # <module> <log>: run TLC, print seconds
     -metadir "$case/tla/states-$1" -config "$1.cfg" "$1.tla" </dev/null >"$case/$2" 2>&1)
   awk -v a="$s" -v b="$EPOCHREALTIME" 'BEGIN { printf "%.2f", b - a }'
 }
-eval_s=""; mc_s=""; viol_s=""
+eval_s=""; mc_s=""; viol_s=""; sym_s=""
 if [ -f "$case/tla/UseEval.tla" ]; then
   eval_s="$(tlc UseEval tlc-eval.txt)"
   mc_s="$(tlc UseMC tlc-mc.txt)"
   if [ -f "$case/tla/UseMCViol.tla" ]; then viol_s="$(tlc UseMCViol tlc-viol.txt)"; fi
+  if [ -f "$case/tla/UseMCSym.tla" ] && [ -z "${TLA_MUTANT:-}" ]; then sym_s="$(tlc UseMCSym tlc-sym.txt)"; fi
   for m in "$case"/tla/UseErr_*.tla; do
     [ -f "$m" ] || continue
     m="$(basename "$m" .tla)"; tlc "$m" "tlc-$m.txt" >/dev/null
   done
 fi
-printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$root/$model" "$(basename "$witness")" "$status" "$check" \
-  "$objects" "$(printf '%s' "$failure" | tr '\t' ' ')" "$use_s" "$eval_s" "$mc_s" "$viol_s" >"$case/case.tsv"
+printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$root/$model" "$(basename "$witness")" "$status" "$check" \
+  "$objects" "$(printf '%s' "$failure" | tr '\t' ' ')" "$use_s" "$eval_s" "$mc_s" "$viol_s" "$sym_s" >"$case/case.tsv"
 echo "$id: use $status/$check/$objects objects ${use_s}s, tlc eval ${eval_s:-n/a}s mc ${mc_s:-n/a}s viol ${viol_s:-n/a}s"

@@ -56,7 +56,7 @@ agree = collections.Counter()  # (class, level, use value, outcome) -> count
 for cid in sorted(os.listdir(cases_dir)):
     d = os.path.join(cases_dir, cid)
     with open(os.path.join(d, "case.tsv")) as f:
-        (_, path, source, status, check, objects, failure, use_s, eval_s, mc_s, viol_s) = f.read().rstrip("\n").split("\t")
+        (_, path, source, status, check, objects, failure, use_s, eval_s, mc_s, viol_s, sym_s) = f.read().rstrip("\n").split("\t")
     objects = objects.replace(",", "")
     tla = os.path.join(d, "tla")
     ran = os.path.exists(os.path.join(tla, "invariants.tsv"))
@@ -135,10 +135,15 @@ for cid in sorted(os.listdir(cases_dir)):
         use_false = {g["invariant"] for g in ground if g["state"] == viol_state and g["object"] == "*" and g["value"] == "false"}
         s0_truth = {g["invariant"]: g["value"] for g in ground if g["state"] == "S0" and g["object"] == "*"}
         s0_all_true = all(s0_truth.get(i) == "true" for i in translated)
+        # The same check under SYMMETRY over one class's objects (UseMCSym), when S0 has a class of 2 to 6 objects.
+        sym = read(os.path.join(d, "tlc-sym.txt"))
+        sym_mc = re.search(r"^SYMMETRY Sym", read(os.path.join(tla, "UseMCSym.cfg")), re.M)
+        sym_res = "" if not sym_mc else "not run" if not sym else \
+            "no violation" if "Model checking completed. No error has been found." in sym else "error: " + tlc_error(sym)
         mc_rows.append([cls, cid, "no violation" if mc_ok else ("violation: " + tlc_error(mc)),
                         "yes" if s0_all_true else "no", mc_states.group(1) if mc_states else "?", mc_s,
                         viol_state or "none", reported or ("no violation reported" if viol_state else ""),
-                        ("yes" if reported in use_false else "NO") if viol_state else "", viol_s])
+                        ("yes" if reported in use_false else "NO") if viol_state else "", viol_s, sym_res, sym_s])
         tm = tsv(os.path.join(tla, "timing.tsv"))
         timing.append([cls, cid, len(translated), objects, eval_s, mc_s, viol_s,
                        tm[0]["use_ms"] if tm else "", tm[0]["translate_ms"] if tm else ""])
@@ -173,7 +178,7 @@ write("agreement.tsv", ["class", "level", "use_value", "agree", "disagree"], row
 write("disagreements.tsv", ["class", "case", "state", "invariant", "object", "use", "tlc", "tlc_error"], disagreements)
 write("errors.tsv", ["case", "state", "invariant", "use", "tlc", "tlc_message"], err_rows)
 write("mc.tsv", ["class", "case", "S0_result", "S0_all_true_in_USE", "S0_distinct_states", "S0_seconds", "violating_state",
-                 "tlc_reported", "reported_is_use_false", "viol_seconds"], mc_rows)
+                 "tlc_reported", "reported_is_use_false", "viol_seconds", "S0_symmetry_result", "sym_seconds"], mc_rows)
 write("timing.tsv", ["class", "case", "translated_invariants", "objects_S0", "tlc_eval_seconds", "tlc_mc_seconds",
                      "tlc_viol_seconds", "plugin_use_ms", "plugin_translate_ms"], timing)
 

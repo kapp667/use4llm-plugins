@@ -184,6 +184,11 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 				tr.end();
 			}
 		}
+		// Object identities are TLC model values (O_<name>), so that TLC accepts symmetry over them.
+		ids.clear();
+		Set<String> allNames = new TreeSet<>();
+		for (MSystemState st : states) for (MObject o : st.allObjects()) allNames.add(o.name());
+		for (String n : allNames) ids.put(n, modelValue(n, ids.size()));
 		Map<String, String> stDefs = new LinkedHashMap<>();
 		while (true) {
 			Set<String> needed = new TreeSet<>();
@@ -257,7 +262,12 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 		if (!Translator.MUTANT.isEmpty() && prelude.equals(new String(getClass().getResourceAsStream("/Prelude.tla").readAllBytes(),
 				StandardCharsets.UTF_8)) && (Translator.MUTANT.equals("div") || Translator.MUTANT.equals("and")))
 			throw new IllegalStateException("mutant " + Translator.MUTANT + " did not apply");
-		write(dir, "UseModel.tla", "---- MODULE UseModel ----\n" + prelude + "\n" + defs + stText + "====\n");
+		StringBuilder objDecl = new StringBuilder();
+		if (!ids.isEmpty()) objDecl.append("CONSTANTS ").append(String.join(", ", ids.values())).append('\n');
+		Map<String, String> objNames = new TreeMap<>();
+		for (Map.Entry<String, String> e : ids.entrySet()) objNames.put(e.getValue(), Translator.quote(e.getKey()));
+		objDecl.append("\\* The USE name of each object.\nObjName == ").append(fn(objNames, "[x \\in {} |-> \"\"]")).append("\n\n");
+		write(dir, "UseModel.tla", "---- MODULE UseModel ----\n" + prelude + "\n" + objDecl + defs + stText + "====\n");
 
 		// The value of each translated invariant on each state, as a whole and per object. A pair
 		// whose evaluation in USE raised an error goes to a module of its own, where TLC must fail.
@@ -274,7 +284,7 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 					if (nErr < 30) {
 						String m = "UseErr_" + nErr++;
 						write(dir, m + ".tla", "---- MODULE " + m + " ----\nEXTENDS UseModel\n" + all + "====\n");
-						write(dir, m + ".cfg", "CONSTANT Undef = Undef\n");
+						write(dir, m + ".cfg", constants());
 						errTsv.append(m).append('\t').append(st.name()).append('\t').append(inv.qualifiedName()).append('\t')
 								.append(truth.get(st.name() + "\t" + inv.qualifiedName())).append('\n');
 					}
@@ -283,16 +293,17 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 				eval.append(all);
 				if (body1.containsKey(i))
 					eval.append("ASSUME \\A o \\in Inst_").append(i).append("(").append(st.name()).append(") : PrintT(")
-							.append(key).append(" \\o o \\o \"|\" \\o Show(Body_").append(i).append("(").append(st.name())
+							.append(key).append(" \\o ObjName[o] \\o \"|\" \\o Show(Body_").append(i).append("(").append(st.name())
 							.append(", o)))\n");
 			}
 		}
 		write(dir, "UseEval.tla", eval + "====\n");
-		write(dir, "UseEval.cfg", "CONSTANT Undef = Undef\n");
+		write(dir, "UseEval.cfg", constants());
 		write(dir, "errors.tsv", errTsv.toString());
 
 		// Model-checking shape: S0, and the first state where USE finds a translated invariant false.
 		mc(dir, "UseMC", "S0", ok);
+		symmetry(dir, s0, ok);
 		String viol = null;
 		for (MSystemState st : states) {
 			for (int i : ok)
@@ -314,7 +325,7 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 	private void mc(File dir, String name, String state, List<Integer> ok) throws IOException {
 		StringBuilder m = new StringBuilder("---- MODULE " + name + " ----\nEXTENDS UseModel\nVARIABLE st\nInit == st = "
 				+ state + "\nNext == UNCHANGED st\n");
-		StringBuilder cfg = new StringBuilder("CONSTANT Undef = Undef\nINIT Init\nNEXT Next\n");
+		StringBuilder cfg = new StringBuilder(constants() + "INIT Init\nNEXT Next\n");
 		for (int i : ok) {
 			m.append("MCInv_").append(i).append(" == Inv_").append(i).append("(st) = TRUE\n");
 			cfg.append("INVARIANT MCInv_").append(i).append('\n');
@@ -323,7 +334,37 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 		write(dir, name + ".cfg", cfg.toString());
 	}
 
-	private static void write(File dir, String name, String text) throws IOException {
+	/**
+	 * UseMC under SYMMETRY over the objects of S0's most populated class with 2 to 6 objects,
+	 * which TLC accepts only for a set of model values. TLC materializes the n! permutations: a
+	 * class of 31 objects ran out of heap.
+	 */
+	private void symmetry(File dir, MSystemState s0, List<Integer> ok) throws IOException {
+		Map<String, List<String>> byClass = new TreeMap<>();
+		for (MObject o : sortedObjects(s0)) byClass.computeIfAbsent(o.cls().name(), z -> new ArrayList<>()).add(ids.get(o.name()));
+		String best = null;
+		for (Map.Entry<String, List<String>> e : byClass.entrySet())
+			if (e.getValue().size() >= 2 && e.getValue().size() <= 6 && (best == null || e.getValue().size() > byClass.get(best).size()))
+				best = e.getKey();
+		if (best == null) return;
+		StringBuilder m = new StringBuilder("---- MODULE UseMCSym ----\nEXTENDS UseMC\n\\* The objects of class " + best + " in S0.\nSym == Permutations({"
+				+ String.join(", ", byClass.get(best)) + "})\n====\n");
+		StringBuilder cfg = new StringBuilder(constants() + "INIT Init\nNEXT Next\nSYMMETRY Sym\n");
+		for (int i : ok) cfg.append("INVARIANT MCInv_").append(i).append('\n');
+		write(dir, "UseMCSym.tla", m.toString());
+		write(dir, "UseMCSym.cfg", cfg.toString());
+	}
+
+	/** The fixed prelude of every translated module. */
+	static String prelude() {
+		try {
+			return new String(TlaCommand.class.getResourceAsStream("/Prelude.tla").readAllBytes(), StandardCharsets.UTF_8);
+		} catch (IOException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	static void write(File dir, String name, String text) throws IOException {
 		Files.write(new File(dir, name).toPath(), text.getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -467,23 +508,47 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 
 	// ---------------------------------------------------------------- state encoding
 
+	/**
+	 * The function m as a balanced tree of @@ over k :> v (the keys are distinct, so @@ is
+	 * associative). A chain of n @@ makes SANY's level checking quadratic once the keys are declared
+	 * constants (model values): t101's 5,967 objects ran it out of memory.
+	 */
 	private static String fn(Map<String, String> m, String empty) {
 		if (m.isEmpty()) return empty;
-		StringBuilder sb = new StringBuilder("(");
-		for (Map.Entry<String, String> e : m.entrySet()) {
-			if (sb.length() > 1) sb.append(" @@ ");
-			sb.append(e.getKey()).append(" :> ").append(e.getValue());
-		}
-		return sb.append(")").toString();
+		List<String> parts = new ArrayList<>();
+		for (Map.Entry<String, String> e : m.entrySet()) parts.add(e.getKey() + " :> " + e.getValue());
+		return "(" + tree(parts, 0, parts.size()) + ")";
 	}
 
-	private static String encodeState(MSystemState st, MModel model, Set<String> needed, Map<String, Translator.Refusal> bad) {
+	private static String tree(List<String> parts, int from, int to) {
+		if (to - from == 1) return parts.get(from);
+		int mid = (from + to) / 2;
+		return (mid - from > 1 ? "(" + tree(parts, from, mid) + ")" : tree(parts, from, mid)) + " @@ "
+				+ (to - mid > 1 ? "(" + tree(parts, mid, to) + ")" : tree(parts, mid, to));
+	}
+
+	/** USE object name -> TLC model value naming it, over every state of the run. */
+	private final Map<String, String> ids = new TreeMap<>();
+
+	/** A TLA+ identifier for an object: O_ and its USE name, or Ox_ and an index when the name is no identifier. */
+	private static String modelValue(String name, int index) {
+		return name.matches("[A-Za-z0-9_]+") ? "O_" + name : "Ox_" + index;
+	}
+
+	/** The cfg lines declaring Undef and every object as a model value. */
+	private String constants() {
+		StringBuilder sb = new StringBuilder("CONSTANT Undef = Undef\n");
+		for (String id : ids.values()) sb.append("CONSTANT ").append(id).append(" = ").append(id).append('\n');
+		return sb.toString();
+	}
+
+	private String encodeState(MSystemState st, MModel model, Set<String> needed, Map<String, Translator.Refusal> bad) {
 		List<MObject> objs = sortedObjects(st);
 		Set<String> names = new TreeSet<>();
 		Map<String, String> cls = new TreeMap<>();
 		for (MObject o : objs) {
-			names.add(Translator.quote(o.name()));
-			cls.put(Translator.quote(o.name()), Translator.quote(o.cls().name()));
+			names.add(ids.get(o.name()));
+			cls.put(ids.get(o.name()), Translator.quote(o.cls().name()));
 		}
 		Map<String, String> att = new TreeMap<>();
 		for (MClass c : model.classes()) {
@@ -493,7 +558,7 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 				Map<String, String> f = new TreeMap<>();
 				try {
 					for (MObject o : st.objectsOfClassAndSubClasses(c))
-						f.put(Translator.quote(o.name()), value(o.state(st).attributeValue(a)));
+						f.put(ids.get(o.name()), value(o.state(st).attributeValue(a)));
 				} catch (Translator.Refusal r) {
 					bad.put(key, r);
 					continue;
@@ -509,8 +574,8 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 			for (MLink l : st.linksOfAssociation(as).links()) {
 				if (l.isVirtual()) continue;
 				List<String> parts = new ArrayList<>();
-				for (MAssociationEnd e : as.associationEnds()) parts.add(Translator.quote(l.linkEnd(e).object().name()));
-				if (l instanceof MLinkObject) parts.add(Translator.quote(((MLinkObject) l).name()));
+				for (MAssociationEnd e : as.associationEnds()) parts.add(ids.get(l.linkEnd(e).object().name()));
+				if (l instanceof MLinkObject) parts.add(ids.get(((MLinkObject) l).name()));
 				tuples.add("<<" + String.join(", ", parts) + ">>");
 			}
 			lnk.put(Translator.quote(as.name()), as.isOrdered() ? "<<" + String.join(", ", tuples) + ">>"
@@ -520,7 +585,7 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 				+ fn(att, "[x \\in {} |-> 0]") + ", lnk |-> " + fn(lnk, "[x \\in {} |-> {}]") + "]";
 	}
 
-	private static String value(Value v) {
+	private String value(Value v) {
 		if (v.isUndefined()) return "Undef";
 		if (v instanceof BooleanValue) return ((BooleanValue) v).value() ? "TRUE" : "FALSE";
 		if (v instanceof IntegerValue) {
@@ -529,7 +594,11 @@ public class TlaCommand implements IPluginShellCmdDelegate {
 		}
 		if (v instanceof StringValue) return Translator.quote(((StringValue) v).value());
 		if (v instanceof EnumValue) return Translator.quote(((EnumType) v.type()).name() + "::" + ((EnumValue) v).value());
-		if (v instanceof ObjectValue) return Translator.quote(((ObjectValue) v).value().name());
+		if (v instanceof ObjectValue) {
+			String id = ids.get(((ObjectValue) v).value().name());
+			if (id == null) throw new Translator.Refusal("state value: object of no state", v.toString());
+			return id;
+		}
 		if (v instanceof SetValue) {
 			Set<String> s = new TreeSet<>();
 			for (Value e : (CollectionValue) v) s.add(value(e));

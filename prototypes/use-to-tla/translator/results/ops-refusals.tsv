@@ -1,0 +1,7 @@
+kind	construct	count	models
+operation	class with a protocol state machine	17	4
+step	class with a protocol state machine	5	4
+operation	call of an operation with a SOIL body inside a body	4	3
+operation	for over an unordered collection (USE iterates in hash order)	4	1
+operation	operation without body (pre/post only)	2	1
+operation	Real	1	1

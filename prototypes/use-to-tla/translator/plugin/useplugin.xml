@@ -8,5 +8,11 @@
 			class="org.tzi.use.plugin.tla.TlaCommand"
 			id="org.tzi.use.plugin.tla.TlaCommand">
 		</command>
+		<command shellcmd="tlaops"
+			label="tlaops"
+			help="Usage: tlaops (settings file | default) 'outdir' [module]; translates the operations of the model under the settings into a TLA+ specification for TLC."
+			class="org.tzi.use.plugin.tla.TlaOpsCommand"
+			id="org.tzi.use.plugin.tla.TlaOpsCommand">
+		</command>
 	</commands>
 </plugin>

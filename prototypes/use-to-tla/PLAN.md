@@ -20,39 +20,39 @@ Validation par l'auteur : A1 et A2 (PR publiques) et G (passage au vrai plugin).
 - [x] Dossier `prototypes/use-to-tla/` sur la branche de session de use4llm-plugins. Un README dit qu'il est jetable, qu'il ne faut ni le fusionner ni le copier, et comment le relancer.
 - [x] Les chemins du conteneur sont remplacés par `USE_HOME`, `USE_SRC`, `MV_JAR` et `TLA2TOOLS`. Les sorties générées et les jar ne sont pas versionnés.
 - [x] Vérification : trois cas relancés depuis la copie du dépôt (témoin t048, sonde, Cars) donnent les mêmes valeurs que l'original, sans aucun désaccord.
-- [ ] PR en brouillon « spike: USE to TLA+ prototype (do not merge) ». La CI ne tourne pas dessus, puisqu'elle ne touche que `prototypes/`.
-- [ ] Après chaque étape de la série B, le dossier est mis à jour sur la même branche.
+- [x] PR en brouillon kapp667/use4llm-plugins#43 « do not merge ». La CI `build-and-test` tourne dessus et passe. CodeQL est rouge pour deux alertes dont la source est dans les vieilles copies SVN, dont le retrait est confié à la session USE4LLM.
+- [ ] Après chaque étape de la série B, le dossier est mis à jour sur la même branche. Fait pour B1 à B3.
 
 ## A1. Corriger `assert valid invs` (kapp667/use4llm#2)
 
-- [ ] Fichiers : `MAssertGlobalInvariants.java`, plus un test shell `use-gui/src/it/resources/testfiles/shell/tNNN.{use,in}` avec la sortie attendue.
-- [ ] Changement : passer une liste vide au lieu de `null`.
-- [ ] Le test échoue avant le changement et passe après. La CI de use4llm est verte.
-- [ ] Le cas minimal de l'issue réussit avec la version construite.
+- [x] Fichiers : `MAssertGlobalInvariants.java`, plus un test JUnit 5 (`MTestSuiteTest`) au lieu d'un test shell. PR kapp667/use4llm#3.
+- [x] Changement : passer une liste vide au lieu de `null`.
+- [x] Le test échoue avant le changement et passe après, en local. `mvn verify` passe, dont 129 `ShellIT`. Pas de CI : Actions n'est pas activé sur le fork.
+- [x] Le cas minimal de l'issue réussit avec la version construite : c'est le cas que reprend le test.
 
 ## A2. Corriger la copie d'état (kapp667/use4llm#1)
 
-- [ ] Fichier : `MSystemState.java:156-158`, plus un test (la variation de l'issue, en test shell ou unitaire).
-- [ ] Changement : donner aux trois contrôleurs les tables de la copie.
-- [ ] Le test échoue avant et passe après. La CI est verte.
-- [ ] La comparaison d'invariants du prototype tourne sans le contournement par réflexion, avec 0 désaccord et 11 bugs volontaires détectés sur 11.
+- [x] Fichier : `MSystemState.java:156-158`, plus un test unitaire qui reprend la variation de l'issue.
+- [x] Changement : donner aux trois contrôleurs les tables de la copie.
+- [x] Le test échoue avant et passe après, en local. Pas de CI, pour la même raison.
+- [ ] La comparaison d'invariants du prototype tourne sans le contournement par réflexion, avec 0 désaccord et 11 bugs volontaires détectés sur 11. En attente : le prototype tourne sur la release 7.5.0, qui n'a pas la correction.
 
 ## B1. Identifiants d'objets en model values
 
-- [ ] Mesure de référence d'abord : `all.sh` donne 0 désaccord et 11 bugs volontaires détectés sur 11.
-- [ ] Changement : les objets deviennent des model values TLC, ce qui permet la symétrie.
-- [ ] Vérification : mêmes chiffres qu'avant, et la symétrie est acceptée par TLC sur un modèle.
+- [x] Mesure de référence d'abord : `all.sh` donne 0 désaccord et 11 bugs volontaires détectés sur 11.
+- [x] Changement : les objets deviennent des model values TLC, ce qui permet la symétrie.
+- [x] Vérification : mêmes chiffres qu'avant, et la symétrie est acceptée par TLC sur un modèle.
 
 ## B2. Fichier de réglages
 
-- [ ] Forme des données d'abord : nombre d'objets par classe, domaines de valeurs, opérations que l'environnement peut appeler, moment où les invariants doivent tenir, regroupements comme `new` suivi de `birth()`.
-- [ ] Vérification : avec ce fichier, `civstat` donne la même spec que la traduction à la main (`ops-probe/`).
+- [x] Forme des données d'abord : nombre d'objets par classe, domaines de valeurs, opérations que l'environnement peut appeler, moment où les invariants doivent tenir, regroupements comme `new` suivi de `birth()`.
+- [x] Vérification : avec ce fichier, `civstat` donne la même spec que la traduction à la main (`ops-probe/`).
 
 ## B3. Traduire les corps SOIL en actions
 
-- [ ] Changement : corps SOIL -> action avec `UNCHANGED` pour le reste, `pre` -> garde, `post` vérifié avec `@pre`. Refus explicite de ce qui n'est pas traduit.
-- [ ] Vérification sur `civstat`. TLC trouve `nameIsUnique`, détecte le `marry()` cassé, et compte 11 161 états (3 personnes) et 524 545 états (4 personnes) sans symétrie, comme la version à la main.
-- [ ] Mesure sur les 18 modèles du corpus qui ont des corps SOIL : nombre traduits, refus par construction.
+- [x] Changement : corps SOIL -> action avec `UNCHANGED` pour le reste, `pre` -> garde, `post` vérifié avec `@pre`. Refus explicite de ce qui n'est pas traduit.
+- [x] Vérification sur `civstat`. TLC trouve `nameIsUnique`, détecte le `marry()` cassé, et compte 11 161 états (3 personnes) et 524 545 états (4 personnes) sans symétrie, comme la version à la main.
+- [x] Mesure sur les 18 modèles du corpus qui ont des corps SOIL : nombre traduits, refus par construction.
 
 ## B4. Oracle de comportement, dans les deux sens
 
