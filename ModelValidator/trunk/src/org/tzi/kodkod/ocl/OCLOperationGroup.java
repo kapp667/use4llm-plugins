@@ -73,8 +73,9 @@ public abstract class OCLOperationGroup {
 	/**
 	 * Returns undefined when the condition holds, the Integer value otherwise.
 	 * Read the result with integerValue and integerUndefined, which do not
-	 * need its atom: the universe holds no atom for a value outside
-	 * Integer_min and Integer_max that is not a literal.
+	 * need its atom: the Integer bounds hold no atom for a value outside
+	 * Integer_min and Integer_max that is not a literal, and KodkodSolver adds
+	 * one only for the values the formula reads as an atom.
 	 */
 	protected final Expression integer(Formula undefinedIf, IntExpression value) {
 		return undefinedIf.thenElse(undefined, value.toExpression());
@@ -144,9 +145,26 @@ public abstract class OCLOperationGroup {
 	}
 
 	/**
-	 * True if the expression may hold an Integer the universe has no atom
-	 * for: a cast of an integer expression other than an Integer literal of
-	 * the model, alone or in a branch of an if-then-else.
+	 * Returns the expression with each integer cast, alone or in a branch of
+	 * an if-then-else, replaced by the empty set, for an equality of two
+	 * expressions that are not both Integers: the formula then reads no cast
+	 * as an atom, and needs no atom for its value.
+	 */
+	protected final Expression withoutIntegerCasts(Expression e) {
+		if (isIntegerCast(e)) {
+			return Expression.NONE;
+		}
+		if (e instanceof IfExpression) {
+			IfExpression choice = (IfExpression) e;
+			return choice.condition().thenElse(withoutIntegerCasts(choice.thenExpr()), withoutIntegerCasts(choice.elseExpr()));
+		}
+		return e;
+	}
+
+	/**
+	 * True if the expression may hold an Integer the Integer bounds hold no
+	 * atom for: a cast of an integer expression other than an Integer literal
+	 * of the model, alone or in a branch of an if-then-else.
 	 */
 	protected final boolean isComputedInteger(Expression e) {
 		if (isIntegerCast(e)) {

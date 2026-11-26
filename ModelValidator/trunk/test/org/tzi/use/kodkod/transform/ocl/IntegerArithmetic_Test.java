@@ -17,11 +17,14 @@ import org.tzi.kodkod.model.iface.IModel;
 /**
  * Checks that an Integer result outside Integer_min and Integer_max keeps its
  * value, as in OCL, whose Integers have no bounds, through a comparison,
- * {@code =}, {@code <>}, a query operation, an if-then-else, a range and
- * floor, and that {@code =} still holds between equal values that are not
- * Integers, including the size of an undefined Set. A result beyond the
- * bitwidth keeps its value too, up to the larger of the bitwidth and the
- * maximum bitwidth, above which the solver refuses the model.
+ * {@code =}, {@code <>}, a query operation, an if-then-else, a range, floor
+ * and a collection that holds it, and that {@code =} still holds between
+ * equal values that are not Integers, including the size of an undefined
+ * Set. A result beyond the bitwidth keeps its value too, up to the larger of
+ * the bitwidth and the maximum bitwidth, and the solver adds an atom for
+ * each value outside the Integer bounds that a collection or a range may
+ * hold, up to the maximum number of computed Integer values; above either
+ * limit, the solver refuses the model.
  */
 public class IntegerArithmetic_Test {
 
@@ -33,6 +36,7 @@ public class IntegerArithmetic_Test {
 		KodkodModelValidatorConfiguration.getInstance().setSatFactory(KodkodModelValidatorConfiguration.DEFAULT_SATFACTORY);
 		KodkodModelValidatorConfiguration.getInstance().setBitwidth(KodkodModelValidatorConfiguration.DEFAULT_BITWIDTH);
 		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(KodkodModelValidatorConfiguration.DEFAULT_MAX_BITWIDTH);
+		KodkodModelValidatorConfiguration.getInstance().setMaxComputedIntegers(KodkodModelValidatorConfiguration.DEFAULT_MAX_COMPUTED_INTEGERS);
 		validator = new OutcomeRecorder();
 		properties = new HashMap<String, Object>();
 		properties.put("A_min", 1);
@@ -45,6 +49,7 @@ public class IntegerArithmetic_Test {
 	public void tearDown() throws Exception {
 		KodkodModelValidatorConfiguration.getInstance().setBitwidth(KodkodModelValidatorConfiguration.DEFAULT_BITWIDTH);
 		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(KodkodModelValidatorConfiguration.DEFAULT_MAX_BITWIDTH);
+		KodkodModelValidatorConfiguration.getInstance().setMaxComputedIntegers(KodkodModelValidatorConfiguration.DEFAULT_MAX_COMPUTED_INTEGERS);
 	}
 
 	/**
@@ -188,5 +193,79 @@ public class IntegerArithmetic_Test {
 	public void productAboveTheLargestBitwidthIsRefused() throws Exception {
 		String message = refusal("self.x * 100000 * 100000 > 0", 0, 10);
 		assertTrue(message, message.contains("need a bitwidth above 32"));
+	}
+
+	@Test
+	public void setWithinTheIntegerBoundsDoesNotIncludeASumAboveThem() {
+		validate("self.s->includes(self.x + 20)", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void setOfASumAboveTheIntegerMaximumIsNotEmpty() {
+		validate("self.x = 5 and Set{self.x + 20}->size() = 0", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void includingASumAboveTheIntegerMaximumAddsAnElement() {
+		validate("self.x = 5 and self.s->including(self.x + 20)->size() = self.s->size()", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void setsOfSumsAboveTheIntegerMaximumWithDifferentValuesAreNotEqual() {
+		validate("self.x = 5 and Set{self.x + 20} = Set{self.x + 30}", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void rangeUpToASumAboveTheIntegerMaximumHoldsEveryIntegerOfIt() {
+		validate("self.x = 5 and Set{0..(self.x + 20)}->size() = 26", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void inclusionOfAProductAboveTheLargestBitwidthIsRefusedForItsBitwidth() throws Exception {
+		String message = refusal("self.s->includes(self.x * 100000 * 100000)", 0, 10);
+		assertTrue(message, message.contains("need a bitwidth above 32"));
+	}
+
+	@Test
+	public void setOfASumAboveTheMaximumNumberOfComputedIntegersIsRefused() throws Exception {
+		KodkodModelValidatorConfiguration.getInstance().setMaxComputedIntegers(5);
+		String message = refusal("self.x = 5 and Set{self.x + 20}->size() = 0", 0, 10);
+		assertTrue(message, message.contains("more than 5 Integer values"));
+	}
+
+	@Test
+	public void rangeElementsTimesTwoWithinTheIntegerBoundsAreComputed() {
+		validate("Set{1..5}->exists(e | self.s->includes(e * 2))", -10, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void rangeElementsPlusOneWithinTheIntegerBoundsAreComputed() {
+		validate("Set{1..5}->collect(e | e + 1)->includes(self.x)", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sizeOfARangeWithinTheIntegerBoundsIsComputed() {
+		validate("self.s->includes(Set{1..5}->size())", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void collectedRangeElementsTimesTwoWithinTheIntegerBoundsAreComputed() {
+		validate("Set{1..5}->collect(e | e + 1)->exists(f | self.s->includes(f * 2))", 0, 20);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void rangeOfAnInactiveInvariantNeedsNoComputedIntegers() {
+		properties.put("A_wide", "inactive");
+		validate("true\ncontext A inv wide: Set{1..5000}->notEmpty()", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
 	}
 }

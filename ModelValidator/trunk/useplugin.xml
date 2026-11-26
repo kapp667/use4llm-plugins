@@ -38,7 +38,7 @@
 		</command>
 		<command id="org.tzi.use.kodkod.plugin.ConfigurationCmd"
 			class="org.tzi.use.kodkod.plugin.ConfigurationCmd"
-			help="Configures basic Kodkod properties. Possible parameters (case sensitive): 'satsolver:=[DefaultSAT4J|LightSAT4J|Lingeling|plingeling|MiniSat|MiniSatProver|ZChaffMincost|CryptoMiniSat]' selects the sat solver to be used (some solvers need to be installed manually); 'bitwidth:=i' sets the smallest solver bitwidth; 'maxBitwidth:=i' sets the largest bitwidth the solver may raise the bitwidth to when the Integer expressions of a model need more; 'automaticDiagramExtraction:=[on|off]' determines if the current object diagram should be used as partial solution; 'save' saves the configuration"
+			help="Configures basic Kodkod properties. Possible parameters (case sensitive): 'satsolver:=[DefaultSAT4J|LightSAT4J|Lingeling|plingeling|MiniSat|MiniSatProver|ZChaffMincost|CryptoMiniSat]' selects the sat solver to be used (some solvers need to be installed manually); 'bitwidth:=i' sets the smallest solver bitwidth; 'maxBitwidth:=i' sets the largest bitwidth the solver may raise the bitwidth to when the Integer expressions of a model need more; 'maxComputedIntegers:=i' sets the largest number of Integer values outside Integer_min and Integer_max that the solver may add for the values the Integer expressions of a model compute; 'automaticDiagramExtraction:=[on|off]' determines if the current object diagram should be used as partial solution; 'save' saves the configuration"
 			label="ConfigurationCmd"
 			shellcmd="modelvalidator -config"
 			alias="mv -config">

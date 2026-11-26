@@ -58,6 +58,13 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 							} catch (NumberFormatException exception) {
 								useShell.getErr().println(LogMessages.solverConfigBitwidthError);
 							}
+						} else if (name.equalsIgnoreCase(KodkodModelValidatorConfiguration.MAX_COMPUTED_INTEGERS_KEY)) {
+							try {
+								int value = Integer.parseInt(split[1]);
+								setMaxComputedIntegers(value);
+							} catch (NumberFormatException exception) {
+								useShell.getErr().println(LogMessages.maxComputedIntegersError);
+							}
 						} else if (name.equalsIgnoreCase(KodkodModelValidatorConfiguration.DIAGRAMEXTREACTION_KEY) || name.equalsIgnoreCase(KodkodModelValidatorConfiguration.DIAGRAMEXTREACTION_KEY_SHORT)) {
 							if (split[1].equalsIgnoreCase("on") || split[1].equalsIgnoreCase("off")) {
 								boolean value = split[1].equalsIgnoreCase("on") ? true : false;
@@ -84,6 +91,7 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 		useShell.getOut().println("Current solver: " + (solver == null ? "None" : solver.toString()));
 		useShell.getOut().println("Current bitwidth: " + CFG.bitwidth());
 		useShell.getOut().println("Current maximum bitwidth: " + CFG.maxBitwidth());
+		useShell.getOut().println("Current maximum number of computed Integer values: " + CFG.maxComputedIntegers());
 		useShell.getOut().println("Automatic extraction of an available object diagram is currently: " + (CFG.isAutomaticDiagramExtraction() ? "enabled" : "disabled"));
 	}
 
@@ -151,6 +159,16 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 		}
 	}
 	
+	private void setMaxComputedIntegers(int maxComputedIntegers) {
+		try {
+			CFG.setMaxComputedIntegers(maxComputedIntegers);
+			useShell.getOut().println(LogMessages.newMaxComputedIntegers(maxComputedIntegers));
+		} catch (ConfigurationException e) {
+			useShell.getErr().println(LogMessages.maxComputedIntegersError);
+			useShell.getOut().println("Maximum number of computed Integer values is now: " + CFG.maxComputedIntegers());
+		}
+	}
+
 	private void setAutomaticDiagramExtraction(boolean on) {
 		CFG.setAutomaticDiagramExtraction(on);
 		useShell.getOut().println(LogMessages.newAutomaticDiagramExtraction(on));
