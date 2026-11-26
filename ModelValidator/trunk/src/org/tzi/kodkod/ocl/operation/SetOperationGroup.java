@@ -363,7 +363,7 @@ public class SetOperationGroup extends OCLOperationGroup {
 		if (object_type_nav)
 			return src.eq(undefined).thenElse(IntConstant.constant(0).toExpression(), IntConstant.constant(1).toExpression());
 		else
-			return src.eq(undefined_Set).thenElse(undefined_Set, src.count().toExpression());
+			return src.eq(undefined_Set).thenElse(undefined, src.count().toExpression());
 	}
 
 	// OCL: srcExpr->sum()
