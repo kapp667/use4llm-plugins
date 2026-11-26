@@ -4,7 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kodkod.ast.Expression;
+import kodkod.ast.Formula;
+import kodkod.ast.IfExpression;
+import kodkod.ast.IntExpression;
+import kodkod.ast.IntToExprCast;
 import kodkod.ast.Relation;
+import kodkod.ast.operator.IntCastOperator;
 
 import org.tzi.kodkod.model.type.TypeConstants;
 import org.tzi.kodkod.model.type.TypeFactory;
@@ -63,5 +68,96 @@ public abstract class OCLOperationGroup {
 	 */
 	public Map<String, String> getSymbolOperationMapping() {
 		return symbolOperationMapping;
+	}
+
+	/**
+	 * Returns undefined when the condition holds, the Integer value otherwise.
+	 * Read the result with integerValue and integerUndefined, which do not
+	 * need its atom: the universe holds no atom for a value outside
+	 * Integer_min and Integer_max that is not a literal.
+	 */
+	protected final Expression integer(Formula undefinedIf, IntExpression value) {
+		return undefinedIf.thenElse(undefined, value.toExpression());
+	}
+
+	/**
+	 * Returns the value of an Integer expression, meaningful where it is
+	 * defined: the integer expression of a cast, the value of the branch an
+	 * if-then-else takes (the other branch when one is undefined), and the
+	 * sum of the atoms of any other expression.
+	 */
+	protected final IntExpression integerValue(Expression e) {
+		if (isIntegerCast(e)) {
+			return ((IntToExprCast) e).intExpr();
+		}
+		if (e instanceof IfExpression) {
+			IfExpression choice = (IfExpression) e;
+			if (choice.thenExpr() == undefined) {
+				return integerValue(choice.elseExpr());
+			}
+			if (choice.elseExpr() == undefined) {
+				return integerValue(choice.thenExpr());
+			}
+			return choice.condition().thenElse(integerValue(choice.thenExpr()), integerValue(choice.elseExpr()));
+		}
+		return e.sum();
+	}
+
+	/**
+	 * Returns the formula that holds when an Integer expression is undefined:
+	 * never for a cast, always for undefined, by the branch it takes for an
+	 * if-then-else, and by comparison with undefined for any other expression.
+	 */
+	protected final Formula integerUndefined(Expression e) {
+		if (isIntegerCast(e)) {
+			return Formula.FALSE;
+		}
+		if (e == undefined) {
+			return Formula.TRUE;
+		}
+		if (e instanceof IfExpression) {
+			IfExpression choice = (IfExpression) e;
+			Formula condition = choice.condition();
+			return condition.and(integerUndefined(choice.thenExpr())).or(condition.not().and(integerUndefined(choice.elseExpr())));
+		}
+		return e.eq(undefined);
+	}
+
+	/**
+	 * Returns the formula that holds, where the expression is defined, when it
+	 * is an Integer that integerValue can read: always for a cast, by the
+	 * branch it takes for an if-then-else, and when it is a single Integer atom
+	 * for any other expression.
+	 */
+	protected final Formula integerKind(Expression e) {
+		if (isIntegerCast(e) || e == undefined) {
+			return Formula.TRUE;
+		}
+		if (e instanceof IfExpression) {
+			IfExpression choice = (IfExpression) e;
+			Formula condition = choice.condition();
+			return condition.and(integerKind(choice.thenExpr())).or(condition.not().and(integerKind(choice.elseExpr())));
+		}
+		return e.one().and(e.in(Expression.INTS));
+	}
+
+	/**
+	 * True if the expression may hold an Integer the universe has no atom
+	 * for: a cast of an integer expression other than an Integer literal of
+	 * the model, alone or in a branch of an if-then-else.
+	 */
+	protected final boolean isComputedInteger(Expression e) {
+		if (isIntegerCast(e)) {
+			return !typeFactory.integerType().typeLiterals().containsValue(e);
+		}
+		if (e instanceof IfExpression) {
+			IfExpression choice = (IfExpression) e;
+			return isComputedInteger(choice.thenExpr()) || isComputedInteger(choice.elseExpr());
+		}
+		return false;
+	}
+
+	private boolean isIntegerCast(Expression e) {
+		return e instanceof IntToExprCast && ((IntToExprCast) e).op() == IntCastOperator.INTCAST;
 	}
 }
