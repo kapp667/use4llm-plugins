@@ -32,8 +32,8 @@ public class CollectionConstructorGroup extends OCLOperationGroup {
 	public Expression mkSetRange(Expression from, Expression to) {
 		final Variable i = Variable.unary("i");
 
-		return from.eq(undefined).or(to.eq(undefined))
-				.thenElse(undefined, i.sum().gte(from.sum()).and(i.sum().lte(to.sum())).comprehension(i.oneOf(Expression.INTS)));
+		return integerUndefined(from).or(integerUndefined(to))
+				.thenElse(undefined, i.sum().gte(integerValue(from)).and(i.sum().lte(integerValue(to))).comprehension(i.oneOf(Expression.INTS)));
 	}
 
 	// OCL: Set{e_1,e_2,...}, where e_i may be a non-collection value or a range
