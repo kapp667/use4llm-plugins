@@ -3,11 +3,13 @@ package org.tzi.kodkod.helper;
 import java.io.File;
 import java.util.List;
 
+import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.model.config.impl.DefaultConfigurationValues;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.use.util.StringUtil;
 
 import kodkod.engine.Statistics;
+import kodkod.instance.Universe;
 import static org.tzi.use.util.StringUtil.inQuotes;
 
 /**
@@ -34,6 +36,9 @@ public final class LogMessages {
 	
 	public static final String WRONG_BITWIDTH_WARNING = "The bitwidth has to be a value between 1 and 32.";
 
+	public static final String maxComputedIntegersError = "The maximum number of computed Integer values has to be a value between 0 and "
+			+ KodkodModelValidatorConfiguration.LARGEST_COMPUTED_INTEGERS + ".";
+
 	public static final String configDiagramExtractionError = "Possible values for AutomaticObjectDiagramExtraction are only " + inQuotes("on") + " or " + inQuotes("off") + ".";
 
 	public static final String objDiagramCreation = "Create object diagram";
@@ -48,6 +53,10 @@ public final class LogMessages {
 
 	public static final String propertiesConfigurationWriteError = "Error while writing .properties file";
 
+	public static final String configurationInvalid = "The configuration breaks these rules. mv -vc also reports rules that do not stop the search.";
+	public static final String configurationRefused = "The model validator does not search with this configuration.";
+	public static final String configurationValueError = "A configuration value cannot be read";
+	public static final String configurationCheckError = "The configuration could not be checked against the validity rules";
 	public static final String configurationError = "Error during model configuration. Please check the log for concrete hints.";
 	
 	public static final String className$Error = "Class names starting with a " + inQuotes("$") + " are not allowed!";
@@ -221,11 +230,53 @@ public final class LogMessages {
 	}
 
 	public static String kodkodStatistics(Statistics statistics) {
-		return "Translation time (Kodkod to SAT): " + statistics.translationTime() + " ms; Solving time: " + statistics.solvingTime() + " ms";
+		return "Translation time (Kodkod to SAT): " + statistics.translationTime() + " ms; Solving time: " + statistics.solvingTime() + " ms; SAT variables: "
+				+ statistics.variables() + " (" + statistics.primaryVariables() + " primary); Clauses: " + statistics.clauses();
+	}
+
+	public static String universeSize(Universe universe) {
+		int integers = 0;
+		for (Object atom : universe) {
+			if(atom instanceof Integer){
+				integers++;
+			}
+		}
+		return "Universe: " + universe.size() + " atoms, " + integers + " of them Integer values";
 	}
 
 	public static String newBitwidth(int newBitwidth) {
 		return "Set bitwidth to " + newBitwidth + ".";
+	}
+
+	public static String newMaxBitwidth(int newMaxBitwidth) {
+		return "Set maximum bitwidth to " + newMaxBitwidth + ".";
+	}
+
+	public static String newMaxComputedIntegers(int newMaxComputedIntegers) {
+		return "Set maximum number of computed Integer values to " + newMaxComputedIntegers + ".";
+	}
+
+	public static String addedComputedIntegers(int added) {
+		return "Added " + added + " Integer values outside Integer_min and Integer_max, for the values the Integer expressions of the model may compute.";
+	}
+
+	public static String computedIntegersAboveMaximum(int maxComputedIntegers) {
+		return "The Integer expressions of the model may compute more than " + maxComputedIntegers
+				+ " Integer values outside Integer_min and Integer_max, above the maximum number of computed Integer values. Raise it with: mv -config "
+				+ KodkodModelValidatorConfiguration.MAX_COMPUTED_INTEGERS_KEY + ":=N, or narrow the values the expressions compute.";
+	}
+
+	public static String raisedBitwidth(int bitwidth, int needed) {
+		return "The Integer expressions of the model need bitwidth " + needed + ", above the bitwidth " + bitwidth + ": solving with bitwidth " + needed + ".";
+	}
+
+	public static String bitwidthAboveMaximum(int needed, int maxBitwidth) {
+		if(needed > KodkodModelValidatorConfiguration.LARGEST_BITWIDTH){
+			return "The Integer expressions of the model need a bitwidth above " + KodkodModelValidatorConfiguration.LARGEST_BITWIDTH
+					+ ", the largest the solver supports. Narrow Integer_min and Integer_max, or the values the expressions compute.";
+		}
+		return "The Integer expressions of the model need bitwidth " + needed + ", above the maximum bitwidth " + maxBitwidth
+				+ ". Raise it with: mv -config " + KodkodModelValidatorConfiguration.MAX_BITWIDTH_KEY + ":=" + needed;
 	}
 
 	public static String newSatSolver(String satFactory) {
@@ -275,10 +326,6 @@ public final class LogMessages {
 
 	public static Object searchSolution(String satFactory, int bitwidth) {
 		return "Searching solution with SatSolver " + inQuotes(satFactory) + " and bitwidth " + bitwidth + "...";
-	}
-
-	public static String extractSatSolverWarning(String defaultSatFactory) {
-		return "Extraction of satsolver libraries failed. Only default SatSolver " + inQuotes(defaultSatFactory) + " can be used! Is USE open twice?";
 	}
 
 	public static String libraryPathWarning(String defaultSatFactory, String exceptionMsg) {

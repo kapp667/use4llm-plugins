@@ -25,6 +25,9 @@ public class AnyOperationGroup extends OCLOperationGroup {
 	}
 
 	public Formula equality(Expression l, Expression r) {
+		if (isComputedInteger(l) || isComputedInteger(r)) {
+			return integerEquality(l, r);
+		}
 		return l.eq(r);
 	}
 
@@ -41,7 +44,7 @@ public class AnyOperationGroup extends OCLOperationGroup {
 	}
 
 	public Formula inequality(Expression l, Expression r) {
-		return l.eq(r).not();
+		return equality(l, r).not();
 	}
 
 	public Formula inequality(Formula l, Expression r) {
@@ -111,5 +114,19 @@ public class AnyOperationGroup extends OCLOperationGroup {
 
 	public Formula isUndefined(Formula src) {
 		return Formula.FALSE;
+	}
+
+	/**
+	 * Returns the formula that holds when two expressions, at least one a
+	 * computed Integer, are equal: both undefined, or both defined and either
+	 * both Integers of equal value or, when not both are Integers, equal atoms,
+	 * an integer cast counting as none.
+	 */
+	private Formula integerEquality(Expression l, Expression r) {
+		Formula lUndefined = integerUndefined(l);
+		Formula rUndefined = integerUndefined(r);
+		Formula integers = integerKind(l).and(integerKind(r));
+		Formula equal = integers.and(integerValue(l).eq(integerValue(r))).or(integers.not().and(withoutIntegerCasts(l).eq(withoutIntegerCasts(r))));
+		return lUndefined.and(rUndefined).or(lUndefined.not().and(rUndefined.not()).and(equal));
 	}
 }

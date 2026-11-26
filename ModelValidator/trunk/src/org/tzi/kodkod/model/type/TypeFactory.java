@@ -2,8 +2,14 @@ package org.tzi.kodkod.model.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import kodkod.ast.Expression;
+import kodkod.ast.IntExpression;
 
 import org.tzi.kodkod.model.iface.IClass;
 
@@ -15,9 +21,31 @@ import org.tzi.kodkod.model.iface.IClass;
 public abstract class TypeFactory {
 
 	private Map<String, Type> buildInTypes;
+	private final Set<IntExpression> singleIntegerReads = Collections.newSetFromMap(new IdentityHashMap<IntExpression, Boolean>());
+	private final Map<Expression, IntExpression[]> integerRanges = new IdentityHashMap<Expression, IntExpression[]>();
 
 	public TypeFactory() {
 		buildInTypes = createBuildInTypes();
+	}
+
+	/**
+	 * Returns the sums that OCLOperationGroup.integerValue builds as the
+	 * translation runs, each over an expression that holds at most one atom
+	 * wherever the sum can change the truth of the formula. IntegerRanges
+	 * bounds each as a single value.
+	 */
+	public Set<IntExpression> singleIntegerReads() {
+		return singleIntegerReads;
+	}
+
+	/**
+	 * Returns, for the comprehension of the elements of each Integer range
+	 * the translation builds, the integer expressions of its first and its
+	 * last value, as {first, last}; the translation adds to it. IntegerRanges
+	 * reads it for the atoms a range holds and the values it needs as atoms.
+	 */
+	public Map<Expression, IntExpression[]> integerRanges() {
+		return integerRanges;
 	}
 
 	/**

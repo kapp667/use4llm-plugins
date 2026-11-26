@@ -24,7 +24,7 @@
 	<commands>
 		<command id="org.tzi.use.kodkod.plugin.KodkodValidateCmd"
 			class="org.tzi.use.kodkod.plugin.KodkodValidateCmd"
-			help="Validates the model using the model validator. A path to a configuration file can be specified. If no path is given, a generic configuration file will be created in the directory of the current USE specification."
+			help="Validates the model using the model validator. A path to a configuration file can be specified. If no path is given, a generic configuration file will be created in the directory of the current USE specification. A configuration with a negative bound or a min above its max is refused before any search. mv -vc lists the rules a configuration breaks."
 			label="KodkodValidateCmd"
 			shellcmd="modelvalidator -validate"
 			alias="mv -validate">
@@ -38,7 +38,7 @@
 		</command>
 		<command id="org.tzi.use.kodkod.plugin.ConfigurationCmd"
 			class="org.tzi.use.kodkod.plugin.ConfigurationCmd"
-			help="Configures basic Kodkod properties. Possible parameters (case sensitive): 'satsolver:=[DefaultSAT4J|LightSAT4J|Lingeling|plingeling|MiniSat|MiniSatProver|ZChaffMincost|CryptoMiniSat]' selects the sat solver to be used (some solvers need to be installed manually); 'bitwidth:=i' sets the solver bitwidth; 'automaticDiagramExtraction:=[on|off]' determines if the current object diagram should be used as partial solution; 'save' saves the configuration"
+			help="Configures basic Kodkod properties. Possible parameters (case sensitive): 'satsolver:=[DefaultSAT4J|LightSAT4J|Lingeling|plingeling|MiniSat|MiniSatProver|ZChaffMincost|CryptoMiniSat]' selects the sat solver to be used (some solvers need to be installed manually); 'bitwidth:=i' sets the smallest solver bitwidth; 'maxBitwidth:=i' sets the largest bitwidth the solver may raise the bitwidth to when the Integer expressions of a model need more; 'maxComputedIntegers:=i' sets the largest number of Integer values outside Integer_min and Integer_max that the solver may add for the values the Integer expressions of a model compute; 'automaticDiagramExtraction:=[on|off]' determines if the current object diagram should be used as partial solution; 'save' saves the configuration"
 			label="ConfigurationCmd"
 			shellcmd="modelvalidator -config"
 			alias="mv -config">
@@ -85,12 +85,12 @@
 			shellcmd="modelvalidator ?"
 			alias="mv ?">
 		</command>
-		<command id="org.tzi.use.kodkod.plugin.SolverDownloadCmd"
-			class="org.tzi.use.kodkod.plugin.SolverDownloadCmd"
-			help="Downloads and installs external solver libraries such as MiniSat and lingeling depending on the compatibilities with the system"
-			label="SolverDownloadCmd"
-			shellcmd="modelvalidator -downloadSolvers"
-			alias="mv -dl">
+		<command id="org.tzi.use.kodkod.plugin.ConfigurationValidationCmd"
+			class="org.tzi.use.kodkod.plugin.ConfigurationValidationCmd"
+			help="Checks the configurations of a properties file against the model and names each rule a configuration breaks. Give the path of the file, then the names of the configurations to check; with no name, every configuration of the file is checked. The check of untightenable bounds of version 5.2.0, which needs the Choco solver, is not included."
+			label="ConfigurationValidationCmd"
+			shellcmd="modelvalidator -validateConfig"
+			alias="mv -vc">
 		</command>
 	</commands>
 </plugin>

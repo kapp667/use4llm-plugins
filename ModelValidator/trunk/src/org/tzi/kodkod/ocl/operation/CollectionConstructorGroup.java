@@ -1,6 +1,7 @@
 package org.tzi.kodkod.ocl.operation;
 
 import kodkod.ast.Expression;
+import kodkod.ast.IntExpression;
 import kodkod.ast.Variable;
 
 import org.apache.log4j.Logger;
@@ -31,9 +32,12 @@ public class CollectionConstructorGroup extends OCLOperationGroup {
 
 	public Expression mkSetRange(Expression from, Expression to) {
 		final Variable i = Variable.unary("i");
+		IntExpression first = integerValue(from);
+		IntExpression last = integerValue(to);
+		Expression elements = i.sum().gte(first).and(i.sum().lte(last)).comprehension(i.oneOf(Expression.INTS));
+		typeFactory.integerRanges().put(elements, new IntExpression[] { first, last });
 
-		return from.eq(undefined).or(to.eq(undefined))
-				.thenElse(undefined, i.sum().gte(from.sum()).and(i.sum().lte(to.sum())).comprehension(i.oneOf(Expression.INTS)));
+		return integerUndefined(from).or(integerUndefined(to)).thenElse(undefined, elements);
 	}
 
 	// OCL: Set{e_1,e_2,...}, where e_i may be a non-collection value or a range
