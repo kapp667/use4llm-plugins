@@ -17,11 +17,12 @@ import org.tzi.kodkod.model.iface.IModel;
 /**
  * Checks that an Integer result outside Integer_min and Integer_max keeps its
  * value, as in OCL, whose Integers have no bounds, through a comparison,
- * {@code =}, {@code <>}, a query operation, an if-then-else, a range and
- * floor, and that {@code =} still holds between equal values that are not
- * Integers, including the size of an undefined Set. A result beyond the
- * bitwidth keeps its value too, up to the larger of the bitwidth and the
- * maximum bitwidth, above which the solver refuses the model.
+ * {@code =}, {@code <>}, a query operation, an if-then-else, a range, floor
+ * and a collection that holds it, and that {@code =} still holds between
+ * equal values that are not Integers, including the size of an undefined
+ * Set. A result beyond the bitwidth keeps its value too, up to the larger of
+ * the bitwidth and the maximum bitwidth, above which the solver refuses the
+ * model.
  */
 public class IntegerArithmetic_Test {
 
@@ -188,5 +189,35 @@ public class IntegerArithmetic_Test {
 	public void productAboveTheLargestBitwidthIsRefused() throws Exception {
 		String message = refusal("self.x * 100000 * 100000 > 0", 0, 10);
 		assertTrue(message, message.contains("need a bitwidth above 32"));
+	}
+
+	@Test
+	public void setWithinTheIntegerBoundsDoesNotIncludeASumAboveThem() {
+		validate("self.s->includes(self.x + 20)", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void setOfASumAboveTheIntegerMaximumIsNotEmpty() {
+		validate("self.x = 5 and Set{self.x + 20}->size() = 0", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void includingASumAboveTheIntegerMaximumAddsAnElement() {
+		validate("self.x = 5 and self.s->including(self.x + 20)->size() = self.s->size()", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void setsOfSumsAboveTheIntegerMaximumWithDifferentValuesAreNotEqual() {
+		validate("self.x = 5 and Set{self.x + 20} = Set{self.x + 30}", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void rangeUpToASumAboveTheIntegerMaximumHoldsEveryIntegerOfIt() {
+		validate("self.x = 5 and Set{0..(self.x + 20)}->size() = 26", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
 	}
 }
