@@ -12,14 +12,16 @@
 #   plugin jar dir:  holds ModelValidatorPlugin.jar and use-filmstrip.jar
 #   corpus dir:      searched for *.use files; each one is a case
 # Outputs: <out dir>/oracle.tsv, a default row, a wide row and, for a model with a witness, a
-#          witness row per model in sorted order, and <out dir>/cases/<n>/output.txt, wide.txt,
-#          replay.txt and witness.txt, the raw USE outputs of the n-th model.
+#          witness row per model in sorted order, <out dir>/metrics.tsv, a row per run of the
+#          validator with the size of its problem and the time of each phase, n/a where the output
+#          holds none, and <out dir>/cases/<n>/output.txt, wide.txt, replay.txt and witness.txt, the
+#          raw USE outputs of the n-th model.
 #          Exits 1 if and only if a SAT solution fails USE's check, the witness bounds are UNSAT,
 #          or widen.sh or witness.sh fails.
 # ORACLE_TIMEOUT sets the seconds allowed per run of USE, up to four per model (default 120).
 set -euo pipefail
 
-[ "$#" -eq 4 ] || { sed -n '2,19p' "$0" >&2; exit 2; }
+[ "$#" -eq 4 ] || { sed -n '2,21p' "$0" >&2; exit 2; }
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usedir="$(cd "$1" && pwd)"
 jars="$(cd "$2" && pwd)"
@@ -57,6 +59,8 @@ mapfile -t models < <(cd "$corpus" && find . -name '*.use' -type f | sed 's|^\./
 
 tsv="$out/oracle.tsv"
 printf 'model\tbounds\tverdict\tcheck\tobjects\terrors\tseconds\tnote\n' >"$tsv"
+metrics="$out/metrics.tsv"
+printf 'model\tbounds\tverdict\tbitwidth\tatoms\tintegers\tvariables\tprimary\tclauses\tuse to kodkod ms\tkodkod to sat ms\tsolving ms\n' >"$metrics"
 failures=0
 
 # Runs USE on the model of the current case with a command file and sets status to its exit
@@ -77,6 +81,7 @@ solve() {
   row="$("$here/parse.sh" "$dir/$3" "$status")"
   IFS=$'\t' read -r verdict check objects errors note <<<"$row"
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$model" "$1" "$verdict" "$check" "$objects" "$errors" "$seconds" "$note" >>"$tsv"
+  printf '%s\t%s\t%s\t%s\n' "$model" "$1" "$verdict" "$("$here/metrics.sh" "$dir/$3")" >>"$metrics"
   echo "[$n/${#models[@]}] $model, $1 bounds: $verdict, check $check, $objects objects, $errors errors, ${seconds}s"
   [ "$check" != fail ] || failures=$((failures + 1))
   # The witness state meets the witness bounds, so UNSAT is a wrong answer.
