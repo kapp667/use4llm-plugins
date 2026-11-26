@@ -26,7 +26,7 @@ import org.tzi.use.main.shell.runtime.IPluginShellCmd;
 import org.tzi.use.uml.sys.MSystem;
 
 /**
- * Runs the model validator, mv -validate, on configuration files.
+ * Tests mv -validate on configuration files.
  */
 public class KodkodValidateCmd_Test {
 
@@ -52,8 +52,8 @@ public class KodkodValidateCmd_Test {
 
 	private void open(String spec) {
 		session = new Session();
-		// As in USE, the plugin watches the session before the model is opened, so
-		// it transforms this model instead of keeping the one of an earlier test.
+		// As in USE, the plugin watches the session before the model is opened, so it
+		// transforms the model under test, not one left over from an earlier test.
 		session.setSystem(new MSystem(TestSpecifications.compile("model Empty\n")));
 		PluginModelFactory.INSTANCE.registerForSession(session);
 		session.setSystem(new MSystem(TestSpecifications.compile(spec)));
