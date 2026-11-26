@@ -1,6 +1,7 @@
 package org.tzi.kodkod.ocl.operation;
 
 import kodkod.ast.Expression;
+import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 
 import org.tzi.kodkod.model.type.StringType;
@@ -28,61 +29,61 @@ public class IntegerOperationGroup extends OCLOperationGroup {
 	}
 
 	public final Expression abs(Expression e) {
-		return e.eq(undefined).thenElse(undefined, e.sum().abs().toExpression());
+		return integer(integerUndefined(e), integerValue(e).abs());
 	}
 
 	public final Expression div(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).or(r.sum().eq(IntConstant.constant(0)))
-				.thenElse(undefined, l.sum().divide(r.sum()).toExpression());
+		return integer(eitherUndefined(l, r).or(integerValue(r).eq(IntConstant.constant(0))),
+				integerValue(l).divide(integerValue(r)));
 	}
 
 	public final Expression floor(Expression e) {
-		return e.eq(undefined).thenElse(undefined, e);
+		return e;
 	}
 
 	public final Expression greater(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().gt(r.sum()).thenElse(booleanTrue, booleanFalse));
+		return eitherUndefined(l, r).thenElse(undefined, integerValue(l).gt(integerValue(r)).thenElse(booleanTrue, booleanFalse));
 	}
 
 	public final Expression greaterOrEqual(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().gte(r.sum()).thenElse(booleanTrue, booleanFalse));
+		return eitherUndefined(l, r).thenElse(undefined, integerValue(l).gte(integerValue(r)).thenElse(booleanTrue, booleanFalse));
 	}
 
 	public final Expression less(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().lt(r.sum()).thenElse(booleanTrue, booleanFalse));
+		return eitherUndefined(l, r).thenElse(undefined, integerValue(l).lt(integerValue(r)).thenElse(booleanTrue, booleanFalse));
 	}
 
 	public final Expression lessOrEqual(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().lte(r.sum()).thenElse(booleanTrue, booleanFalse));
+		return eitherUndefined(l, r).thenElse(undefined, integerValue(l).lte(integerValue(r)).thenElse(booleanTrue, booleanFalse));
 	}
 
 	public final Expression max(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().gte(r.sum()).thenElse(l, r));
+		return integer(eitherUndefined(l, r), integerValue(l).gte(integerValue(r)).thenElse(integerValue(l), integerValue(r)));
 	}
 
 	public final Expression min(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().lte(r.sum()).thenElse(l, r));
+		return integer(eitherUndefined(l, r), integerValue(l).lte(integerValue(r)).thenElse(integerValue(l), integerValue(r)));
 	}
 
 	public final Expression minus(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().minus(r.sum()).toExpression());
+		return integer(eitherUndefined(l, r), integerValue(l).minus(integerValue(r)));
 	}
 
 	public final Expression mod(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).or(r.sum().eq(IntConstant.constant(0)))
-				.thenElse(undefined, l.sum().modulo(r.sum()).toExpression());
+		return integer(eitherUndefined(l, r).or(integerValue(r).eq(IntConstant.constant(0))),
+				integerValue(l).modulo(integerValue(r)));
 	}
 
 	public final Expression multiply(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().multiply(r.sum()).toExpression());
+		return integer(eitherUndefined(l, r), integerValue(l).multiply(integerValue(r)));
 	}
 
 	public final Expression negation(Expression e) {
-		return e.eq(undefined).thenElse(undefined, e.sum().negate().toExpression());
+		return integer(integerUndefined(e), integerValue(e).negate());
 	}
 
 	public final Expression plus(Expression l, Expression r) {
-		return l.eq(undefined).or(r.eq(undefined)).thenElse(undefined, l.sum().plus(r.sum()).toExpression());
+		return integer(eitherUndefined(l, r), integerValue(l).plus(integerValue(r)));
 	}
 
 	public final Expression round(Expression e) {
@@ -92,5 +93,9 @@ public class IntegerOperationGroup extends OCLOperationGroup {
 	public final Expression toString(Expression src) {
 		StringType stringType = (StringType) typeFactory.stringType();
 		return src.eq(undefined).thenElse(undefined, src.join(stringType.toStringMap()));
+	}
+
+	private Formula eitherUndefined(Expression l, Expression r) {
+		return integerUndefined(l).or(integerUndefined(r));
 	}
 }
