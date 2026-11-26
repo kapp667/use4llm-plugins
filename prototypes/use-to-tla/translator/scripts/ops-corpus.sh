@@ -58,7 +58,7 @@ rows, hist, hist_models = [], collections.Counter(), collections.defaultdict(set
 def tlc(path):
     t = open(path, errors="replace").read() if os.path.exists(path) else ""
     m = re.search(r"Error: Invariant (\w+) is violated", t)
-    states = re.search(r"([\d,]+) distinct states found", t)
+    states = re.findall(r"([\d,]+) distinct states found", t)  # the last one; a Progress line comes first
     depth = re.search(r"depth of the complete state graph search is (\d+)", t)
     if m: r = "violated " + m.group(1)
     elif "Model checking completed. No error has been found." in t: r = "no violation"
@@ -66,7 +66,7 @@ def tlc(path):
     else:
         e = re.search(r"^(Error:.*|.*Exception.*)$", t, re.M)
         r = "TLC error: " + (e.group(1)[:120] if e else "?")
-    return r, states.group(1).replace(",", "") if states else "", depth.group(1) if depth else ""
+    return r, states[-1].replace(",", "") if states else "", depth.group(1) if depth else ""
 for cid in sorted(os.listdir(os.path.join(out, "cases"))):
     d = os.path.join(out, "cases", cid)
     root, model = open(os.path.join(d, "model.tsv")).read().rstrip("\n").split("\t")
