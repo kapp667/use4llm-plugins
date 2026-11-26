@@ -2,20 +2,26 @@ package org.tzi.use.kodkod.transform.ocl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
+import org.tzi.kodkod.KodkodSolver;
+import org.tzi.kodkod.model.iface.IModel;
 
 /**
  * Checks that an Integer result outside Integer_min and Integer_max keeps its
  * value, as in OCL, whose Integers have no bounds, through a comparison,
  * {@code =}, {@code <>}, a query operation, an if-then-else, a range and
  * floor, and that {@code =} still holds between equal values that are not
- * Integers, including the size of an undefined Set.
+ * Integers, including the size of an undefined Set. A result beyond the
+ * bitwidth keeps its value too, up to the larger of the bitwidth and the
+ * maximum bitwidth, above which the solver refuses the model.
  */
 public class IntegerArithmetic_Test {
 
@@ -26,6 +32,7 @@ public class IntegerArithmetic_Test {
 	public void setUp() throws Exception {
 		KodkodModelValidatorConfiguration.getInstance().setSatFactory(KodkodModelValidatorConfiguration.DEFAULT_SATFACTORY);
 		KodkodModelValidatorConfiguration.getInstance().setBitwidth(KodkodModelValidatorConfiguration.DEFAULT_BITWIDTH);
+		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(KodkodModelValidatorConfiguration.DEFAULT_MAX_BITWIDTH);
 		validator = new OutcomeRecorder();
 		properties = new HashMap<String, Object>();
 		properties.put("A_min", 1);
@@ -34,12 +41,19 @@ public class IntegerArithmetic_Test {
 		properties.put("A_x_max", 1);
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		KodkodModelValidatorConfiguration.getInstance().setBitwidth(KodkodModelValidatorConfiguration.DEFAULT_BITWIDTH);
+		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(KodkodModelValidatorConfiguration.DEFAULT_MAX_BITWIDTH);
+	}
+
 	/**
-	 * Validates a class A with an Integer attribute x, a Set(Integer)
-	 * attribute s, a query operation shifted(d) that returns x + d, and the
-	 * given invariant, with the given Integer_min and Integer_max.
+	 * Returns the configured model of a class A with an Integer attribute x, a
+	 * Set(Integer) attribute s, a query operation shifted(d) that returns
+	 * x + d, and the given invariant, with the given Integer_min and
+	 * Integer_max.
 	 */
-	private void validate(String invariant, int min, int max) {
+	private IModel model(String invariant, int min, int max) {
 		String spec = "model M\n"
 				+ "class A\n"
 				+ "attributes\n"
@@ -52,7 +66,26 @@ public class IntegerArithmetic_Test {
 				+ "context A inv i: " + invariant + "\n";
 		properties.put("Integer_min", min);
 		properties.put("Integer_max", max);
-		validator.validate(TestSpecifications.configure(TestSpecifications.transform(spec), properties));
+		return TestSpecifications.configure(TestSpecifications.transform(spec), properties);
+	}
+
+	private void validate(String invariant, int min, int max) {
+		validator.validate(model(invariant, min, max));
+	}
+
+	/**
+	 * Returns the message of the IllegalStateException that KodkodSolver.solve
+	 * throws for model(invariant, min, max); fails the test if it throws none.
+	 */
+	private String refusal(String invariant, int min, int max) throws Exception {
+		IModel model = model(invariant, min, max);
+		try {
+			new KodkodSolver().solve(model);
+		} catch (IllegalStateException e) {
+			return e.getMessage();
+		}
+		fail("the solver did not refuse the model");
+		return null;
 	}
 
 	@Test
@@ -116,5 +149,44 @@ public class IntegerArithmetic_Test {
 	public void floorOfASumAboveTheIntegerMaximumKeepsTheSum() {
 		validate("self.x = 5 and (self.x + 20).floor() = self.x + 20 and (self.x + 20).floor() <> self.x + 30", 0, 10);
 		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sumAboveTheBitwidthIsComputed() {
+		validate("self.x = 100 and self.x + 100 > 127", -128, 127);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sumAboveTheBitwidthIsNotNegative() {
+		validate("self.x = 100 and self.x + 100 < 0", -128, 127);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void productAboveTheBitwidthIsComputed() {
+		validate("self.x = 50 and self.x * self.x > 2000", -100, 100);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sumAboveTheMaximumBitwidthIsRefusedWithTheBitwidthItNeeds() throws Exception {
+		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(8);
+		String message = refusal("self.x = 100 and self.x + 100 > 127", -128, 127);
+		assertTrue(message, message.contains("need bitwidth 9,"));
+	}
+
+	@Test
+	public void sumWithinTheBitwidthAboveTheMaximumBitwidthIsComputed() throws Exception {
+		KodkodModelValidatorConfiguration.getInstance().setBitwidth(16);
+		KodkodModelValidatorConfiguration.getInstance().setMaxBitwidth(8);
+		validate("self.x = 100 and self.x + 100 > 127", -128, 127);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void productAboveTheLargestBitwidthIsRefused() throws Exception {
+		String message = refusal("self.x * 100000 * 100000 > 0", 0, 10);
+		assertTrue(message, message.contains("need a bitwidth above 32"));
 	}
 }

@@ -50,11 +50,20 @@ public class KodkodSolver {
 		final Solver solver = new Solver();
 		solver.options().setLogTranslation(1);
 		
-		LOG.info(LogMessages.searchSolution(configuration.satFactory().toString(), configuration.bitwidth()));
+		int needed = IntegerRanges.requiredBitwidth(constraint, bounds, model.typeFactory().singleIntegerReads());
+		if (needed > Math.max(configuration.bitwidth(), configuration.maxBitwidth())) {
+			throw new IllegalStateException(LogMessages.bitwidthAboveMaximum(needed, configuration.maxBitwidth()));
+		}
+		int bitwidth = Math.max(configuration.bitwidth(), needed);
+		if (bitwidth > configuration.bitwidth()) {
+			LOG.info(LogMessages.raisedBitwidth(configuration.bitwidth(), bitwidth));
+		}
+
+		LOG.info(LogMessages.searchSolution(configuration.satFactory().toString(), bitwidth));
 		LOG.info(LogMessages.universeSize(bounds.universe()));
 
 		solver.options().setSolver(configuration.satFactory());
-		solver.options().setBitwidth(configuration.bitwidth());
+		solver.options().setBitwidth(bitwidth);
 		
 		Solution solution = solver.solve(constraint, bounds);
 		
