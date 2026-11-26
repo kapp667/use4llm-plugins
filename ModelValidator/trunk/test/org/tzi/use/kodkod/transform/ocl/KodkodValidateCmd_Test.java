@@ -1,5 +1,6 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -46,12 +47,16 @@ public class KodkodValidateCmd_Test {
 	public void setUp() {
 		appender = new WriterAppender(new PatternLayout("%p %m%n"), log);
 		Logger.getLogger("org.tzi").addAppender(appender);
+		open(SPEC);
+	}
+
+	private void open(String spec) {
 		session = new Session();
 		// As in USE, the plugin watches the session before the model is opened, so
 		// it transforms this model instead of keeping the one of an earlier test.
 		session.setSystem(new MSystem(TestSpecifications.compile("model Empty\n")));
 		PluginModelFactory.INSTANCE.registerForSession(session);
-		session.setSystem(new MSystem(TestSpecifications.compile(SPEC)));
+		session.setSystem(new MSystem(TestSpecifications.compile(spec)));
 		boolean plugins = Options.doPLUGIN;
 		Options.doPLUGIN = false;
 		Shell.createInstance(session, null);
@@ -88,6 +93,23 @@ public class KodkodValidateCmd_Test {
 	public void solvesDespiteASuperfluousSetting() throws Exception {
 		String output = check(file("real.properties",
 				"[real]\n" + BOUNDS + "Employee_min = 1\nEmployee_max = 1\nReal_min = -1.0\nReal_max = 1.0\nReal_step = 0.5\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithBoundsOnTheTotalOfAnAbstractClass() throws Exception {
+		open("model F\nabstract class Fruit\nend\nclass Apple < Fruit\nend\n");
+		String output = check(file("fruit.properties", "[fruit]\nFruit_min = 1\nFruit_max = 1\nApple_min = 0\nApple_max = 3\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, 1, session.system().state().allObjects().size());
+	}
+
+	@Test
+	public void solvesWithAnAttributeMaxAboveItsClassMax() throws Exception {
+		String output = check(file("attr.properties", "[attr]\nInteger_min = -2\nInteger_max = 2\n"
+				+ "Employee_min = 1\nEmployee_max = 1\nEmployee_salary_min = 1\nEmployee_salary_max = 3\n"));
 		assertFalse(output, output.contains("ERROR"));
 		assertTrue(output, output.contains("INFO SATISFIABLE"));
 	}
