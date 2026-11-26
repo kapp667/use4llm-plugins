@@ -1,5 +1,9 @@
 package org.tzi.kodkod.validation;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * The set of validity rules. The applicability of rules may depend on other
  * rules to be not violated. These dependencies are expressed here.
@@ -363,30 +367,29 @@ public enum ValidityRule {
 	}
 
 	/**
-	 * Returns whether a violation of the rule leaves the model validator nothing
-	 * sound to search with: a setting is missing, invalid or contradicts another.
-	 * A superfluous or imperfect setting does not. Neither do two settings that
-	 * version 5.2.0 counts as invalid: bounds of an abstract class narrower than
-	 * the sums of its subclasses' bounds, which restrict the total number of its
-	 * objects, and an attribute max above the max of its class, which the search
-	 * cannot reach. The solver handles both soundly.
-	 * 
-	 * @return Whether a violation of the rule makes the configuration unusable.
+	 * The rules that mv -validate checks before it searches.
 	 */
-	public boolean breaksTheConfiguration() {
-		if (this == CLASS_SETTINGS_ABSTRACT_CLASS_BOUNDS_EQUALS_SUM_OF_BOUNDS_OF_DERIVED_CLASSES
-				|| this == ATTRIBUTE_SETTINGS_MAX_STAR_OR_LESS_THAN_OR_EQUAL_CLASS_MAX) {
-			return false;
-		}
-		switch (level) {
-		case INCOMPLETE:
-		case INVALID:
-		case INTER_CONTRADICTION:
-		case INTRA_CONTRADICTION:
-			return true;
-		default:
-			return false;
-		}
+	private static final Set<ValidityRule> STOPPING_THE_SEARCH = Collections.unmodifiableSet(EnumSet.of(
+			INTEGER_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, STRING_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
+			STRING_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, CLASS_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
+			CLASS_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, ASSOCIATION_SETTINGS_MAX_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO,
+			ASSOCIATION_SETTINGS_MIN_GREATER_THAN_OR_EQUAL_ZERO,
+			ASSOCIATION_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX_WHEN_MAX_NOT_STAR,
+			ATTRIBUTE_SETTINGS_MIN_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO,
+			ATTRIBUTE_SETTINGS_MAX_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO, ATTRIBUTE_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX,
+			ATTRIBUTE_SETTINGS_COLLECTION_MIN_SIZE_GREATER_THAN_OR_EQUAL_ZERO,
+			ATTRIBUTE_SETTINGS_COLLECTION_MAX_SIZE_STAR_OR_GREATER_THAN_OR_EQUAL_MIN_SIZE));
+
+	/**
+	 * Returns the rules that mv -validate checks before it searches: a bound out of
+	 * range, or a min above its max, which the loader does not report. The other
+	 * rules are reported by mv -vc only, because some of them reject settings the
+	 * loader reads soundly.
+	 * 
+	 * @return The rules, a set that cannot be changed.
+	 */
+	public static Set<ValidityRule> stoppingTheSearch() {
+		return STOPPING_THE_SEARCH;
 	}
 
 	/**
