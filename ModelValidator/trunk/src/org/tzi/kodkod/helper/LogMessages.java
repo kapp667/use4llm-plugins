@@ -185,6 +185,10 @@ public final class LogMessages {
 		return "Cannot transform " + inQuotes(expression) + ": only two sets can be compared.";
 	}
 
+	public static String stringOperationError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": comparing (<, <=, >, >=) or concatenating (+) String values is not supported.";
+	}
+
 	public static String realValueError(String expression) {
 		return "Cannot transform " + inQuotes(expression) + ": Real values are not supported.";
 	}
