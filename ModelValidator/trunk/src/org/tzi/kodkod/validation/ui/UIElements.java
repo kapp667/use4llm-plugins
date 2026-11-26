@@ -127,14 +127,9 @@ public final class UIElements {
 		if (notContainedNames == null) {
 			throw new IllegalArgumentException();
 		}
-		return "The following names, which will be ignored further on, are not contained in the file: "
+		return "The file holds no configuration of these names: "
 				+ notContainedNames;
 	}
-
-	/**
-	 * The CLI info that there are names specified but no valid name is specified.
-	 */
-	public static final String CLI_NotEnoughValidNameArguments = "Multiple names are specified but not at least one valid name is contained.";
 
 	/**
 	 * The label for a class.

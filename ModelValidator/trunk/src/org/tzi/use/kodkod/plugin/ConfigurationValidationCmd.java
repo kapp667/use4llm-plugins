@@ -47,11 +47,11 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 		initialize(pluginCommand.getSession());
 		final IModel model = model();
 
-		final Map<String, SettingsConfiguration> configurationsForNames = LoadedConfigFileManager
-				.loadEditableState(model, configFilePath).getConfigurations();
-		if (configurationsForNames == null) {
+		final LoadedConfigFileManager loaded = LoadedConfigFileManager.loadEditableState(model, configFilePath);
+		if (loaded == null) {
 			return;
 		}
+		final Map<String, SettingsConfiguration> configurationsForNames = loaded.getConfigurations();
 		if (!validateNameArguments(configurationsForNames, names, LOG)) {
 			return;
 		}
@@ -80,6 +80,7 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			try {
 				violationsByValdityRules = new ValidityRuleValidator().validate(config, model, extractInvariants());
 			} catch (Exception e) {
+				log.error("Config " + name + " could not be validated.", e);
 				logString += "Config " + name + " could not be validated.\n\n";
 				continue;
 			}
@@ -158,18 +159,7 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 	 *            The configuration names given as arguments.
 	 * @param LOG
 	 *            The logger.
-	 * @return Whether at least to different valid configurations names are given.
-	 */
-	/**
-	 * Validates configuration names given as arguments.
-	 * 
-	 * @param configurationsForNames
-	 *            The existing configurations for their names.
-	 * @param names
-	 *            The configuration names given as arguments.
-	 * @param LOG
-	 *            The logger.
-	 * @return Whether at least one valid configurations names is given.
+	 * @return Whether every name given is a configuration of the file.
 	 */
 	private static boolean validateNameArguments(Map<String, SettingsConfiguration> configurationsForNames,
 			String[] names, final Logger LOG) {
@@ -177,7 +167,6 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			throw new IllegalArgumentException();
 		}
 		if (names.length != 0) {
-			List<String> validNames = new ArrayList<>();
 			List<String> namesWithoutDuplicates = new ArrayList<>();
 			List<String> duplicatedNames = new ArrayList<>();
 			for (String name : names) {
@@ -191,18 +180,13 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			for (String name : names) {
 				if (!configurationsForNames.containsKey(name)) {
 					notContainedNames.add(name);
-				} else if (!validNames.contains(name)) {
-					validNames.add(name);
 				}
 			}
 			if (!duplicatedNames.isEmpty()) {
 				LOG.warn(UIElements.CLI_MultipleNamesArguments(duplicatedNames));
 			}
 			if (!notContainedNames.isEmpty()) {
-				LOG.warn(UIElements.CLI_UncontainedNamesArgumentss(notContainedNames));
-			}
-			if (validNames.size() < 1) {
-				LOG.error(UIElements.CLI_NotEnoughValidNameArguments);
+				LOG.error(UIElements.CLI_UncontainedNamesArgumentss(notContainedNames));
 				return false;
 			}
 		}
