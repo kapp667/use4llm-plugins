@@ -100,7 +100,9 @@ public abstract class OCLOperationGroup {
 			}
 			return choice.condition().thenElse(integerValue(choice.thenExpr()), integerValue(choice.elseExpr()));
 		}
-		return e.sum();
+		IntExpression read = e.sum();
+		typeFactory.singleIntegerReads().add(read);
+		return read;
 	}
 
 	/**
