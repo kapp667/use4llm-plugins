@@ -3,6 +3,7 @@ package org.tzi.kodkod.helper;
 import java.io.File;
 import java.util.List;
 
+import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.model.config.impl.DefaultConfigurationValues;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.use.util.StringUtil;
@@ -238,6 +239,23 @@ public final class LogMessages {
 
 	public static String newBitwidth(int newBitwidth) {
 		return "Set bitwidth to " + newBitwidth + ".";
+	}
+
+	public static String newMaxBitwidth(int newMaxBitwidth) {
+		return "Set maximum bitwidth to " + newMaxBitwidth + ".";
+	}
+
+	public static String raisedBitwidth(int bitwidth, int needed) {
+		return "The Integer expressions of the model need bitwidth " + needed + ", above the bitwidth " + bitwidth + ": solving with bitwidth " + needed + ".";
+	}
+
+	public static String bitwidthAboveMaximum(int needed, int maxBitwidth) {
+		if(needed > KodkodModelValidatorConfiguration.LARGEST_BITWIDTH){
+			return "The Integer expressions of the model need a bitwidth above " + KodkodModelValidatorConfiguration.LARGEST_BITWIDTH
+					+ ", the largest the solver supports. Narrow Integer_min and Integer_max, or the values the expressions compute.";
+		}
+		return "The Integer expressions of the model need bitwidth " + needed + ", above the maximum bitwidth " + maxBitwidth
+				+ ". Raise it with: mv -config " + KodkodModelValidatorConfiguration.MAX_BITWIDTH_KEY + ":=" + needed;
 	}
 
 	public static String newSatSolver(String satFactory) {
