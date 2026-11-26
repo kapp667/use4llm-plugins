@@ -1,12 +1,10 @@
 package org.tzi.use.kodkod.plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -184,21 +182,6 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		protected static final Logger LOG = Logger.getLogger(LoadedConfigFileManager.class);
 
 		/**
-		 * The class diagram of the UML/OCL model.
-		 */
-		private final IModel model;
-
-		/**
-		 * The configuration file.
-		 */
-		private final File file;
-
-		/**
-		 * The manager for the configuration file.
-		 */
-		private final ConfigurationFileManager configManager;
-
-		/**
 		 * The loaded configurations from the file for their names.
 		 */
 		private final Map<String, SettingsConfiguration> configs;
@@ -208,44 +191,22 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 * 
 		 * @param model
 		 *            The class diagram of the UML/OCL model.
-		 * @param file
-		 *            The configuration file.
 		 * @param configManager
 		 *            The manager for the configuration file.
 		 */
-		private LoadedConfigFileManager(IModel model, File file, ConfigurationFileManager configManager) {
-			this.model = model;
-			this.file = file;
-			this.configManager = configManager;
+		private LoadedConfigFileManager(IModel model, ConfigurationFileManager configManager) {
 			this.configs = getConfigurations(configManager, model);
 		}
 
 		/**
-		 * Constructs an object.
+		 * Loads the configurations of a file.
 		 * 
 		 * @param model
 		 *            The class diagram of the UML/OCL model.
 		 * @param configFilePath
 		 *            The path to the configuration file.
-		 * @return The manager for loaded configuration files.
-		 */
-		public static LoadedConfigFileManager generateEditableState(IModel model, String configFilePath) {
-			if (model == null || configFilePath == null) {
-				throw new IllegalArgumentException();
-			}
-			return new LoadedConfigFileManager(model,
-					new File(Shell.getInstance().getFilenameToOpen(configFilePath.trim(), false)),
-					new ConfigurationFileManager(model, new SettingsConfiguration(model)));
-		}
-
-		/**
-		 * Constructs an object.
-		 * 
-		 * @param model
-		 *            The class diagram of the UML/OCL model.
-		 * @param configFilePath
-		 *            The path to the configuration file.
-		 * @return The manager for loaded configuration files.
+		 * @return The loaded configurations, or null after an error is logged if the
+		 *         file cannot be read.
 		 */
 		public static LoadedConfigFileManager loadEditableState(IModel model, String configFilePath) {
 			if (model == null || configFilePath == null) {
@@ -264,7 +225,7 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 				LOG.error("Could not extract configurations from file.");
 				return null;
 			}
-			return new LoadedConfigFileManager(model, file, configManager);
+			return new LoadedConfigFileManager(model, configManager);
 		}
 
 		/**
@@ -290,20 +251,6 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 
 		public Map<String, SettingsConfiguration> getConfigurations() {
 			return configs;
-		}
-
-		/**
-		 * Saves the current state of the configurations.
-		 * 
-		 * @throws IOException
-		 *             If the saving fails.
-		 */
-		public void saveCurrentState() throws IOException {
-			for (Entry<String, SettingsConfiguration> configByName : configs.entrySet()) {
-				configManager.addOrUpdateConfiguration(configByName.getKey(),
-						ChangeConfiguration.toProperties(configByName.getValue(), model));
-			}
-			configManager.save(file);
 		}
 
 	}

@@ -87,7 +87,7 @@
 		</command>
 		<command id="org.tzi.use.kodkod.plugin.ConfigurationValidationCmd"
 			class="org.tzi.use.kodkod.plugin.ConfigurationValidationCmd"
-			help="Validates configurations for the model validator regarding the model. A path to a configuration file must be specified. In the following, selected configurations from the file can be specified by name. If no names are given, all configurations will be validated."
+			help="Checks the configurations of a properties file against the model and names each rule a configuration breaks. Give the path of the file, then the names of the configurations to check; with no name, every configuration of the file is checked. The check of untightenable bounds of version 5.2.0, which needs the Choco solver, is not included."
 			label="ConfigurationValidationCmd"
 			shellcmd="modelvalidator -validateConfig"
 			alias="mv -vc">
