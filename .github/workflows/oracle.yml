@@ -92,6 +92,7 @@ jobs:
           name: oracle
           path: |
             ${{ runner.temp }}/oracle/*/oracle.tsv
+            ${{ runner.temp }}/oracle/*/metrics.tsv
             ${{ runner.temp }}/oracle/*/cases/*/output.txt
             ${{ runner.temp }}/oracle/*/cases/*/wide.txt
             ${{ runner.temp }}/oracle/*/cases/*/replay.txt
