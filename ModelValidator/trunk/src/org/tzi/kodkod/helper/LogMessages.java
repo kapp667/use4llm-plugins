@@ -53,7 +53,7 @@ public final class LogMessages {
 
 	public static final String propertiesConfigurationWriteError = "Error while writing .properties file";
 
-	public static final String configurationInvalid = "The configuration breaks these rules. mv -vc also lists the rules of superfluous settings.";
+	public static final String configurationInvalid = "The configuration breaks these rules. mv -vc lists every rule, also those that do not stop the search.";
 	public static final String configurationRefused = "The model validator does not search with an invalid configuration.";
 	public static final String configurationValueError = "A value of the configuration cannot be read";
 	public static final String configurationCheckError = "The configuration could not be checked against the validity rules";

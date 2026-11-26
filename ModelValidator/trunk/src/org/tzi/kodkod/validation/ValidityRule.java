@@ -365,11 +365,19 @@ public enum ValidityRule {
 	/**
 	 * Returns whether a violation of the rule leaves the model validator nothing
 	 * sound to search with: a setting is missing, invalid or contradicts another.
-	 * A superfluous or imperfect setting does not.
+	 * A superfluous or imperfect setting does not. Neither do two settings that
+	 * version 5.2.0 counts as invalid: bounds of an abstract class narrower than
+	 * the sums of its subclasses' bounds, which restrict the total number of its
+	 * objects, and an attribute max above the max of its class, which the search
+	 * cannot reach. The solver handles both soundly.
 	 * 
 	 * @return Whether a violation of the rule makes the configuration unusable.
 	 */
 	public boolean breaksTheConfiguration() {
+		if (this == CLASS_SETTINGS_ABSTRACT_CLASS_BOUNDS_EQUALS_SUM_OF_BOUNDS_OF_DERIVED_CLASSES
+				|| this == ATTRIBUTE_SETTINGS_MAX_STAR_OR_LESS_THAN_OR_EQUAL_CLASS_MAX) {
+			return false;
+		}
 		switch (level) {
 		case INCOMPLETE:
 		case INVALID:
