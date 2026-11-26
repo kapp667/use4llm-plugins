@@ -3,6 +3,7 @@ package org.tzi.use.kodkod.transform.ocl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import kodkod.ast.IntExpression;
 import kodkod.ast.IntToExprCast;
@@ -48,12 +49,21 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 			object_type_nav = object_type_nav || visitor.isObject_type_nav();
 		}
 		
+		refuseStringOrderAndConcatenation(exp);
 		refuseWhatSetsDoNotKeep(exp);
 
 		if (exp.opname().equals("-") && !set && arguments.size() == 1) {
 			handleMinus();
 		} else {
 			invokeMethod(exp.opname(), arguments, set);
+		}
+	}
+
+	private static final Set<String> STRING_ORDER_AND_CONCATENATION = Set.of("<", "<=", ">", ">=", "+");
+
+	private void refuseStringOrderAndConcatenation(ExpStdOp exp) {
+		if (STRING_ORDER_AND_CONCATENATION.contains(exp.opname()) && exp.args().length == 2 && exp.args()[0].type().isTypeOfString()) {
+			throw new TransformationException(LogMessages.stringOperationError(exp.toString()));
 		}
 	}
 
