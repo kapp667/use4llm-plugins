@@ -8,6 +8,7 @@ import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.use.util.StringUtil;
 
 import kodkod.engine.Statistics;
+import kodkod.instance.Universe;
 import static org.tzi.use.util.StringUtil.inQuotes;
 
 /**
@@ -221,7 +222,18 @@ public final class LogMessages {
 	}
 
 	public static String kodkodStatistics(Statistics statistics) {
-		return "Translation time (Kodkod to SAT): " + statistics.translationTime() + " ms; Solving time: " + statistics.solvingTime() + " ms";
+		return "Translation time (Kodkod to SAT): " + statistics.translationTime() + " ms; Solving time: " + statistics.solvingTime() + " ms; SAT variables: "
+				+ statistics.variables() + " (" + statistics.primaryVariables() + " primary); Clauses: " + statistics.clauses();
+	}
+
+	public static String universeSize(Universe universe) {
+		int integers = 0;
+		for (Object atom : universe) {
+			if(atom instanceof Integer){
+				integers++;
+			}
+		}
+		return "Universe: " + universe.size() + " atoms, " + integers + " of them Integer values";
 	}
 
 	public static String newBitwidth(int newBitwidth) {
