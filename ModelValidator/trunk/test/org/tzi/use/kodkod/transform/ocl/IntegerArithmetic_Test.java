@@ -15,7 +15,8 @@ import org.tzi.kodkod.KodkodModelValidatorConfiguration;
  * value, as in OCL, whose Integers have no bounds, through a comparison,
  * {@code =}, {@code <>}, a query operation, an if-then-else, a range and
  * floor, and that {@code =} still holds between equal values that are not
- * Integers, including the size of an undefined Set.
+ * Integers, including the size of an undefined Set. A result beyond the
+ * bitwidth keeps its value too.
  */
 public class IntegerArithmetic_Test {
 
@@ -115,6 +116,24 @@ public class IntegerArithmetic_Test {
 	@Test
 	public void floorOfASumAboveTheIntegerMaximumKeepsTheSum() {
 		validate("self.x = 5 and (self.x + 20).floor() = self.x + 20 and (self.x + 20).floor() <> self.x + 30", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sumAboveTheBitwidthIsComputed() {
+		validate("self.x = 100 and self.x + 100 > 127", -128, 127);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sumAboveTheBitwidthIsNotNegative() {
+		validate("self.x = 100 and self.x + 100 < 0", -128, 127);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void productAboveTheBitwidthIsComputed() {
+		validate("self.x = 50 and self.x * self.x > 2000", -100, 100);
 		assertEquals("SATISFIABLE", validator.outcome);
 	}
 }
