@@ -30,6 +30,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		AttributeValueBounds_Test.class,
 		AssociationClassMultiplicity_Test.class,
 		IntegerArithmetic_Test.class,
-		IntegerCollectionBounds_Test.class })
+		IntegerCollectionBounds_Test.class,
+		PluginCommands_Test.class })
 public class TestSuite {
 }
