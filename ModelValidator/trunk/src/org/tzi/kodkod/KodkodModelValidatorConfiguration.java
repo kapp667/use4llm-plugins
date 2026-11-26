@@ -43,6 +43,7 @@ public class KodkodModelValidatorConfiguration {
 	public static final String SATSOLVER_KEY = "SatSolver";
 	public static final String BITWIDTH_KEY = "bitwidth";
 	public static final String MAX_BITWIDTH_KEY = "maxBitwidth";
+	public static final String MAX_COMPUTED_INTEGERS_KEY = "maxComputedIntegers";
 	public static final String DIAGRAMEXTREACTION_KEY = "AutomaticDiagramExtraction";
 	public static final String DIAGRAMEXTREACTION_KEY_SHORT = "objExtraction";
 	public static final String DEBUG_BOUNDS_PRINTOUT_KEY = "dBoundPrintout";
@@ -78,11 +79,19 @@ public class KodkodModelValidatorConfiguration {
 	 */
 	public static final int LARGEST_BITWIDTH = 32;
 	public static final int DEFAULT_MAX_BITWIDTH = LARGEST_BITWIDTH;
+	/**
+	 * The largest maximum number of computed Integer values. The solver holds
+	 * no more than about 46000 atoms in a universe with binary relations, and
+	 * each computed value adds two: the Integer and its String.
+	 */
+	public static final int LARGEST_COMPUTED_INTEGERS = 100000;
+	public static final int DEFAULT_MAX_COMPUTED_INTEGERS = 1000;
 	public static final boolean DEFAULT_DIAGRAMEXTRACTION = false;
 
 	private SATFactory satFactory = null;
 	private int bitwidth = DEFAULT_BITWIDTH;
 	private int maxBitwidth = DEFAULT_MAX_BITWIDTH;
+	private int maxComputedIntegers = DEFAULT_MAX_COMPUTED_INTEGERS;
 	private boolean automaticDiagramExtraction = DEFAULT_DIAGRAMEXTRACTION;
 	private boolean debugBoundsPrint = false;
 
@@ -157,6 +166,7 @@ public class KodkodModelValidatorConfiguration {
 					setBitwidth(config.getInt(BITWIDTH_KEY, DEFAULT_BITWIDTH));
 					setAutomaticDiagramExtraction(config.getBoolean(DIAGRAMEXTREACTION_KEY, DEFAULT_DIAGRAMEXTRACTION));
 					setMaxBitwidth(config.getInt(MAX_BITWIDTH_KEY, DEFAULT_MAX_BITWIDTH));
+					setMaxComputedIntegers(config.getInt(MAX_COMPUTED_INTEGERS_KEY, DEFAULT_MAX_COMPUTED_INTEGERS));
 				} catch (ConfigurationException e) {
 					// error while loading user config file
 					// stick with default values
@@ -168,6 +178,7 @@ public class KodkodModelValidatorConfiguration {
 				}
 				bitwidth = DEFAULT_BITWIDTH;
 				maxBitwidth = DEFAULT_MAX_BITWIDTH;
+				maxComputedIntegers = DEFAULT_MAX_COMPUTED_INTEGERS;
 				setAutomaticDiagramExtraction(DEFAULT_DIAGRAMEXTRACTION);
 			}
 			read = true;
@@ -185,6 +196,7 @@ public class KodkodModelValidatorConfiguration {
 		}
 		iniFile.setProperty(BITWIDTH_KEY, bitwidth);
 		iniFile.setProperty(MAX_BITWIDTH_KEY, maxBitwidth);
+		iniFile.setProperty(MAX_COMPUTED_INTEGERS_KEY, maxComputedIntegers);
 		iniFile.setProperty(DIAGRAMEXTREACTION_KEY, automaticDiagramExtraction);
 		
 		iniFile.save(iniSaveFile);
@@ -307,6 +319,29 @@ public class KodkodModelValidatorConfiguration {
 			this.maxBitwidth = maxBitwidth;
 		} else {
 			throw new ConfigurationException("Invalid bitwidth range.");
+		}
+	}
+
+	/**
+	 * Returns the largest number of Integer values, besides those of the
+	 * configuration and the literals, that the solver adds as atoms for the
+	 * values the Integer expressions of a model may compute. A model that
+	 * needs more gets no verdict.
+	 */
+	public int maxComputedIntegers() {
+		return maxComputedIntegers;
+	}
+
+	/**
+	 * Sets the maximum number of computed Integer values, from 0 to
+	 * LARGEST_COMPUTED_INTEGERS; throws ConfigurationException outside that
+	 * range.
+	 */
+	public void setMaxComputedIntegers(int maxComputedIntegers) throws ConfigurationException {
+		if (maxComputedIntegers >= 0 && maxComputedIntegers <= LARGEST_COMPUTED_INTEGERS) {
+			this.maxComputedIntegers = maxComputedIntegers;
+		} else {
+			throw new ConfigurationException("Invalid maximum number of computed Integer values.");
 		}
 	}
 
