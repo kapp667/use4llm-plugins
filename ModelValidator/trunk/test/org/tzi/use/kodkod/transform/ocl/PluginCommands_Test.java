@@ -1,6 +1,7 @@
 package org.tzi.use.kodkod.transform.ocl;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,6 +23,13 @@ public class PluginCommands_Test {
 		List<String> commands = shellCommandsAndAliases();
 		assertFalse(commands.toString(), commands.contains("modelvalidator -downloadSolvers"));
 		assertFalse(commands.toString(), commands.contains("mv -dl"));
+	}
+
+	@Test
+	public void configurationCheckIsDeclared() throws Exception {
+		List<String> commands = shellCommandsAndAliases();
+		assertTrue(commands.toString(), commands.contains("modelvalidator -validateConfig"));
+		assertTrue(commands.toString(), commands.contains("mv -vc"));
 	}
 
 	private static List<String> shellCommandsAndAliases() throws Exception {
