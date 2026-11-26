@@ -486,7 +486,7 @@ public class OCLTest {
 			return IntegerValue.valueOf((Integer) atom);
 		}
 		String name = atom.toString();
-		if (name.equals(TypeConstants.UNDEFINED) || name.equals(TypeConstants.UNDEFINED_SET)) {
+		if (name.equals(TypeConstants.UNDEFINED)) {
 			return UndefinedValue.instance;
 		}
 		if (name.equals(TypeConstants.BOOLEAN_TRUE) || name.equals(TypeConstants.TRUE)) {

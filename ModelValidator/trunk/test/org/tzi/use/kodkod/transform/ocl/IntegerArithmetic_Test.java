@@ -19,12 +19,15 @@ import org.tzi.kodkod.model.iface.IModel;
  * value, as in OCL, whose Integers have no bounds, through a comparison,
  * {@code =}, {@code <>}, a query operation, an if-then-else, a range, floor
  * and a collection that holds it, and that {@code =} still holds between
- * equal values that are not Integers, including the size of an undefined
- * Set. A result beyond the bitwidth keeps its value too, up to the larger of
- * the bitwidth and the maximum bitwidth, and the solver adds an atom for
- * each value outside the Integer bounds that a collection or a range may
- * hold, up to the maximum number of computed Integer values; above either
- * limit, the solver refuses the model.
+ * equal values that are not Integers. A result beyond the bitwidth keeps its
+ * value too, up to the larger of the bitwidth and the maximum bitwidth, and
+ * the solver adds an atom for each value outside the Integer bounds that a
+ * collection or a range may hold, up to the maximum number of computed
+ * Integer values; above either limit, the solver refuses the model. This
+ * class also checks that the size of an undefined Set is undefined, as in
+ * USE: {@code =} holds between such a size and itself,
+ * {@code oclIsUndefined()} holds for it, and neither {@code size() + 1 = 1}
+ * nor {@code size() >= 0} holds.
  */
 public class IntegerArithmetic_Test {
 
@@ -142,6 +145,30 @@ public class IntegerArithmetic_Test {
 		properties.put("A_s_max", 0);
 		validate("self.s->size() = self.s->size()", 0, 10);
 		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sizeOfAnUndefinedSetIsUndefined() {
+		properties.put("A_s_min", 0);
+		properties.put("A_s_max", 0);
+		validate("self.s->size().oclIsUndefined()", 0, 10);
+		assertEquals("SATISFIABLE", validator.outcome);
+	}
+
+	@Test
+	public void sizeOfAnUndefinedSetPlusOneIsNotOne() {
+		properties.put("A_s_min", 0);
+		properties.put("A_s_max", 0);
+		validate("self.s->size() + 1 = 1", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void sizeOfAnUndefinedSetIsNotAtLeastZero() {
+		properties.put("A_s_min", 0);
+		properties.put("A_s_max", 0);
+		validate("self.s->size() >= 0", 0, 10);
+		assertTrue(validator.outcome, String.valueOf(validator.outcome).endsWith("UNSATISFIABLE"));
 	}
 
 	@Test
