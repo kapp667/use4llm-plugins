@@ -6,9 +6,20 @@
 ===============
 Please, copy the jar-file into the lib/plugins directory of USE.
 
-The Java based solver SAT4j comes with the download. More potent external
-solvers can be downloaded from within the plugin using the command
-`modelvalidator -downloadSolvers'.
+The Java based solver SAT4j comes with the plugin and needs no installation.
+
+Native solvers are installed by hand, before USE starts. Copy a solver's
+library into lib/plugins/modelValidatorPlugin/x64 under the USE directory, or
+into lib/plugins/modelValidatorPlugin/x86 for a 32-bit Java. Then start USE
+with -Djava.library.path set to that folder, for example in VMARGS in bin/use
+or bin/start_use.bat. Name the library after the solver in lower case, as
+Java expects on your system: libminisat.so on Linux, libminisat.dylib on
+macOS or minisat.dll on Windows for MiniSat, and the same for lingeling,
+minisatprover and cryptominisat. The plingeling solver is an executable named
+plingeling in the same folder. Select the solver with
+`mv -config satsolver:=MiniSat', or `mv -config satsolver:=MiniSat; save' to
+keep it. When the plugin cannot load the solver, the command lists the
+solvers it can load.
 
 3. Usage
 ===============
