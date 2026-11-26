@@ -1,5 +1,8 @@
 package org.tzi.use.kodkod.plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.model.iface.IModel;
@@ -7,7 +10,9 @@ import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.kodkod.UseLogAppender;
 import org.tzi.use.kodkod.transform.enrich.ModelEnricher;
 import org.tzi.use.main.Session;
+import org.tzi.use.uml.mm.MClassInvariant;
 import org.tzi.use.uml.mm.MModel;
+import org.tzi.use.uml.ocl.expr.Expression;
 import org.tzi.use.uml.sys.MSystem;
 
 /**
@@ -50,6 +55,17 @@ public abstract class AbstractPlugin {
 
 	protected IModel model() {
 		return PluginModelFactory.INSTANCE.getModel(mModel);
+	}
+
+	/**
+	 * Returns the expanded expression of each class invariant of the model.
+	 */
+	protected List<Expression> extractInvariants() {
+		final List<Expression> invariants = new ArrayList<>();
+		for (MClassInvariant mClassInvariant : mModel.classInvariants()) {
+			invariants.add(mClassInvariant.expandedExpression());
+		}
+		return invariants;
 	}
 
 }
