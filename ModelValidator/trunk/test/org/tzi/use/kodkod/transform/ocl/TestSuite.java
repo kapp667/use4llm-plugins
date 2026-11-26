@@ -32,6 +32,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		IntegerArithmetic_Test.class,
 		IntegerCollectionBounds_Test.class,
 		PluginCommands_Test.class,
-		ConfigurationValidationCmd_Test.class })
+		ConfigurationValidationCmd_Test.class,
+		KodkodValidateCmd_Test.class })
 public class TestSuite {
 }

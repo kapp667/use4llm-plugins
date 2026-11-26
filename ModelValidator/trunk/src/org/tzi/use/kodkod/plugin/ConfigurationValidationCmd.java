@@ -8,7 +8,6 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.model.iface.IModel;
-import org.tzi.kodkod.validation.AbstractFix;
 import org.tzi.kodkod.validation.ValidityRule;
 import org.tzi.kodkod.validation.ValidityRuleValidator;
 import org.tzi.kodkod.validation.ValidityRuleViolence;
@@ -88,46 +87,10 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 				logString += "Config " + name + " is valid.\n\n";
 			} else {
 				logString += "Config " + name + " is invalid.\n";
-				logString += getLog(violationsByValdityRules, config, model) + "\n";
+				logString += describeViolations(violationsByValdityRules) + "\n";
 			}
 		}
 		log.info(logString);
-	}
-
-	/**
-	 * Creates a CLI output for violations of validity rules.
-	 * 
-	 * @param violationsByValdityRules
-	 *            The violations of validity rules for the rules.
-	 * @param config
-	 *            The configuration for the UML/OCL model.
-	 * @param model
-	 *            The class diagram of the UML/OCL model.
-	 * @return
-	 */
-	private String getLog(SortedMap<ValidityRule, ValidityRuleViolence[]> violationsByValdityRules,
-			final SettingsConfiguration config, final IModel model) {
-		String logString = "";
-		for (Entry<ValidityRule, ValidityRuleViolence[]> violationsByValdityRule : violationsByValdityRules
-				.entrySet()) {
-			logString += "    Rule " + violationsByValdityRule.getKey().name() + " is violated.\n";
-			for (ValidityRuleViolence violation : violationsByValdityRule.getValue()) {
-				logString += "        " + violation.getExplenation() + "\n";
-				AbstractFix[] fixes = violation.getFixes();
-				if (fixes.length == 1) {
-					logString += "            To get closer to validity perform the following fix:\n";
-					logString += "                " + (fixes[0].resolvesProblemCompletely() ? "[fF]" : "[pF]") + " | "
-							+ fixes[0].getExplenation() + "\n";
-				} else if (fixes.length > 1) {
-					logString += "            To get closer to validity perform one of the following fixes:\n";
-					for (AbstractFix fix : fixes) {
-						logString += "                " + (fix.resolvesProblemCompletely() ? "[fF]" : "[pF]") + " | "
-								+ fix.getExplenation() + "\n";
-					}
-				}
-			}
-		}
-		return logString;
 	}
 
 	/**

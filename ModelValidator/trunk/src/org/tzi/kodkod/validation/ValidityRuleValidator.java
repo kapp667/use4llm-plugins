@@ -1,5 +1,7 @@
 package org.tzi.kodkod.validation;
 
+import java.util.Set;
+
 /**
  * Links the implementations of the validation of validity rule to the rules.
  * 
@@ -7,6 +9,23 @@ package org.tzi.kodkod.validation;
  *
  */
 public class ValidityRuleValidator extends AbstractValidityRuleValidator {
+
+	/**
+	 * Constructs a validator that evaluates every rule.
+	 */
+	public ValidityRuleValidator() {
+		super();
+	}
+
+	/**
+	 * Constructs a validator that evaluates only the given rules.
+	 * 
+	 * @param evaluated
+	 *            The rules to evaluate.
+	 */
+	public ValidityRuleValidator(Set<ValidityRule> evaluated) {
+		super(evaluated);
+	}
 
 	@Override
 	protected AbstractValidator getValidator(ValidityRule rule) {

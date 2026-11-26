@@ -1,5 +1,9 @@
 package org.tzi.kodkod.validation;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * The set of validity rules. The applicability of rules may depend on other
  * rules to be not violated. These dependencies are expressed here.
@@ -360,6 +364,32 @@ public enum ValidityRule {
 		this.level = level;
 		this.conditionallyDueToInviolations = conditionallyDueToInviolations != null ? conditionallyDueToInviolations
 				: new ValidityRule[0];
+	}
+
+	/**
+	 * The rules that mv -validate checks before it searches.
+	 */
+	private static final Set<ValidityRule> STOPPING_THE_SEARCH = Collections.unmodifiableSet(EnumSet.of(
+			INTEGER_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, STRING_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
+			STRING_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, CLASS_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
+			CLASS_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, ASSOCIATION_SETTINGS_MAX_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO,
+			ASSOCIATION_SETTINGS_MIN_GREATER_THAN_OR_EQUAL_ZERO,
+			ASSOCIATION_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX_WHEN_MAX_NOT_STAR,
+			ATTRIBUTE_SETTINGS_MIN_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO,
+			ATTRIBUTE_SETTINGS_MAX_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO, ATTRIBUTE_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX,
+			ATTRIBUTE_SETTINGS_COLLECTION_MIN_SIZE_GREATER_THAN_OR_EQUAL_ZERO,
+			ATTRIBUTE_SETTINGS_COLLECTION_MAX_SIZE_STAR_OR_GREATER_THAN_OR_EQUAL_MIN_SIZE));
+
+	/**
+	 * Returns the rules that mv -validate checks before it searches: a bound out of
+	 * range, or a min above its max, which the loader does not report. The other
+	 * rules are reported by mv -vc only, because some of them reject settings the
+	 * loader reads soundly.
+	 * 
+	 * @return The rules, a set that cannot be changed.
+	 */
+	public static Set<ValidityRule> stoppingTheSearch() {
+		return STOPPING_THE_SEARCH;
 	}
 
 	/**
