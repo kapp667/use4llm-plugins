@@ -15,7 +15,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IAssociation;
@@ -186,43 +185,6 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 			
 			defaultMin = DefaultConfigurationValues.integerMin;
 			defaultMax = DefaultConfigurationValues.integerMax;
-			
-			// check for values exceeding bitwidth
-			int bitwidth = KodkodModelValidatorConfiguration.getInstance().bitwidth();
-			
-			if(!specificValues.isEmpty()){
-				int maxSpecific = Integer.MIN_VALUE;
-				for(String[] s : specificValues){
-					int curr;
-					try {
-						curr = Integer.valueOf(s[0]);
-					} catch(NumberFormatException ex){
-						continue;
-					}
-					if(curr > maxSpecific){
-						maxSpecific = curr;
-					}
-				}
-				int requiredBitwidthSpecific = KodkodModelValidatorConfiguration.calculateRequiredBitwidth(maxSpecific);
-				if(requiredBitwidthSpecific > bitwidth){
-					warning("The configured bitwidth is too small for the specific Integer value(s). Required bitwidth: " + requiredBitwidthSpecific + " or greater.");
-				}
-			}
-			
-			if(min != Integer.MIN_VALUE){
-				int requiredBitwidthMin = KodkodModelValidatorConfiguration.calculateRequiredBitwidth(min);
-				
-				if(requiredBitwidthMin > bitwidth){
-					warning("The configured bitwidth is too small for the property Integer min value. Required bitwidth: " + requiredBitwidthMin + " or greater.");
-				}
-			}
-			if(max != Integer.MIN_VALUE){
-				int requiredBitwidthMax = KodkodModelValidatorConfiguration.calculateRequiredBitwidth(max);
-				
-				if(requiredBitwidthMax > bitwidth){
-					warning("The configured bitwidth is too small for the property Integer max value. Required bitwidth: " + requiredBitwidthMax + " or greater.");
-				}
-			}
 		} else if (type.isString()) {
 			min = readSize(type.name() + PropertyEntry.stringValuesMin, Integer.MIN_VALUE, false);
 			max = readSize(type.name() + PropertyEntry.stringValuesMax, Integer.MIN_VALUE, false);

@@ -51,6 +51,13 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 							} catch (NumberFormatException exception) {
 								useShell.getErr().println(LogMessages.solverConfigBitwidthError);
 							}
+						} else if (name.equalsIgnoreCase(KodkodModelValidatorConfiguration.MAX_BITWIDTH_KEY)) {
+							try {
+								int value = Integer.parseInt(split[1]);
+								setMaxBitwidth(value);
+							} catch (NumberFormatException exception) {
+								useShell.getErr().println(LogMessages.solverConfigBitwidthError);
+							}
 						} else if (name.equalsIgnoreCase(KodkodModelValidatorConfiguration.DIAGRAMEXTREACTION_KEY) || name.equalsIgnoreCase(KodkodModelValidatorConfiguration.DIAGRAMEXTREACTION_KEY_SHORT)) {
 							if (split[1].equalsIgnoreCase("on") || split[1].equalsIgnoreCase("off")) {
 								boolean value = split[1].equalsIgnoreCase("on") ? true : false;
@@ -76,6 +83,7 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 		SATFactory solver = CFG.satFactory();
 		useShell.getOut().println("Current solver: " + (solver == null ? "None" : solver.toString()));
 		useShell.getOut().println("Current bitwidth: " + CFG.bitwidth());
+		useShell.getOut().println("Current maximum bitwidth: " + CFG.maxBitwidth());
 		useShell.getOut().println("Automatic extraction of an available object diagram is currently: " + (CFG.isAutomaticDiagramExtraction() ? "enabled" : "disabled"));
 	}
 
@@ -130,6 +138,16 @@ public class ConfigurationCmd implements IPluginShellCmdDelegate {
 		} catch (ConfigurationException e) {
 			useShell.getErr().println(LogMessages.WRONG_BITWIDTH_WARNING);
 			useShell.getOut().println("Bitwidth is now: " + CFG.bitwidth());
+		}
+	}
+
+	private void setMaxBitwidth(int maxBitwidth) {
+		try {
+			CFG.setMaxBitwidth(maxBitwidth);
+			useShell.getOut().println(LogMessages.newMaxBitwidth(maxBitwidth));
+		} catch (ConfigurationException e) {
+			useShell.getErr().println(LogMessages.WRONG_BITWIDTH_WARNING);
+			useShell.getOut().println("Maximum bitwidth is now: " + CFG.maxBitwidth());
 		}
 	}
 	
