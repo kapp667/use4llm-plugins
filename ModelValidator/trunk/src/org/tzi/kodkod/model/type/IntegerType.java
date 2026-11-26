@@ -1,6 +1,7 @@
 package org.tzi.kodkod.model.type;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -20,10 +21,21 @@ import org.tzi.kodkod.model.visitor.Visitor;
 public class IntegerType extends ConfigurableType {
 
 	private List<Object> literalValues;
+	private List<Object> computedValues;
 
 	IntegerType() {
 		super(TypeConstants.INTEGER);
 		literalValues = new ArrayList<Object>();
+		computedValues = new ArrayList<Object>();
+	}
+
+	/**
+	 * Sets the values, besides those of the configuration and the literals,
+	 * that the Integer expressions of the model may compute and read as an
+	 * atom. Bounds built afterwards hold an atom for each.
+	 */
+	public void setComputedValues(Collection<Integer> values) {
+		computedValues = new ArrayList<Object>(values);
 	}
 
 	@Override
@@ -76,7 +88,9 @@ public class IntegerType extends ConfigurableType {
 
 	@Override
 	protected Set<Object> createAtomList() {
-		return configurator.atoms(this, literalValues);
+		List<Object> values = new ArrayList<Object>(literalValues);
+		values.addAll(computedValues);
+		return configurator.atoms(this, values);
 	}
 
 	@Override

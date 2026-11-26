@@ -36,6 +36,9 @@ public final class LogMessages {
 	
 	public static final String WRONG_BITWIDTH_WARNING = "The bitwidth has to be a value between 1 and 32.";
 
+	public static final String maxComputedIntegersError = "The maximum number of computed Integer values has to be a value between 0 and "
+			+ KodkodModelValidatorConfiguration.LARGEST_COMPUTED_INTEGERS + ".";
+
 	public static final String configDiagramExtractionError = "Possible values for AutomaticObjectDiagramExtraction are only " + inQuotes("on") + " or " + inQuotes("off") + ".";
 
 	public static final String objDiagramCreation = "Create object diagram";
@@ -243,6 +246,20 @@ public final class LogMessages {
 
 	public static String newMaxBitwidth(int newMaxBitwidth) {
 		return "Set maximum bitwidth to " + newMaxBitwidth + ".";
+	}
+
+	public static String newMaxComputedIntegers(int newMaxComputedIntegers) {
+		return "Set maximum number of computed Integer values to " + newMaxComputedIntegers + ".";
+	}
+
+	public static String addedComputedIntegers(int added) {
+		return "Added " + added + " Integer values outside Integer_min and Integer_max, for the values the Integer expressions of the model may compute.";
+	}
+
+	public static String computedIntegersAboveMaximum(int maxComputedIntegers) {
+		return "The Integer expressions of the model may compute more than " + maxComputedIntegers
+				+ " Integer values outside Integer_min and Integer_max, above the maximum number of computed Integer values. Raise it with: mv -config "
+				+ KodkodModelValidatorConfiguration.MAX_COMPUTED_INTEGERS_KEY + ":=N, or narrow the values the expressions compute.";
 	}
 
 	public static String raisedBitwidth(int bitwidth, int needed) {
