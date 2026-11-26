@@ -19,15 +19,12 @@ public class PluginCommands_Test {
 
 	@Test
 	public void noCommandDownloadsSolverLibraries() throws Exception {
-		List<String> commands = shellCommands();
+		List<String> commands = shellCommandsAndAliases();
 		assertFalse(commands.toString(), commands.contains("modelvalidator -downloadSolvers"));
 		assertFalse(commands.toString(), commands.contains("mv -dl"));
 	}
 
-	/**
-	 * Returns the name and the alias of each command in the descriptor.
-	 */
-	private static List<String> shellCommands() throws Exception {
+	private static List<String> shellCommandsAndAliases() throws Exception {
 		NodeList nodes = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 				.parse(new File("useplugin.xml")).getElementsByTagName("command");
 		List<String> commands = new ArrayList<String>();
