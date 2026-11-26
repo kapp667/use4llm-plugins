@@ -114,6 +114,46 @@ public class KodkodValidateCmd_Test {
 		assertTrue(output, output.contains("INFO SATISFIABLE"));
 	}
 
+	@Test
+	public void solvesWithARequiredLinkOfAnAssociationClass() throws Exception {
+		open("model AC\nclass Person\nend\nclass Company\nend\n"
+				+ "associationclass Job between\n  Person[*] role worker\n  Company[*] role employer\nend\n");
+		String output = check(file("ac.properties", "[ac]\nPerson = Set{p1}\nPerson_min = 1\nPerson_max = 1\n"
+				+ "Company = Set{c1}\nCompany_min = 1\nCompany_max = 1\n"
+				+ "Job_ac = Set{j1}\nJob_min = 1\nJob_max = 1\nJob = Set{(j1, p1, c1)}\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("SATISFIABLE"));
+		assertFalse(output, output.contains("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithARequiredLinkBetweenGeneratedObjects() throws Exception {
+		open("model G\nclass Person\nend\nclass Company\nend\n"
+				+ "association Works between\n  Person[*] role worker\n  Company[*] role employer\nend\n");
+		String output = check(file("gen.properties", "[gen]\nPerson_min = 2\nPerson_max = 2\n"
+				+ "Company_min = 1\nCompany_max = 1\nWorks_min = 1\nWorks_max = 2\nWorks = Set{(person2, company1)}\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("SATISFIABLE"));
+		assertFalse(output, output.contains("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithASingleRealValue() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Real\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 1.0\nReal_max = 1.0\nReal_step = 0.5\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = 1\nC_r_max = 1\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithIntegerValuesGivenForAnAttribute() throws Exception {
+		open("model I\nclass C\nattributes\n  x : Integer\nend\n");
+		String output = check(file("int.properties", "[int]\nC_min = 1\nC_max = 1\nC_x_min = 1\nC_x_max = 1\nC_x = Set{1,2}\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
