@@ -17,6 +17,8 @@ operations
 end
 
 class Company
+attributes
+  name:String
 end
 
 class Car
@@ -98,6 +100,11 @@ end
 association DerivedFriendship between
   Person[0..1] role befriender
   Person[0..1] role derivedFriend derived = self.bestFriend
+end
+
+association CheckedJob between
+  Person[*] role checkedEmployee
+  Company[0..1] role checkedEmployer derived = if self.employerAC.isDefined() then self.employerAC else null endif
 end
 
 associationclass Idle_AC between
