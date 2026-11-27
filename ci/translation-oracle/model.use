@@ -1,0 +1,15 @@
+model M
+
+class A
+attributes
+  n : Integer
+  d : Integer derive: self.dst->size()
+end
+
+class B < A
+end
+
+association R between
+  A [0..1] role src
+  A [*] role dst
+end
