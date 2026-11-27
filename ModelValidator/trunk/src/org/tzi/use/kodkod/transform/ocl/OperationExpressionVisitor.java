@@ -138,7 +138,7 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 
 	private DefaultExpressionVisitor visitOperation(MOperation operation) {
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, opVariables, opReplaceVariables, opCollectionVariables);
-		operation.expression().processWithVisitor(visitor);
+		visitor.processAs(operation.expression(), operation.resultType());
 
 		return visitor;
 	}
@@ -158,9 +158,8 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 			VarDecl currentParam;
 			for (int i = 0; i < params.size(); i++) {
 				visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-				arguments[i + 1].processWithVisitor(visitor);
-
 				currentParam = params.varDecl(i);
+				visitor.processAs(arguments[i + 1], currentParam.type());
 
 				opVariables.put(currentParam.name(), visitor.getObject());
 
