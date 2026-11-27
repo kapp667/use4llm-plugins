@@ -1,5 +1,7 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import java.util.Map;
+
 import kodkod.ast.Relation;
 import kodkod.instance.TupleSet;
 
@@ -19,6 +21,14 @@ class OutcomeRecorder extends KodkodModelValidator {
 	 */
 	TupleSet tuples(Relation relation) {
 		return solution.instance().tuples(relation);
+	}
+
+	/**
+	 * Returns the tuples of every relation in the solution of the last
+	 * validation. The validation must have found a solution.
+	 */
+	Map<Relation, TupleSet> relationTuples() {
+		return solution.instance().relationTuples();
 	}
 
 	@Override
