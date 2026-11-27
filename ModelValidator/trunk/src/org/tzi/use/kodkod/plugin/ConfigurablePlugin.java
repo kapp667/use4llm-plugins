@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
@@ -14,6 +15,7 @@ import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.config.impl.DefaultConfigurationVisitor;
 import org.tzi.kodkod.model.config.impl.PropertyConfigurationVisitor;
+import org.tzi.kodkod.model.config.impl.UnknownConfigurationKeys;
 import org.tzi.kodkod.validation.AbstractFix;
 import org.tzi.kodkod.validation.ValidityRule;
 import org.tzi.kodkod.validation.ValidityRuleValidator;
@@ -38,6 +40,13 @@ public abstract class ConfigurablePlugin extends AbstractPlugin {
 	 *             is logged.
 	 */
 	protected void configureModel(Configuration config, PrintWriter warningsOut) throws ConfigurationException {
+		List<String> unknown = UnknownConfigurationKeys.unknown(mModel, config);
+		if (!unknown.isEmpty()) {
+			for (String key : unknown) {
+				LOG.error(UnknownConfigurationKeys.message(key));
+			}
+			throw new ConfigurationException(LogMessages.configurationRefused);
+		}
 		checkConfiguration(config);
 		model().reset();
 		PropertyConfigurationVisitor newConfigurationVisitor = new PropertyConfigurationVisitor(config, warningsOut);

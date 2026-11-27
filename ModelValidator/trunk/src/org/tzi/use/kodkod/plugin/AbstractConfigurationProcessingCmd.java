@@ -8,14 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.model.config.ConfigurationFileManager;
+import org.tzi.kodkod.model.config.impl.UnknownConfigurationKeys;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.plugin.gui.model.data.SettingsConfiguration;
 import org.tzi.use.kodkod.plugin.gui.util.ChangeConfiguration;
 import org.tzi.use.main.shell.Shell;
 import org.tzi.use.runtime.shell.IPluginShellCmdDelegate;
+import org.tzi.use.uml.mm.MModel;
 
 /**
  * Abstract CLI plugin for processing a configuration.
@@ -187,6 +190,11 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		private final Map<String, SettingsConfiguration> configs;
 
 		/**
+		 * The keys of each configuration that name nothing of the model.
+		 */
+		private final Map<String, List<String>> unknownKeys = new TreeMap<String, List<String>>();
+
+		/**
 		 * Constructs an object.
 		 * 
 		 * @param model
@@ -194,8 +202,8 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 * @param configManager
 		 *            The manager for the configuration file.
 		 */
-		private LoadedConfigFileManager(IModel model, ConfigurationFileManager configManager) {
-			this.configs = getConfigurations(configManager, model);
+		private LoadedConfigFileManager(IModel model, MModel mModel, ConfigurationFileManager configManager) {
+			this.configs = getConfigurations(configManager, model, mModel, unknownKeys);
 		}
 
 		/**
@@ -208,7 +216,7 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 * @return The loaded configurations, or null after an error is logged if the
 		 *         file cannot be read.
 		 */
-		public static LoadedConfigFileManager loadEditableState(IModel model, String configFilePath) {
+		public static LoadedConfigFileManager loadEditableState(IModel model, MModel mModel, String configFilePath) {
 			if (model == null || configFilePath == null) {
 				throw new IllegalArgumentException();
 			}
@@ -225,7 +233,7 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 				LOG.error("Could not extract configurations from file.");
 				return null;
 			}
-			return new LoadedConfigFileManager(model, configManager);
+			return new LoadedConfigFileManager(model, mModel, configManager);
 		}
 
 		/**
@@ -238,12 +246,18 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 * @return The loaded configurations for their names.
 		 */
 		private static Map<String, SettingsConfiguration> getConfigurations(
-				final ConfigurationFileManager configManager, final IModel model) {
+				final ConfigurationFileManager configManager, final IModel model, final MModel mModel,
+				final Map<String, List<String>> unknownKeys) {
 			final String[] configNames = configManager.getConfigurationNames();
 			final Map<String, SettingsConfiguration> configurationsForNames = new TreeMap<String, SettingsConfiguration>();
 			for (String configurationName : configNames) {
 				final SettingsConfiguration configuration = new SettingsConfiguration(model);
-				ChangeConfiguration.toSettings(model, configManager.getConfiguration(configurationName), configuration);
+				Configuration section = configManager.getConfiguration(configurationName);
+				List<String> unknown = UnknownConfigurationKeys.unknown(mModel, section);
+				if (!unknown.isEmpty()) {
+					unknownKeys.put(configurationName, unknown);
+				}
+				ChangeConfiguration.toSettings(model, section, configuration);
 				configurationsForNames.put(configurationName, configuration);
 			}
 			return configurationsForNames;
@@ -251,6 +265,10 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 
 		public Map<String, SettingsConfiguration> getConfigurations() {
 			return configs;
+		}
+
+		public Map<String, List<String>> getUnknownKeys() {
+			return unknownKeys;
 		}
 
 	}

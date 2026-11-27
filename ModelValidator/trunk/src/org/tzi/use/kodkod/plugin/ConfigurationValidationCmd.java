@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.tzi.kodkod.model.config.impl.UnknownConfigurationKeys;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.validation.ValidityRule;
 import org.tzi.kodkod.validation.ValidityRuleValidator;
@@ -46,7 +47,7 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 		initialize(pluginCommand.getSession());
 		final IModel model = model();
 
-		final LoadedConfigFileManager loaded = LoadedConfigFileManager.loadEditableState(model, configFilePath);
+		final LoadedConfigFileManager loaded = LoadedConfigFileManager.loadEditableState(model, mModel, configFilePath);
 		if (loaded == null) {
 			return;
 		}
@@ -55,7 +56,7 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			return;
 		}
 		filterForNameArguments(configurationsForNames, names);
-		processValidation(model, configurationsForNames, LOG);
+		processValidation(model, configurationsForNames, loaded.getUnknownKeys(), LOG);
 	}
 
 	/**
@@ -69,10 +70,20 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 	 *            The logger.
 	 */
 	private void processValidation(final IModel model, final Map<String, SettingsConfiguration> configurationsForNames,
-			final Logger log) {
+			final Map<String, List<String>> unknownKeys, final Logger log) {
 		String logString = "Validation results:\n\n";
 		for (Entry<String, SettingsConfiguration> configurationForName : configurationsForNames.entrySet()) {
 			String name = configurationForName.getKey();
+
+			List<String> unknown = unknownKeys.get(name);
+			if (unknown != null) {
+				logString += "Config " + name + " is invalid.\n";
+				for (String key : unknown) {
+					logString += "    " + UnknownConfigurationKeys.message(key) + "\n";
+				}
+				logString += "\n";
+				continue;
+			}
 
 			SettingsConfiguration config = configurationForName.getValue();
 			SortedMap<ValidityRule, ValidityRuleViolence[]> violationsByValdityRules;
