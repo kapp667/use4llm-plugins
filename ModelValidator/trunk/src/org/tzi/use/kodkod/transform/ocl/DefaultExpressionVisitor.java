@@ -279,10 +279,14 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	}
 
 	private Object branch(org.tzi.use.uml.ocl.expr.Expression branch, boolean collection) {
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-		branch.processWithVisitor(visitor);
 		if (collection && branch.type().isTypeOfVoidType()) {
 			return undefined_Set;
+		}
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
+		branch.processWithVisitor(visitor);
+		if (collection && !visitor.isSet() && visitor.getObject() != undefined_Set) {
+			throw new TransformationException("Cannot transform " + StringUtil.inQuotes(branch.toString())
+					+ ": it is a branch of a collection-valued if but is not translated to a set.");
 		}
 		return visitor.getObject();
 	}
