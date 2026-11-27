@@ -368,4 +368,14 @@ public class Inequality_Test extends OCLTest {
 		test("test52", ocl, expected);
 	}
 
+	@Test
+	public void anUndefinedSetIsNotUnequalToNull() {
+		test("anUndefinedSetIsNotUnequalToNull", "ada.luckyNumbers <> null");
+	}
+
+	@Test
+	public void aDefinedSetIsUnequalToNull() {
+		test("aDefinedSetIsUnequalToNull", "bob.luckyNumbers <> null");
+	}
+
 }

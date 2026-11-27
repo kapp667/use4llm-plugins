@@ -33,4 +33,24 @@ public class OperationCall_Test extends OCLTest {
 	public void setOfAnIfWithAnUndefinedConditionIsNotKnownToBeEmpty() {
 		test("setOfAnIfWithAnUndefinedConditionIsNotKnownToBeEmpty", "ada.numbersIfAlive()->isEmpty()");
 	}
+
+	@Test
+	public void setArgumentOfNullHasNoSize() {
+		test("setArgumentOfNullHasNoSize", "ada.sizeOf(null)");
+	}
+
+	@Test
+	public void setArgumentOfADefinedSetHasItsSize() {
+		test("setArgumentOfADefinedSetHasItsSize", "ada.sizeOf(bob.luckyNumbers)");
+	}
+
+	@Test
+	public void setResultOfNullHasNoSize() {
+		test("setResultOfNullHasNoSize", "ada.noNumbers()->size()");
+	}
+
+	@Test
+	public void setResultOfNullEqualsAnUndefinedSet() {
+		test("setResultOfNullEqualsAnUndefinedSet", "ada.noNumbers() = ada.luckyNumbers");
+	}
 }

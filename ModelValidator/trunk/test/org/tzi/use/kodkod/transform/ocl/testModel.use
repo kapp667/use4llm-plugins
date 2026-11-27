@@ -17,6 +17,8 @@ operations
   currentEmployer():Company = self.employerAC
   numbersIfAlive():Set(Integer) = if self.alive then Set{1} else Set{2} endif
   named():Boolean = self.name.isDefined()
+  sizeOf(numbers:Set(Integer)):Integer = numbers->size()
+  noNumbers():Set(Integer) = null
 end
 
 class Company
@@ -42,6 +44,7 @@ attributes
   parent:Parent_AC
   buy:Buy_AC
   exam:Exam_AC
+  numbers:Set(Integer) derived = null
 end
 
 association Job_A between
