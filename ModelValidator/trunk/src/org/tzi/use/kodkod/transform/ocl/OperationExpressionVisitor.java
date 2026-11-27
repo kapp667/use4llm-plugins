@@ -85,8 +85,6 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 			object = expression.in(undefined).thenElse(set ? undefined_Set : undefined, getAsExpression(object));
 			
 			opVariables.remove("self");
-
-			//variables.putAll(opVariables);
 		}
 		finally {
 			// stack might have been cleared because a recursion has been detected and we are currently handling the exception throw
