@@ -14,19 +14,14 @@ import org.tzi.kodkod.model.impl.DerivedAssociation;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd.Parameter;
 import org.tzi.kodkod.model.impl.DerivedAttribute;
-import org.tzi.kodkod.model.type.ObjectType;
 import org.tzi.kodkod.model.type.TypeLiterals;
 import org.tzi.use.kodkod.transform.TransformationException;
-import org.tzi.use.kodkod.transform.TypeConverter;
 import org.tzi.use.uml.mm.MAssociation;
 import org.tzi.use.uml.mm.MAssociationEnd;
-import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MNavigableElement;
-import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.ocl.expr.ExpAttrOp;
 import org.tzi.use.uml.ocl.expr.ExpNavigation;
 import org.tzi.use.uml.ocl.expr.ExpNavigationClassifierSource;
-import org.tzi.use.uml.ocl.expr.ExpObjOp;
 import org.tzi.use.uml.ocl.expr.ExpVariable;
 import org.tzi.use.uml.ocl.type.Type;
 import org.tzi.use.uml.ocl.type.Type.VoidHandling;
@@ -44,8 +39,6 @@ import kodkod.ast.Variable;
  */
 public class VariableOperationVisitor extends DefaultExpressionVisitor {
 
-	private IClass attributeClass;
-
 	public VariableOperationVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
 			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
 		super(model, variables, variableClasses, replaceVariables, collectionVariables);
@@ -54,35 +47,16 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 	@Override
 	public void visitAttrOp(ExpAttrOp exp) {
 		exp.objExp().processWithVisitor(this);
-		
-		if(attributeClass == null){
-			// try to find the source type
-			org.tzi.kodkod.model.type.Type sourceType = new TypeConverter(model).convert(exp.objExp().type());
-			if(sourceType instanceof ObjectType){
-				attributeClass = ((ObjectType) sourceType).clazz();
-			} else {
-				throw new TransformationException("Cannot determine type of source expression for " + StringUtil.inQuotes(exp.toString()) + ".");
-			}
-		}
-		IAttribute attribute = attributeClass.getAttribute(exp.attr().name());
-		
-		if (attribute != null) {
-			if(attribute instanceof DerivedAttribute){
-				handleDerivedAttribute(exp, (DerivedAttribute) attribute);
-			} else {
-				handleRegularAttribute(exp, attribute);
-			}
-			
-			// update current type
-			if(attribute.type().isObjectType()){
-				org.tzi.kodkod.model.type.ObjectType t = (org.tzi.kodkod.model.type.ObjectType) attribute.type();
-				attributeClass = t.clazz();
-			}
-			else {
-				attributeClass = null;
-			}
-		} else {
+
+		IClass owner = model.getClass(exp.attr().owner().name());
+		IAttribute attribute = owner == null ? null : owner.getAttribute(exp.attr().name());
+		if (attribute == null) {
 			throw new TransformationException("Cannot find attribute " + exp.attr().name() + ".");
+		}
+		if (attribute instanceof DerivedAttribute) {
+			handleDerivedAttribute(exp, (DerivedAttribute) attribute);
+		} else {
+			handleRegularAttribute(exp, attribute);
 		}
 	}
 
@@ -251,7 +225,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				}
 			}
 			object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, (Expression) object);
-			attributeClass = to.associatedClass();
 		} else {
 			// n-Ary assoc
 			// TODO implement derived associations
@@ -332,7 +305,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 					IAssociationEnd associationEnd = association.associationEnds().get(toIndex);
 					set = !associationEnd.multiplicity().isObjectTypeEnd();
 				}
-				attributeClass = association.associationClass();
 			}
 			return 0;
 		}
@@ -354,7 +326,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 					} else {
 						set = !associationEnd.multiplicity().isObjectTypeEnd();
 					}
-					attributeClass = associationEnd.associatedClass();
 				}
 
 				return i + 1;
@@ -375,40 +346,18 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		
 		if (replaceVariables.containsKey(exp.getVarname())) {
 			object = replaceVariables.get(exp.getVarname());
-			getAttributeClass(replaceVariables.get(exp.getVarname()).name());
-
 		} else if (variables.containsKey(exp.getVarname())) {
 			object = variables.get(exp.getVarname());
 			if (collectionVariables.contains(exp.getVarname())) {
 				set = true;
 			}
-			getAttributeClass(exp.getVarname());
 		} else if (exp.type().isTypeOfClass()) {
 			IClass clazz = model.getClass(exp.type().shortName());
 			TypeLiterals type = clazz.objectType();
 			type.addTypeLiteral(exp.getVarname());
 			object = type.getTypeLiteral(exp.getVarname());
-			attributeClass = clazz;
 		} else {
 			throw new TransformationException("No variable " + exp.getVarname() + ".");
 		}
-	}
-
-	@Override
-	public void visitObjOp(ExpObjOp exp) {
-		super.visitObjOp(exp);
-		MOperation operation = exp.getOperation();
-		if (operation.hasResultType() && operation.resultType().isTypeOfClass()) {
-			attributeClass = model.getClass(((MClass) operation.resultType()).name());
-		}
-	}
-
-	private void getAttributeClass(String varName) {
-		if (variableClasses.containsKey(varName))
-			attributeClass = variableClasses.get(varName);
-	}
-
-	public IClass getAttributeClass() {
-		return attributeClass;
 	}
 }
