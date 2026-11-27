@@ -150,7 +150,7 @@ public class ModelTransformator {
 
 		for (MAttribute mAttribute : attributes) {
 			Type type = typeConverter.convert(mAttribute.type());
-			if (type != null && (mAttribute.isDerived() || !holdsOclAny(type))) {
+			if (type != null && (mAttribute.isDerived() || !type.isUndefined() && !holdsOclAny(type))) {
 				IAttribute attr;
 				if(mAttribute.isDerived()){
 					attr = factory.createDerivedAttribute(model, mAttribute.name(), type, clazz, mAttribute.getDeriveExpression());
