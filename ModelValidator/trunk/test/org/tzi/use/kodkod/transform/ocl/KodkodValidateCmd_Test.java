@@ -154,6 +154,32 @@ public class KodkodValidateCmd_Test {
 		assertTrue(output, output.contains("INFO SATISFIABLE"));
 	}
 
+	@Test
+	public void refusesAStringAttributeWhenTheStringSettingsAreMissing() throws Exception {
+		open("model S\nclass C\nattributes\n  name : String\nend\n");
+		String output = check(file("nostring.properties", "[nostring]\nC_min = 1\nC_max = 1\nC_name_min = 1\nC_name_max = 1\n"));
+		assertTrue(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("STRING_SETTINGS_NESSESSARY"));
+		assertFalse(output, output.contains("SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithAStringAttributeAndTheStringSettings() throws Exception {
+		open("model S\nclass C\nattributes\n  name : String\nend\n");
+		String output = check(file("string.properties", "[string]\nString_min = 1\nString_max = 1\n"
+				+ "C_min = 1\nC_max = 1\nC_name_min = 1\nC_name_max = 1\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithAStringAttributeThatNoObjectCanHold() throws Exception {
+		open("model S\nclass C\nattributes\n  name : String\nend\n");
+		String output = check(file("noobject.properties", "[noobject]\nC_min = 0\nC_max = 0\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("SATISFIABLE"));
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
