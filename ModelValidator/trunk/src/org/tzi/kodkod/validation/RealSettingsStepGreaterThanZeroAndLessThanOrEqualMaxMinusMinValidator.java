@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.tzi.kodkod.model.config.impl.DefaultConfigurationValues;
 import org.tzi.kodkod.model.config.impl.PropertyEntry;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.type.TypeConstants;
@@ -19,8 +20,8 @@ import org.tzi.use.kodkod.plugin.gui.model.data.RealSettings;
  * 
  * Provided on invalidity:
  * <ul>
- * <li>If real step value is less than 0, set it to the difference of maximum
- * and minimum real values.</li>
+ * <li>If real step value is less than 0.01, the precision of the real values,
+ * set it to the difference of maximum and minimum real values.</li>
  * <li>If real step value is greater than the difference of maximum and minimum
  * real values, set the maximum real value to the sum of the difference and the
  * minimum real value.</li>
@@ -46,7 +47,7 @@ final class RealSettingsStepGreaterThanZeroAndLessThanOrEqualMaxMinusMinValidato
 			final BigDecimal maximum = new BigDecimal("" + config.getMaximum());
 			final BigDecimal maximumStep = maximum.subtract(minimum);
 			List<AbstractFix> fixes = new ArrayList<AbstractFix>();
-			if (step.compareTo(new BigDecimal("0")) < 0) {
+			if (step.compareTo(new BigDecimal("" + DefaultConfigurationValues.realStepMinimum)) < 0) {
 				fixes.add(
 						new SetRealSettingsStepFix(config.getSettingsConfiguration(), model,
 								UIElements.SetToValue(TypeConstants.REAL + PropertyEntry.realStep,
