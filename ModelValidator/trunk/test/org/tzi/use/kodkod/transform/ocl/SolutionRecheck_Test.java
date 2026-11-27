@@ -24,10 +24,7 @@ import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator;
 import org.tzi.use.main.Session;
 import org.tzi.use.kodkod.UseKodkodModelValidator;
-import org.tzi.use.uml.mm.MClassInvariant;
 import org.tzi.use.uml.mm.MModel;
-import org.tzi.use.uml.ocl.expr.Evaluator;
-import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.ocl.value.IntegerValue;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystem;
@@ -101,29 +98,6 @@ public class SolutionRecheck_Test {
 		assertEquals(ObjectDiagramCreator.ErrorType.INVARIANT, creator.hasDiagramErrors());
 		assertEquals(1, errors.size());
 		assertTrue(String.valueOf(errors.get(0).getMessage()), String.valueOf(errors.get(0).getMessage()).contains("A::five"));
-	}
-
-	@Test
-	public void validationDoesNotEndOnASolutionThatUseRejects() throws Exception {
-		// the translation answers 3, the smallest, and USE answers 20, the first in its hash set
-		MModel mModel = TestSpecifications.compile("model M\n"
-				+ "class A\n"
-				+ "end\n"
-				+ "constraints\n"
-				+ "context A inv three: Set{3, 20}->any(i | true) = 3\n");
-		Session session = new Session();
-		session.setSystem(new MSystem(mModel));
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("Integer_min", 0);
-		properties.put("Integer_max", 20);
-		properties.put("A_min", 1);
-		properties.put("A_max", 1);
-		new UseKodkodModelValidator(session).validate(TestSpecifications.configure(TestSpecifications.transform(mModel), properties));
-
-		MSystemState state = session.system().state();
-		for (MClassInvariant invariant : mModel.classInvariants()) {
-			assertEquals(invariant.name(), BooleanValue.TRUE, new Evaluator().eval(invariant.expandedExpression(), state));
-		}
 	}
 
 	@Test

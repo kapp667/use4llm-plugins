@@ -56,28 +56,6 @@ public class SetOperationGroup extends OCLOperationGroup {
 		return false;
 	}
 
-	// As the core translation does not support nested collections, the
-	// result value of the any operation is object valued. In Kodkod the
-	// result is a singleton relation.
-
-	// When several integers fulfill the body formula (body), the translation
-	// returns the smallest, as USE does. For other elements the user has the
-	// responsibility to ensure that at most one element of the source
-	// collection (src) fulfills the body formula. Otherwise, the evaluation
-	// result may be corrupted => The translation returns the undefined value.
-
-	// OCL: srcExpr->any(var | bodyExpr) = srcExpr->select(var | bodyExpr)->any(true)
-
-	public final Expression any(Expression src, Formula body, Variable var) {
-		final Expression select = select(src, body, var);
-		return src.eq(undefined_Set).thenElse(undefined, select.one().thenElse(select,
-				select.some().and(select.in(Expression.INTS)).thenElse(min(select), undefined)));
-	}
-
-	public final Expression any(Expression src, Expression body, Variable var) {
-		return any(src, body.eq(booleanTrue), var);
-	}
-
 	// OCL: srcExpr->asSet()
 
 	public final Expression asSet(Expression src) {
