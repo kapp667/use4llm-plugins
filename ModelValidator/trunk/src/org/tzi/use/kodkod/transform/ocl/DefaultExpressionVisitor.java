@@ -15,7 +15,6 @@ import org.tzi.kodkod.model.type.TypeLiterals;
 import org.tzi.kodkod.ocl.OCLMethodInvoker;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.kodkod.transform.TypeConverter;
-import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.ocl.expr.ExpAllInstances;
 import org.tzi.use.uml.ocl.expr.ExpAsType;
 import org.tzi.use.uml.ocl.expr.ExpAttrOp;
@@ -70,7 +69,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	protected IModel model;
 	protected Map<String, Node> variables;
 	protected List<String> collectionVariables;
-	protected Map<String, IClass> variableClasses;
 	protected Map<String, Variable> replaceVariables;
 	
 	protected final Relation undefined;
@@ -82,11 +80,10 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 
 	private boolean collectionOfCollectionsAccepted = false;
 
-	public DefaultExpressionVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
-			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
+	public DefaultExpressionVisitor(IModel model, Map<String, Node> variables, Map<String, Variable> replaceVariables,
+			List<String> collectionVariables) {
 		this.model = model;
 		this.variables = variables;
-		this.variableClasses = variableClasses;
 		this.replaceVariables = replaceVariables;
 		this.collectionVariables = collectionVariables;
 
@@ -235,7 +232,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		super.visitObjOp(exp);
 		refuseCollectionOfCollections(exp);
 		refuseReal(exp);
-		DefaultExpressionVisitor visitor = new OperationExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new OperationExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
@@ -245,27 +242,22 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitLet(ExpLet exp) {
 		super.visitLet(exp);
 		refuseCollectionOfCollections(exp);
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getVarExpression().processWithVisitor(visitor);
 		Node varExpression = visitor.getObject();
 
 		variables.put(exp.getVarname(), varExpression);
-		
-		if(exp.getVarType().isTypeOfClass()){
-			variableClasses.put(exp.getVarname(), model.getClass(((MClass)exp.getVarType()).name()));
-		}
-		
+
 		if (visitor.isSet()) {
 			collectionVariables.add(exp.getVarname());
 		}
 
-		visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getInExpression().processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
 
 		variables.remove(exp.getVarname());
-		variableClasses.remove(exp.getVarname());
 	}
 
 	@Override
@@ -275,15 +267,15 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 
 		List<Object> arguments = new ArrayList<Object>();
 
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getCondition().processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 
-		visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getThenExpression().processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 
-		visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getElseExpression().processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 
@@ -341,7 +333,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitQuery(ExpQuery exp) {
 		super.visitQuery(exp);
 		refuseCollectionOfCollections(exp);
-		QueryExpressionVisitor visitor = new QueryExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		QueryExpressionVisitor visitor = new QueryExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
@@ -380,7 +372,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitStdOp(ExpStdOp exp) {
 		super.visitStdOp(exp);
 		refuseCollectionOfCollections(exp);
-		StandardOperationVisitor visitor = new StandardOperationVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		StandardOperationVisitor visitor = new StandardOperationVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
@@ -430,7 +422,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		
 		DefaultExpressionVisitor visitor;
 		for(org.tzi.use.uml.ocl.expr.Expression e : expToVisit){
-			visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+			visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 			e.processWithVisitor(visitor);
 			args.add(visitor.getObject());
 		}
@@ -464,7 +456,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		
 		DefaultExpressionVisitor visitor;
 		for (org.tzi.use.uml.ocl.expr.Expression expression : exp.getElemExpr()) {
-			visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+			visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 			expression.processWithVisitor(visitor);
 			arguments.add(visitor.getObject());
 		}
@@ -478,7 +470,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	 * @param exp
 	 */
 	private void visitVariableOperation(org.tzi.use.uml.ocl.expr.Expression exp) {
-		VariableOperationVisitor visitor = new VariableOperationVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		VariableOperationVisitor visitor = new VariableOperationVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
@@ -511,7 +503,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		}
 		List<Object> arguments = new ArrayList<Object>();
 
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		sourceExpression.processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 		set = visitor.isSet();

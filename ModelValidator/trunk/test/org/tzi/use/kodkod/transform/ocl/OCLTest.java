@@ -308,7 +308,7 @@ public class OCLTest {
 	}
 
 	protected Object toKodkod(org.tzi.use.uml.ocl.expr.Expression expression) {
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, new HashMap<String, Node>(), new HashMap<String, IClass>(), new HashMap<String, Variable>(), new ArrayList<String>());
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, new HashMap<String, Node>(), new HashMap<String, Variable>(), new ArrayList<String>());
 		expression.processWithVisitor(visitor);
 		return visitor.getObject();
 	}

@@ -16,7 +16,6 @@ import kodkod.engine.fol2sat.UnboundLeafException;
 
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
-import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.use.kodkod.solution.SolutionValueReader;
 import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
 import org.tzi.use.kodkod.solution.SolutionValueReader.Unreadable;
@@ -85,10 +84,8 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 
 	private Node transformExpression(Expression expr) {
 		Map<String, Node> variables = new TreeMap<String, Node>();
-		Map<String, IClass> variableClasses = new TreeMap<String, IClass>();
 
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, variableClasses, new HashMap<String, Variable>(),
-				new ArrayList<String>());
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, new HashMap<String, Variable>(), new ArrayList<String>());
 		expr.processWithVisitor(visitor);
 		return visitor.getObject();
 	}
