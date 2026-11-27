@@ -21,6 +21,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		SubsetsAssociationEnd_Test.class, UnionAssociationEnd_Test.class,
 		RedefinesAssociationEnd_Test.class,
 		SolutionDiagram_Test.class,
+		CollectionAttributeDiagram_Test.class,
 		QualifiedAssociation_Test.class,
 		NestedCollection_Test.class,
 		CollectionKind_Test.class,
