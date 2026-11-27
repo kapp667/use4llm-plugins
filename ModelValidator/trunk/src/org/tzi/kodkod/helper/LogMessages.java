@@ -364,10 +364,6 @@ public final class LogMessages {
 		return "Searching solution with SatSolver " + inQuotes(satFactory) + " and bitwidth " + bitwidth + "...";
 	}
 
-	public static String libraryPathWarning(String defaultSatFactory, String exceptionMsg) {
-		return "Only default SatSolver " + inQuotes(defaultSatFactory) + " can be used! " + exceptionMsg;
-	}
-
 	public static String noClassInvariantError(String className, String invariantName) {
 		return "Class " + inQuotes(className) + " has no invariant " + inQuotes(invariantName);
 	}

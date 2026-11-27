@@ -13,7 +13,6 @@ import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalINIConfiguration;
 import org.apache.log4j.Logger;
-import org.tzi.kodkod.helper.LibraryPathHelper;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.helper.PathHelper;
 import org.tzi.kodkod.helper.SystemInformation;
@@ -102,27 +101,7 @@ public class KodkodModelValidatorConfiguration {
 	private KodkodModelValidatorConfiguration() {
 		iniSaveFile = new File(PathHelper.getPluginPath() + FOLDER_NAME, INI_FILENAME);
 
-		addSolverFolders();
 		readFile();
-	}
-
-	/**
-	 * Adds the solver library folder for this JVM's architecture to the
-	 * 'java.library.path'.
-	 */
-	private void addSolverFolders() {
-		try {
-			SystemInformation si = SystemInformation.getSystemInformation();
-			String path = getSolverFolder(si);
-			
-			if(path == null){
-				throw new IOException("Unknown jvm architecture.");
-			} else {
-				LibraryPathHelper.addDirectory(path);
-			}
-		} catch (IOException e) {
-			LOG.warn(LogMessages.libraryPathWarning(DEFAULT_SATFACTORY, e.getMessage()));
-		}
 	}
 	
 	/**
