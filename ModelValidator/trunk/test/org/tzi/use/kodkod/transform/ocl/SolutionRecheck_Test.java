@@ -15,7 +15,11 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import kodkod.ast.Relation;
+import kodkod.instance.TupleSet;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
+import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator;
 import org.tzi.use.main.Session;
@@ -120,5 +124,34 @@ public class SolutionRecheck_Test {
 		for (MClassInvariant invariant : mModel.classInvariants()) {
 			assertEquals(invariant.name(), BooleanValue.TRUE, new Evaluator().eval(invariant.expandedExpression(), state));
 		}
+	}
+
+	@Test
+	public void validationLooksForAnotherSolutionWhenUseFindsAnInvariantFalse() throws Exception {
+		MModel mModel = TestSpecifications.compile(SPEC);
+		Session session = new Session();
+		session.setSystem(new MSystem(mModel));
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("Integer_min", 4);
+		properties.put("Integer_max", 4);
+		properties.put("A_min", 1);
+		properties.put("A_max", 1);
+		IModel model = TestSpecifications.configure(TestSpecifications.transform(mModel), properties);
+		// the solver ignores the invariant, which USE then finds false, as when the translation differs from USE
+		final IInvariant five = model.getInvariant("A::five");
+		five.deactivate();
+		final List<Boolean> retries = new ArrayList<Boolean>();
+		new UseKodkodModelValidator(session) {
+			@Override
+			protected boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples) {
+				five.activate();
+				boolean retry = super.createObjectDiagram(relationTuples);
+				five.deactivate();
+				retries.add(retry);
+				return retry;
+			}
+		}.validate(model);
+
+		assertEquals(Boolean.TRUE, retries.get(0));
 	}
 }
