@@ -36,8 +36,6 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 	private List<IInvariant> negatedInvariants;
 	private IInvariant currentInvariant;
 
-	private boolean validateSingleInvariant = false;
-	
 	public InvariantIndepChecker(Session session) {
 		this.session = session;
 	}
@@ -49,7 +47,6 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		if (refusesUntransformedElements(model)) {
 			return;
 		}
-		validateSingleInvariant = true;
 		changeLogLevels();
 
 		Collection<IInvariant> invariants = model.classInvariants();
@@ -77,7 +74,6 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		if (refusesUntransformedElements(model)) {
 			return;
 		}
-		validateSingleInvariant = false;
 		Logger.getLogger(KodkodModelValidator.class).setLevel(Level.WARN);
 		Logger.getLogger(KodkodSolver.class).setLevel(Level.WARN);
 		LOG.setLevel(Level.INFO);
@@ -142,37 +138,48 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		}
 	}
 
-	private void createObjectDiagram(Map<Relation, TupleSet> relationTuples){
+	/**
+	 * Creates the object diagram of the solution in USE.
+	 *
+	 * @return true if USE accepts the object diagram, false if it refuses it.
+	 */
+	private boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples){
 		LOG.info(LogMessages.objDiagramCreation);
 
 		session.reset();
 		ObjectDiagramCreator diagramCreator = new ObjectDiagramCreator(model, session);
 		try {
 			diagramCreator.create(relationTuples);
-			diagramCreator.hasDiagramErrors();
+			return diagramCreator.hasDiagramErrors() == ObjectDiagramCreator.ErrorType.NONE;
 		} catch (UseApiException ex) {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.objDiagramCreationError, ex);
 			} else {
 				LOG.error(LogMessages.objDiagramCreationError + " Reason: " + ex.getMessage());
 			}
+			return false;
+		}
+	}
+
+	/**
+	 * Reports "Independent" only if USE accepts the object diagram of the solution.
+	 */
+	private void reportIndependence() {
+		if (createObjectDiagram(solution.instance().relationTuples())) {
+			LOG.info(currentInvariant.qualifiedName() + ": Independent");
+		} else {
+			LOG.error(LogMessages.indepSolutionRefusedError(currentInvariant.qualifiedName()));
 		}
 	}
 	
 	@Override
 	protected void satisfiable() {
-		LOG.info(currentInvariant.qualifiedName() + ": Independent");
-		if(validateSingleInvariant){
-			createObjectDiagram(solution.instance().relationTuples());
-		}
+		reportIndependence();
 	}
 
 	@Override
 	protected void trivially_satisfiable() {
-		LOG.info(currentInvariant.qualifiedName() + ": Independent");
-		if(validateSingleInvariant){
-			createObjectDiagram(solution.instance().relationTuples());
-		}
+		reportIndependence();
 	}
 
 	@Override
