@@ -50,6 +50,8 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		KodkodValidateCmd_Test.class,
 		KodkodQueryCmd_Test.class,
 		KodkodCTScrollingValidateCmd_Test.class,
-		ScrollingNext_Test.class })
+		ScrollingNext_Test.class,
+		SubclassSetAttributeBounds_Test.class,
+		SubclassAttributeMaxValidation_Test.class })
 public class TestSuite {
 }
