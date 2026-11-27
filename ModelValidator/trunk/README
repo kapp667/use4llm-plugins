@@ -26,3 +26,19 @@ solvers it can load.
 The shell command 'plugins' shows all available Model Validator commands.
 For further information, please feel free to use our sourceforge forums. A
 quick reference guide is included in the Model Validator ZIP archive.
+
+4. What the translation refuses
+===============================
+The plugin refuses to validate a model with an expression it cannot
+translate faithfully, and names that expression, rather than answer with a
+verdict that USE could contradict.
+
+any() is refused. On a Set or Bag with several matching elements, USE
+returns the first one its hash-based collection iterates: Set{3, 20}->any(true)
+is 20, and objects are placed by the hash of their names. The plugin does not
+model that choice, so a translated any() could change a verdict. On a Sequence
+or OrderedSet, the message names the order instead. In USE's examples,
+Metamodels/UML23/UML2MM.use and Others/Sudoku/Sudoku.use use any(). Where only
+the existence of a match or a property of all matches matters,
+select(...)->notEmpty() or select(...)->forAll(...) expresses it and is
+translated.
