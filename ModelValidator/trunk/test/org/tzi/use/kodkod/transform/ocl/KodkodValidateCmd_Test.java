@@ -233,6 +233,26 @@ public class KodkodValidateCmd_Test {
 				.attributeValue("r").toString();
 	}
 
+	@Test
+	public void solvesWithAListedRealValueOfThreeDecimals() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Real\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 1\nReal_max = 2\nReal_step = 0.125\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = -1\nC_r = Set{1.125}\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, "1.125", realValue());
+	}
+
+	@Test
+	public void keepsAGeneratedRealValueOfThreeDecimals() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Set(Real)\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 1\nReal_max = 2\nReal_step = 0.875\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = -1\nC_r_minSize = 2\nC_r_maxSize = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, "Set{1.0,1.875}", realValue());
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
