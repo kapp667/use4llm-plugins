@@ -78,7 +78,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 
 	protected Node object;
 	protected boolean set;
-	protected boolean object_type_nav;
 	protected Type sourceType;
 
 	private boolean collectionOfCollectionsAccepted = false;
@@ -95,7 +94,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		undefined_Set = model.typeFactory().undefinedSetType().relation();
 
 		set = false;
-		object_type_nav = false;
 	}
 
 	/**
@@ -120,15 +118,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		return sourceType;
 	}
 	
-	/**
-	 * Returns <code>true</code>, if the result object is a navigation to an object end.
-	 * 
-	 * @return
-	 */
-	public boolean isObject_type_nav() {
-		return object_type_nav;
-	}
-
 	/**
 	 * Accepts a collection of collections as the expression this visitor
 	 * transforms.
@@ -249,7 +238,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 	}
 
 	@Override
@@ -274,7 +262,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.getInExpression().processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 
 		variables.remove(exp.getVarname());
 		variableClasses.remove(exp.getVarname());
@@ -336,6 +323,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitObjAsSet(ExpObjAsSet exp) {
 		super.visitObjAsSet(exp);
 		visitVariableOperation(exp.getObjectExpression());
+		object = ((Expression) object).eq(undefined).thenElse(Expression.NONE, (Expression) object);
 		set = true;
 	}
 
@@ -354,7 +342,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 	}
 	
 	@Override
@@ -394,7 +381,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 	}
 
 	@Override
@@ -493,7 +479,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.processWithVisitor(visitor);
 		object = visitor.getObject();
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 		sourceType = visitor.getSourceType();
 	}
 
@@ -517,7 +502,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		sourceExpression.processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 		set = visitor.isSet();
-		object_type_nav = visitor.isObject_type_nav();
 
 		TypeConverter typeConverter = new TypeConverter(model);
 		org.tzi.kodkod.model.type.Type type = typeConverter.convert(targetType);
@@ -593,7 +577,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	 */
 	protected void invokeMethod(String opName, List<Object> arguments, boolean setOperation) {
 		OCLMethodInvoker invoker = new OCLMethodInvoker();
-		invoker.invoke(opName, arguments, setOperation, object_type_nav);
+		invoker.invoke(opName, arguments, setOperation);
 		object = invoker.getObject();
 		set = invoker.isSet();
 	}
