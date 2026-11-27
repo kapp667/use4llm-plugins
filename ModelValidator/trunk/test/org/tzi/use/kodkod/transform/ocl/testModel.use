@@ -16,6 +16,7 @@ operations
   coworkers():Set(Person) = Person.allInstances()->select(p | p.employerAC = self.employerAC)
   currentEmployer():Company = self.employerAC
   numbersIfAlive():Set(Integer) = if self.alive then Set{1} else Set{2} endif
+  named():Boolean = self.name.isDefined()
 end
 
 class Company
