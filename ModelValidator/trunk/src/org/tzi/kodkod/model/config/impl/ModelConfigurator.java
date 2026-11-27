@@ -111,9 +111,7 @@ public class ModelConfigurator extends Configurator<IModel> {
 				relation = clazz.relation();
 				tupleSet = relationTuples.get(relation);
 
-				if (!tupleSet.isEmpty()) {
-					formula = formula.and(relation.eq(createClassRelationExpression(relationTuples.get(relation))));
-				}
+				formula = formula.and(holdsExactly(relation, createClassRelationExpression(tupleSet)));
 
 				for (IAttribute attribute : clazz.attributes()) {
 					if(attribute instanceof DerivedAttribute){
@@ -122,9 +120,7 @@ public class ModelConfigurator extends Configurator<IModel> {
 					relation = attribute.relation();
 					tupleSet = relationTuples.get(relation);
 
-					if (!tupleSet.isEmpty()) {
-						formula = formula.and(relation.eq(createAttributeRelationExpression(relationTuples.get(relation), attribute.type())));
-					}
+					formula = formula.and(holdsExactly(relation, createAttributeRelationExpression(tupleSet, attribute.type())));
 				}
 			}
 
@@ -135,12 +131,12 @@ public class ModelConfigurator extends Configurator<IModel> {
 				relation = association.relation();
 				tupleSet = relationTuples.get(relation);
 
-				if (!tupleSet.isEmpty()) {
-					formula = formula.and(relation.eq(createAssociationRelationExpression(relationTuples.get(relation), association)));
-				}
+				formula = formula.and(holdsExactly(relation, createAssociationRelationExpression(tupleSet, association)));
 			}
 
-			solutionFormula = solutionFormula.and(formula.forSome(globDecl).not());
+			// A state with no objects has no variable to quantify.
+			Formula solution = (globDecl == null) ? formula : formula.forSome(globDecl);
+			solutionFormula = solutionFormula.and(solution.not());
 		} catch (Exception e) {
 			LOG.error(LogMessages.solutionForbidError);
 			LOG.error(e.getMessage());
@@ -148,6 +144,15 @@ public class ModelConfigurator extends Configurator<IModel> {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * The relation holds exactly the tuples of the solution, or none when the
+	 * solution has none (tuples is null). Without the second case, forbidding
+	 * the solution also forbids each state that only adds tuples to it.
+	 */
+	private static Formula holdsExactly(Relation relation, Expression tuples) {
+		return (tuples == null) ? relation.no() : relation.eq(tuples);
 	}
 
 	/**
