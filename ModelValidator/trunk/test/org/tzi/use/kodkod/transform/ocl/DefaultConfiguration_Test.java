@@ -18,11 +18,6 @@ import org.tzi.use.main.Session;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.sys.MSystem;
 
-/**
- * Checks that the default configuration, the one the validator writes when it
- * is given no properties file, gives an object to a class with a Real
- * attribute or an OclAny attribute.
- */
 public class DefaultConfiguration_Test {
 
 	@Rule
