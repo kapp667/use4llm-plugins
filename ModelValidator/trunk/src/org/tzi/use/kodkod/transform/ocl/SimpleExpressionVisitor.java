@@ -1,6 +1,7 @@
 package org.tzi.use.kodkod.transform.ocl;
 
 import org.apache.log4j.Logger;
+import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.ocl.expr.ExpAllInstances;
@@ -213,7 +214,7 @@ public class SimpleExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visitObjRef(ExpObjRef exp) {
-		LOG.debug("ExpObjRef");
+		throw new TransformationException(LogMessages.objectReferenceError(exp.toString(), exp.getObject().name()));
 	}
 
 	@Override
@@ -240,7 +241,7 @@ public class SimpleExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visitWithValue(ExpressionWithValue exp) {
-		LOG.debug("ExpressionWithValue");
+		throw new TransformationException(LogMessages.unsupportedExpressionError(exp.toString()));
 	}
 
 	@Override
@@ -261,7 +262,7 @@ public class SimpleExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visitSortedBy(ExpSortedBy exp) {
-		LOG.debug("ExpSortedBy");
+		throw new TransformationException(LogMessages.sortedByError(exp.toString()));
 	}
 
 	@Override
@@ -312,7 +313,7 @@ public class SimpleExpressionVisitor implements ExpressionVisitor {
 
 	@Override
 	public void visitObjectByUseId(ExpObjectByUseId expObjectByUseId) {
-				
+		throw new TransformationException(LogMessages.unsupportedExpressionError(expObjectByUseId.toString()));
 	}
 
 	@Override
