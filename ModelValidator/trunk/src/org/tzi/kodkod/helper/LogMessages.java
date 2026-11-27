@@ -253,6 +253,10 @@ public final class LogMessages {
 		return StringUtil.inQuotes(argument) + " does not have the correct syntax. Use " + inQuotes("class") + " - " + inQuotes("invariant") + ".";
 	}
 
+	public static String indepSolutionRefusedError(String invariantName) {
+		return invariantName + ": Cannot decide the independence: USE does not accept the object diagram of the solution.";
+	}
+
 	public static String unsupportedCollectionWarning(String collectionName) {
 		return "This approach does not support " + collectionName + ". All collections will be handled like sets.";
 	}
