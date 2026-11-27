@@ -70,6 +70,23 @@ jobs:
       - name: Build plugins and run JUnit
         run: ci/build-and-test.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/junit" "${RUNNER_TEMP}/out" "${RUNNER_TEMP}/jacoco"
 
+      # Fails when the OCL translation gives another value than USE on an expression and state
+      # that expected.tsv does not list. See .claude/skills/verify-ocl-translation/SKILL.md.
+      - name: Compare the OCL translation with USE
+        run: ci/translation-oracle/run.sh "${RUNNER_TEMP}/use" "${RUNNER_TEMP}/junit" "${RUNNER_TEMP}/translation-oracle"
+
+      - name: Upload the translation comparison
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: translation-oracle
+          path: |
+            ${{ runner.temp }}/translation-oracle/findings.txt
+            ${{ runner.temp }}/translation-oracle/expected.diff
+            ${{ runner.temp }}/translation-oracle/expected-not-compared.diff
+            ${{ runner.temp }}/translation-oracle/answers.tsv
+          if-no-files-found: ignore
+
       - name: Upload plugin jars
         if: success()
         uses: actions/upload-artifact@v4

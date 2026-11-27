@@ -64,6 +64,10 @@ expression that agreed and now is not compared (or the reverse), and on a change
 number of states (152) or expressions. `ORACLE_DEPTH=1` gives a 20-second smoke run. Do not commit `expected.tsv` from a depth
 other than 2.
 
+CI runs it on every pull request and push to `develop`, in the `build-and-test` job of
+`.github/workflows/ci.yml`. On a failure the job uploads `findings.txt`, both diffs and
+`answers.tsv` as the `translation-oracle` artifact.
+
 ## Read a failure
 
 Open `<out>/findings.txt`. Each entry gives the expression, the state as USE's value of
