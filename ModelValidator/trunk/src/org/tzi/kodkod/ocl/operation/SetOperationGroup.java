@@ -331,10 +331,14 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	public final Expression selectByKind(Expression src, Expression type){
 		// type must be the inheritance type
-		return src.eq(undefined_Set).thenElse(undefined_Set, src.intersection(type));
+		return elementsIn(src, type);
 	}
 	
 	public final Expression selectByType(Expression src, Expression type){
+		return elementsIn(src, type);
+	}
+
+	private Expression elementsIn(Expression src, Expression type) {
 		return src.eq(undefined_Set).thenElse(undefined_Set, src.intersection(type));
 	}
 	

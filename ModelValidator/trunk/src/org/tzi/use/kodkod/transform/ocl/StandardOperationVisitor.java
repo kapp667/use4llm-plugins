@@ -14,6 +14,7 @@ import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.uml.ocl.expr.ExpStdOp;
+import org.tzi.use.uml.ocl.expr.Expression;
 import org.tzi.use.uml.ocl.type.Type;
 import org.tzi.use.uml.ocl.type.Type.VoidHandling;
 
@@ -36,13 +37,14 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 	@Override
 	public void visitStdOp(ExpStdOp exp) {
 		arguments = new ArrayList<Object>();
+		Expression[] args = exp.args();
 
-		for (int i = 0; i < exp.args().length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 			if (exp.opname().equals("flatten")) {
 				visitor.acceptCollectionOfCollections();
 			}
-			visitor.processAs(exp.args()[i], argumentType(exp, i));
+			visitor.processAs(args[i], argumentType(exp.opname(), args, i));
 			arguments.add(visitor.getObject());
 			set = set || visitor.isSet();
 		}
@@ -59,15 +61,13 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 
 	private static final Set<String> EQUALITY = Set.of("=", "<>");
 
-	/**
-	 * The type USE takes an argument of the operation as. An operand of = or <> is
-	 * taken as a value of the type of the other operand.
-	 */
-	private static Type argumentType(ExpStdOp exp, int index) {
-		if (EQUALITY.contains(exp.opname())) {
-			return exp.args()[1 - index].type();
+	/** In = and <>, null against a collection is the undefined set, so each operand takes the other's type. */
+	private static Type argumentType(String opname, Expression[] args, int index) {
+		if (EQUALITY.contains(opname)) {
+			Expression otherOperand = args[1 - index];
+			return otherOperand.type();
 		}
-		return exp.args()[index].type();
+		return args[index].type();
 	}
 
 	private static final Set<String> STRING_ORDER_AND_CONCATENATION = Set.of("<", "<=", ">", ">=", "+");
