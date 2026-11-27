@@ -166,7 +166,8 @@ public final class LogMessages {
 	}
 
 	public static String flattenOrderedSetError(String expression) {
-		return "Cannot transform " + inQuotes(expression) + ": USE fails to flatten an ordered set that holds an undefined collection.";
+		return "Cannot transform " + inQuotes(expression)
+				+ ": USE fails to flatten an ordered set when one of its element collections is undefined, and an element of this ordered set may be undefined.";
 	}
 
 	public static String flattenCollectNestedOnCollectionError(String expression) {
