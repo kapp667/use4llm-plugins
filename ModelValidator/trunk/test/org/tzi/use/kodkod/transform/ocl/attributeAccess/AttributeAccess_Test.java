@@ -360,4 +360,24 @@ public class AttributeAccess_Test extends OCLTest {
 		test("derivedSetAttributeOfNullEqualsAnUndefinedSet", "uf.numbers = ada.luckyNumbers");
 	}
 
+	@Test
+	public void derivedSetAttributeOfAnUndefinedObjectIsUndefined() {
+		test("derivedSetAttributeOfAnUndefinedObjectIsUndefined", "uf.person.employers");
+	}
+
+	@Test
+	public void derivedSetAttributeOfAnUndefinedObjectHasNoSize() {
+		test("derivedSetAttributeOfAnUndefinedObjectHasNoSize", "uf.person.employers->size()");
+	}
+
+	@Test
+	public void derivedIntegerAttributeOfAnUndefinedObjectIsUndefined() {
+		test("derivedIntegerAttributeOfAnUndefinedObjectIsUndefined", "uf.person.employerCount.isUndefined()");
+	}
+
+	@Test
+	public void derivedSetAttributeOfDefinedObjects() {
+		test("derivedSetAttributeOfDefinedObjects", "Person.allInstances()->select(p | p.employers->includes(ibm))->size()");
+	}
+
 }
