@@ -6,7 +6,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import kodkod.ast.Node;
@@ -16,6 +19,8 @@ import kodkod.engine.fol2sat.UnboundLeafException;
 
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
+import org.tzi.kodkod.model.iface.IClass;
+import org.tzi.kodkod.model.type.TypeLiterals;
 import org.tzi.use.kodkod.solution.SolutionValueReader;
 import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
 import org.tzi.use.kodkod.solution.SolutionValueReader.Unreadable;
@@ -82,12 +87,46 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 		compareWithSolution(ocl, expr, useValue);
 	}
 
+	/**
+	 * Translates the expression. The translation registers each literal it
+	 * meets in the model, which the next solve would bind. The literals that
+	 * the translation adds are dropped afterwards, so a query does not change
+	 * the universe of the next solve.
+	 */
 	private Node transformExpression(Expression expr) {
 		Map<String, Node> variables = new TreeMap<String, Node>();
+		List<TypeLiterals> types = literalTypes();
+		List<Set<String>> literalsBefore = new ArrayList<Set<String>>();
+		for (TypeLiterals type : types) {
+			literalsBefore.add(new HashSet<String>(type.typeLiterals().keySet()));
+		}
+		try {
+			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, new HashMap<String, Variable>(), new ArrayList<String>());
+			expr.processWithVisitor(visitor);
+			return visitor.getObject();
+		} finally {
+			for (int i = 0; i < types.size(); i++) {
+				TypeLiterals type = types.get(i);
+				for (String literal : new ArrayList<String>(type.typeLiterals().keySet())) {
+					if (!literalsBefore.get(i).contains(literal)) {
+						type.removeTypeLiteral(literal);
+					}
+				}
+			}
+		}
+	}
 
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, new HashMap<String, Variable>(), new ArrayList<String>());
-		expr.processWithVisitor(visitor);
-		return visitor.getObject();
+	/**
+	 * Returns the types of the model that hold literals: the built-in types,
+	 * the enums and the object type of each class.
+	 */
+	private List<TypeLiterals> literalTypes() {
+		List<TypeLiterals> types = new ArrayList<TypeLiterals>(model().typeFactory().typeLiterals());
+		types.addAll(model().enumTypes());
+		for (IClass clazz : model().classes()) {
+			types.add(clazz.objectType());
+		}
+		return types;
 	}
 
 	private void compareWithSolution(String ocl, Expression expr, Value useValue) {

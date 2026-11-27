@@ -1,5 +1,6 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -12,6 +13,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.kodkod.plugin.KodkodQueryCmd;
 import org.tzi.use.kodkod.plugin.KodkodScrollingValidateCmd;
 import org.tzi.use.kodkod.plugin.KodkodValidateCmd;
@@ -113,6 +115,20 @@ public class KodkodQueryCmd_Test {
 	}
 
 	@Test
+	public void doesNotCompareOnceTheStateChangedWithoutAnEvent() throws Exception {
+		solve();
+		UseSystemApi nativeApi = UseSystemApi.create(shell.system(), false);
+		nativeApi.setAttributeValue("person1", "age", "7");
+		String output = query("person1.age");
+		assertTrue(output, output.contains("INFO 7 : Integer"));
+		assertNotComparedWithoutError(output);
+		nativeApi.createObject("Person", "person3");
+		output = query("Person.allInstances->size()");
+		assertTrue(output, output.contains("INFO 3 : Integer"));
+		assertNotComparedWithoutError(output);
+	}
+
+	@Test
 	public void doesNotCompareOnceTheLastStatementIsUndone() throws Exception {
 		solve();
 		shell.type("undo");
@@ -138,6 +154,17 @@ public class KodkodQueryCmd_Test {
 		output = query("Color::green");
 		assertTrue(output, output.contains("INFO Color::green : Color"));
 		assertNotComparedWithoutError(output);
+	}
+
+	@Test
+	public void aQueryDoesNotChangeTheUniverseOfTheNextSolve() throws Exception {
+		String properties = properties();
+		String first = shell.run(new KodkodValidateCmd(), properties);
+		assertTrue(first, first.contains("Universe:"));
+		query("4 > 5");
+		query("'zzz' = 'zzz'");
+		String second = shell.run(new KodkodValidateCmd(), properties);
+		assertEquals(lineContaining(first, "Universe:"), lineContaining(second, "Universe:"));
 	}
 
 	@Test
@@ -219,6 +246,15 @@ public class KodkodQueryCmd_Test {
 		for (String line : output.split("\n")) {
 			if (line.startsWith(start)) {
 				return line;
+			}
+		}
+		return "";
+	}
+
+	private static String lineContaining(String output, String part) {
+		for (String line : output.split("\n")) {
+			if (line.contains(part)) {
+				return line.substring(line.indexOf(part));
 			}
 		}
 		return "";

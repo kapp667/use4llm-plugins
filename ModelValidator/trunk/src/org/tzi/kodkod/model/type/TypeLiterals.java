@@ -43,6 +43,16 @@ public abstract class TypeLiterals extends TypeAtoms {
 		return typeLiterals.get(literalName);
 	}
 
+	/**
+	 * Removes the literal with the given full name, such as Integer_4. Other
+	 * literals stay.
+	 * 
+	 * @param literalName
+	 */
+	public void removeTypeLiteral(String literalName) {
+		typeLiterals().remove(literalName);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.visitTypeLiterals(this);
