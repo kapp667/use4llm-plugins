@@ -19,7 +19,7 @@ an `ERROR` that names both values.
 Preconditions:
 
 - `fixtures/pets.use` and `fixtures/pets-sat.properties`. The comparison only happens for a solution found after
-  `mv ? enable` and only until the diagram changes.
+  `mv ? enable`, and only while the state still has the content of that solution.
 
 - **Compare.** `scripts/drive.sh <work> fixtures/pets.use fixtures/query.cmd <evidence>/query`, then
   `scripts/judge.sh <evidence>/query --expect SAT --require 'INFO: 1 : Integer$' --require 'INFO: true : Boolean$'`.
@@ -40,5 +40,11 @@ Preconditions:
   for (`p.nick = 'Rex'` when the solver chose `'Tom'`: `the solution has no atom for String_Rex`), when it
   yields a Bag (`collect` gives `WARN: Collect operation ... unsupported type Bag` and the translation uses a
   Set), and when it calls `any()` (refused, see `ModelValidator/trunk/README` section 4).
-- Changing the diagram (`!create`, `!insert`, another `mv -validate`) drops the kept solution; query again right
-  after the `mv -validate` it belongs to.
+- The cache matches the kept solution by the content of the state (objects, attribute values, links), not by
+  events (`KodkodQueryCache.evaluatorFor`). A change to the content (`!create`, `!insert`, another
+  `mv -validate`) makes the state differ from the solution. The plugin then logs
+  `Not compared with a solution: the state shown is not a solution found since mv ? enable, or it changed since`.
+  Query again right after the `mv -validate` it belongs to.
+- A query's literals are removed from the model after its translation, so a query does not change the next
+  solve. A literal with no atom in the solution gives `Not compared ... the solution has no atom for String_Zed`.
+- When USE's own evaluation fails, `mv ?` prints an `ERROR` and no value line (`KodkodQueryCmd.query`).

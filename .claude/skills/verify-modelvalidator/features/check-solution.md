@@ -30,8 +30,13 @@ Preconditions:
 
 ## Gotchas
 
+- Before the plugin keeps a SAT solution, it runs USE's structure check on the diagram
+  (`ObjectDiagramCreator.hasDiagramErrors`). Any structure error logs an `ERROR`. The plugin then logs
+  `INFO: Trying to find a new solution` and looks for another one (`UseKodkodModelValidator.handleSolution`).
+  A cycle or a sharing is refused only when the configuration forbids it. A journey can `--forbid` the structure
+  `ERROR` line.
 - After an UNSATISFIABLE verdict the diagram is empty and `check` still prints `0 failures`. That result is
   vacuous; `judge.sh --expect UNSAT` ignores it on purpose.
 - `info state` must come before `check`; the judge reads the object count from it.
 - A SAT verdict followed by a `check` with failures means the translation accepted a diagram USE rejects. Treat
-  it as a plugin defect. `judge.sh` fails it. Not covered by `prove.sh`.
+  it as a plugin defect, even when the structure check passed. `judge.sh` fails it. Not covered by `prove.sh`.

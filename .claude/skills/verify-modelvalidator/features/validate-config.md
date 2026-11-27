@@ -8,6 +8,8 @@ prints no SAT or UNSAT verdict.
 
 - `vc-valid` reports `Config <name> is valid.`
 - `vc-invalid` reports `Config <name> is invalid.` with the rule and the bound values that break it.
+- `vc-failed` reports `Config <name> could not be validated.` when the check of that configuration throws
+  (`ConfigurationValidationCmd.processValidation`).
 - `vc-select` checks only the named configurations; with no name, every configuration of the file.
 
 ## How to get to it (user POV)
@@ -32,5 +34,7 @@ Preconditions:
 
 - The result is one INFO block, not one line per configuration; `--require` each `Config <name>` line the
   journey is about, or an unexpected `valid` for a bad file passes unnoticed.
+- Each fix line is tagged `[fF]` (the fix repairs the rule completely) or `[pF]` (partial fix, the rule can
+  still break). The tag comes from `ConfigurablePlugin`.
 - The section name in brackets (`[sat]`) is the configuration name the output uses.
 - `prove.sh` covers only the valid file and the min-above-max rule, not the other rules or the `[config names]` selection.
