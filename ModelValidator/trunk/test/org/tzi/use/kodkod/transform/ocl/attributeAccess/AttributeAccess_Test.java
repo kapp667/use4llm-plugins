@@ -340,4 +340,14 @@ public class AttributeAccess_Test extends OCLTest {
 		test("test42", ocl, expected);
 	}
 
+	@Test
+	public void attributeOfAnIfInADerivedAttribute() {
+		test("attributeOfAnIfInADerivedAttribute", "ada.employerName");
+	}
+
+	@Test
+	public void selectByAttributeOfAnIfInADerivedAttribute() {
+		test("selectByAttributeOfAnIfInADerivedAttribute", "Person.allInstances()->select(p | p.employerName = 'IBM')->size()");
+	}
+
 }
