@@ -1,155 +1,155 @@
 ((1 + 1) + 1)	no-value	
-(A.allInstances - B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-(A.allInstances - B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
+(A.allInstances - B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+(A.allInstances - B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
 (A.allInstances->size() + 1)	no-value	
-A.allInstances->closure(x | x.dst)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->excluding(null)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->including(null)->collect(x | (x.n + x.n))->asSet()	no-value	warn
+A.allInstances->closure(x | x.dst)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->excluding(null)->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->including(null)->collect(x | (x.n + x.n))->asSet()	no-value	
 A.allInstances->including(null)->size()	no-value	
-A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-A.allInstances->union(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->excluding(null)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->including(null)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->union(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
-B.allInstances->union(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
+A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->union(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+A.allInstances->union(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->excluding(null)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->including(null)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->intersection(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->union(A.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.d + x.d))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.d + x.n))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	
+B.allInstances->union(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	

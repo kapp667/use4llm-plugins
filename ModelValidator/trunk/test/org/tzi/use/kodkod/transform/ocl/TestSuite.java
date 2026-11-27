@@ -52,6 +52,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		KodkodCTScrollingValidateCmd_Test.class,
 		ScrollingNext_Test.class,
 		StructureCheck_Test.class,
-		ObjectDiagramExtraction_Test.class })
+		ObjectDiagramExtraction_Test.class,
+		CollectDuplicates_Test.class })
 public class TestSuite {
 }
