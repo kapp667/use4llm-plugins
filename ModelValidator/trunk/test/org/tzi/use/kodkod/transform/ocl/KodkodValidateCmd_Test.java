@@ -196,6 +196,28 @@ public class KodkodValidateCmd_Test {
 		assertTrue(output, output.contains("INFO SATISFIABLE"));
 	}
 
+	@Test
+	public void refusesMoreRequiredLinksThanTheLinkMax() throws Exception {
+		open("model L\nclass A\nend\nclass C\nend\n"
+				+ "association sub between\n  A[*] role as\n  C[*] role cs\nend\n");
+		String output = check(file("links.properties", "[links]\nA_min = 2\nA_max = 2\nA = Set{a1,a2}\n"
+				+ "C_min = 1\nC_max = 1\nC = Set{c1}\nsub = Set{(a1, c1), (a2, c1)}\nsub_min = 0\nsub_max = 1\n"));
+		assertTrue(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("sub"));
+		assertFalse(output, output.contains("SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithRequiredLinksBetweenTheLinkMinAndMax() throws Exception {
+		open("model L\nclass A\nend\nclass C\nend\n"
+				+ "association sub between\n  A[*] role as\n  C[*] role cs\nend\n");
+		String output = check(file("links.properties", "[links]\nA_min = 2\nA_max = 2\nA = Set{a1,a2}\n"
+				+ "C_min = 1\nC_max = 1\nC = Set{c1}\nsub = Set{(a1, c1), (a2, c1)}\nsub_min = 0\nsub_max = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("SATISFIABLE"));
+		assertFalse(output, output.contains("UNSATISFIABLE"));
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
