@@ -53,4 +53,9 @@ public class Flatten_Test extends OCLTest {
 		test("test7", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeFlattenedIsUndefined() {
+		test("undefinedSetOfATypeFlattenedIsUndefined", "oclUndefined(Set(Integer))->flatten()");
+	}
+
 }

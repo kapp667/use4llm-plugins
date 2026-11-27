@@ -264,4 +264,9 @@ public class Let_Test extends OCLTest {
 		test("setVariableBoundToNullEqualsAnUndefinedSet", "let s : Set(Integer) = null in s = ada.luckyNumbers");
 	}
 
+	@Test
+	public void variableBoundToAnUndefinedSetOfATypeHasNoSize() {
+		test("variableBoundToAnUndefinedSetOfATypeHasNoSize", "let s = oclUndefined(Set(Integer)) in s->size()");
+	}
+
 }

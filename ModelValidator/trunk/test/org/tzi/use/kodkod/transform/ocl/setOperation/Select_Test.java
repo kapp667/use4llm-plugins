@@ -440,4 +440,9 @@ public class Select_Test extends OCLTest {
 		test("selectionByKindFromADefinedSetKeepsItsElements", "bob.luckyNumbers->selectByKind(Integer)");
 	}
 
+	@Test
+	public void selectionByKindFromAnUndefinedSetOfATypeIsUndefined() {
+		test("selectionByKindFromAnUndefinedSetOfATypeIsUndefined", "oclUndefined(Set(Person))->selectByKind(Person)");
+	}
+
 }

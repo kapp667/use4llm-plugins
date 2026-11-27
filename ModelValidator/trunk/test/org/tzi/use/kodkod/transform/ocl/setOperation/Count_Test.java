@@ -151,4 +151,9 @@ public class Count_Test extends OCLTest {
 		test("test21", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeCountsNoElement() {
+		test("undefinedSetOfATypeCountsNoElement", "oclUndefined(Set(Integer))->count(1)");
+	}
+
 }
