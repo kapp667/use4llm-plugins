@@ -8,18 +8,22 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.tzi.kodkod.model.iface.IAssociation;
-import org.tzi.kodkod.model.iface.IAssociationClass;
-import org.tzi.kodkod.model.iface.IAttribute;
-import org.tzi.kodkod.model.iface.IClass;
-import org.tzi.kodkod.model.iface.IInvariant;
-import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.type.TypeConstants;
+import org.tzi.use.uml.mm.MAssociation;
+import org.tzi.use.uml.mm.MAssociationClass;
+import org.tzi.use.uml.mm.MAttribute;
+import org.tzi.use.uml.mm.MClass;
+import org.tzi.use.uml.mm.MClassInvariant;
+import org.tzi.use.uml.mm.MModel;
 
 /**
  * The keys of a configuration section that name something of the model. These are the
  * forms {@link PropertyConfigurationVisitor} reads; any other key of a section is unknown
  * and must be reported, not ignored.
+ * <p>
+ * The names come from the USE model, not from the transformed model: the transformation
+ * leaves out some attributes (for example of type OclAny) and stops at the first element it
+ * cannot transform, and a key of such an element names something of the model all the same.
  */
 public final class UnknownConfigurationKeys {
 
@@ -44,7 +48,7 @@ public final class UnknownConfigurationKeys {
 	/**
 	 * The keys of the section that name nothing of the model, in the order the section gives them.
 	 */
-	public static List<String> unknown(IModel model, Configuration config) {
+	public static List<String> unknown(MModel model, Configuration config) {
 		Set<String> known = knownKeys(model, config);
 		List<String> unknown = new ArrayList<String>();
 		for (Iterator<String> keys = config.getKeys(); keys.hasNext();) {
@@ -56,36 +60,37 @@ public final class UnknownConfigurationKeys {
 		return unknown;
 	}
 
-	private static Set<String> knownKeys(IModel model, Configuration config) {
+	private static Set<String> knownKeys(MModel model, Configuration config) {
 		Set<String> known = new HashSet<String>(Arrays.asList(GLOBAL_KEYS));
-		for (IAssociation association : model.associations()) {
+		for (MAssociation association : model.associations()) {
 			String name = association.name();
 			known.add(name);
 			known.add(name + PropertyEntry.linksMin);
 			known.add(name + PropertyEntry.linksMax);
 		}
-		for (IClass clazz : model.classes()) {
+		for (MClass clazz : model.classes()) {
 			String name = clazz.name();
 			known.add(name);
 			known.add(name + PropertyEntry.objMin);
 			known.add(name + PropertyEntry.objMax);
-			if (clazz instanceof IAssociationClass) {
+			if (clazz instanceof MAssociationClass) {
 				known.add(name + PropertyEntry.ASSOCIATIONCLASS);
 			}
-			for (IInvariant invariant : clazz.invariants()) {
-				known.add(invariant.qualifiedName().replaceFirst("::", "_"));
-			}
-			for (IAttribute attribute : clazz.attributes()) {
-				String prefix = attribute.owner().name() + "_" + attribute.name();
+			List<String> objects = objects(clazz, config);
+			for (MAttribute attribute : clazz.attributes()) {
+				String prefix = name + "_" + attribute.name();
 				known.add(prefix);
 				known.add(prefix + PropertyEntry.attributeDefValuesMin);
 				known.add(prefix + PropertyEntry.attributeDefValuesMax);
 				known.add(prefix + PropertyEntry.attributeColSizeMin);
 				known.add(prefix + PropertyEntry.attributeColSizeMax);
-				for (String object : objects(attribute.owner(), config)) {
+				for (String object : objects) {
 					known.add(object + "_" + attribute.name());
 				}
 			}
+		}
+		for (MClassInvariant invariant : model.classInvariants()) {
+			known.add(invariant.qualifiedName().replaceFirst("::", "_"));
 		}
 		return known;
 	}
@@ -93,13 +98,13 @@ public final class UnknownConfigurationKeys {
 	/**
 	 * The objects listed for the class and its subclasses, as the visitor reads them.
 	 */
-	private static List<String> objects(IClass clazz, Configuration config) {
+	private static List<String> objects(MClass clazz, Configuration config) {
 		List<String> objects = new ArrayList<String>();
 		addObjects(clazz.name(), config, objects);
-		if (clazz instanceof IAssociationClass) {
+		if (clazz instanceof MAssociationClass) {
 			addObjects(clazz.name() + PropertyEntry.ASSOCIATIONCLASS, config, objects);
 		}
-		for (IClass child : clazz.children()) {
+		for (MClass child : clazz.children()) {
 			objects.addAll(objects(child, config));
 		}
 		return objects;

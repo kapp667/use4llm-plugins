@@ -47,7 +47,7 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 		initialize(pluginCommand.getSession());
 		final IModel model = model();
 
-		final LoadedConfigFileManager loaded = LoadedConfigFileManager.loadEditableState(model, configFilePath);
+		final LoadedConfigFileManager loaded = LoadedConfigFileManager.loadEditableState(model, mModel, configFilePath);
 		if (loaded == null) {
 			return;
 		}
