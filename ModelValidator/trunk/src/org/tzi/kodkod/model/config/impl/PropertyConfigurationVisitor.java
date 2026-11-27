@@ -309,14 +309,23 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 		if(values.size() > 0){
 			configurator.setSpecificValues(values);
 		}
+		String minName = association.name() + PropertyEntry.linksMin;
+		String maxName = association.name() + PropertyEntry.linksMax;
+		int min;
+		int max;
 		if (association instanceof UnionAssociation) {
 			// its links follow from its subsetting associations: no default number of links
-			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, 0, false),
-					readSize(association.name() + PropertyEntry.linksMax, -1, false));
+			min = readSize(minName, 0, false);
+			max = readSize(maxName, -1, false);
 		} else {
-			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, DefaultConfigurationValues.linksPerAssocMin, false),
-					readSize(association.name() + PropertyEntry.linksMax, DefaultConfigurationValues.linksPerAssocMax, false));
+			min = readSize(minName, DefaultConfigurationValues.linksPerAssocMin, false);
+			max = readSize(maxName, DefaultConfigurationValues.linksPerAssocMax, false);
 		}
+		// Without a max key the default max applies, and the listed links still raise it.
+		if (config.containsKey(maxName) && max != -1 && max < values.size()) {
+			error(LogMessages.linksMaxBelowListedLinksError(maxName, max, values.size()));
+		}
+		configurator.setLimits(min, max);
 		association.setConfigurator(configurator);
 	}
 

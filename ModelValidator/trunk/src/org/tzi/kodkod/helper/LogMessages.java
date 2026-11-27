@@ -400,6 +400,11 @@ public final class LogMessages {
 		return "The value for " + name + " is not a number! The default value will be used.";
 	}
 
+	public static String linksMaxBelowListedLinksError(String maxName, int max, int listedLinks) {
+		return maxName + " is " + max + ", but " + listedLinks + " links are listed. Set " + maxName
+				+ " to at least " + listedLinks + ", or to -1 for no max.";
+	}
+
 	public static String realStepConfigError(double step) {
 		return "The step " + step + " is not at least " + DefaultConfigurationValues.realStepMinimum
 				+ ", the precision of the Real values of the search space.";
