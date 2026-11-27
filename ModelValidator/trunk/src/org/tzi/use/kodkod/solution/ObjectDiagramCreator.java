@@ -101,7 +101,7 @@ public class ObjectDiagramCreator {
 		MSystem mSystem = systemApi.getSystem();
 		boolean foundErrors = !mSystem.state().checkStructure(out);
 		if (foundErrors) {
-			String result = buffer.toString();
+			String report = buffer.toString();
 
 			boolean aggregationcyclefreeness = DefaultConfigurationValues.AGGREGATIONCYCLEFREENESS;
 			boolean forbiddensharing = DefaultConfigurationValues.FORBIDDENSHARING;
@@ -110,15 +110,13 @@ public class ObjectDiagramCreator {
 				forbiddensharing = ((ModelConfigurator) model.getConfigurator()).isForbiddensharing();
 			}
 
-			if (aggregationcyclefreeness) {
-				if (result.contains("cycle")) {
-					return ErrorType.STRUCTURE;
-				}
+			StructureErrors errors = new StructureErrors(report);
+			if (errors.unexpected) {
+				LOG.error(LogMessages.structureError(report));
+				return ErrorType.STRUCTURE;
 			}
-			if(forbiddensharing){
-				if (result.contains("shared")) {
-					return ErrorType.STRUCTURE;
-				}
+			if ((aggregationcyclefreeness && errors.cycle) || (forbiddensharing && errors.shared)) {
+				return ErrorType.STRUCTURE;
 			}
 		}
 
@@ -140,6 +138,44 @@ public class ObjectDiagramCreator {
 		return invariantError? ErrorType.INVARIANT : ErrorType.NONE;
 	}
 	
+	/**
+	 * The error lines of USE's structure report. A cycle and a sharing are the
+	 * errors the configuration may allow. Any other error line is unexpected,
+	 * and so is a report without a line that can be read.
+	 */
+	private static class StructureErrors {
+		private boolean unexpected;
+		private boolean cycle;
+		private boolean shared;
+
+		StructureErrors(String report) {
+			boolean inError = false;
+			for (String line : report.split("\\r?\\n")) {
+				if (line.trim().isEmpty() || line.startsWith("checking structure")
+						|| line.startsWith("checked structure")) {
+					inError = false;
+				} else if (Character.isWhitespace(line.charAt(0))) {
+					// a continuation line belongs to the error above it
+					if (!inError) {
+						unexpected = true;
+					}
+				} else if (line.contains("cycle in the part-whole hierarchy")) {
+					inError = true;
+					cycle = true;
+				} else if (line.contains(" is shared by object ")) {
+					inError = true;
+					shared = true;
+				} else {
+					inError = true;
+					unexpected = true;
+				}
+			}
+			if (!unexpected && !cycle && !shared) {
+				unexpected = true;
+			}
+		}
+	}
+
 	private Map<Relation, TupleSet> createObjects(
 			Map<Relation, TupleSet> relations) throws UseApiException {
 		Map<Relation, TupleSet> withoutClasses = new HashMap<Relation, TupleSet>(
