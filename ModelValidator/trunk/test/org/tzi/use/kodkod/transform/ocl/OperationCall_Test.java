@@ -23,4 +23,14 @@ public class OperationCall_Test extends OCLTest {
 	public void employerOfAnUndefinedPersonIsUndefined() {
 		test("employerOfAnUndefinedPersonIsUndefined", "uf.person.currentEmployer()");
 	}
+
+	@Test
+	public void setOfAnIfWithAnUndefinedConditionHasNoSize() {
+		test("setOfAnIfWithAnUndefinedConditionHasNoSize", "ada.numbersIfAlive()->size()");
+	}
+
+	@Test
+	public void setOfAnIfWithAnUndefinedConditionIsNotKnownToBeEmpty() {
+		test("setOfAnIfWithAnUndefinedConditionIsNotKnownToBeEmpty", "ada.numbersIfAlive()->isEmpty()");
+	}
 }
