@@ -326,10 +326,6 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 		return formula;
 	}
 
-	/**
-	 * True for a class type whose class and subclasses are all abstract: no
-	 * object can exist, so the attribute can only be undefined.
-	 */
 	private static boolean hasNoObjects(Type type) {
 		if (!type.isObjectType()) {
 			return false;
