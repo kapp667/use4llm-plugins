@@ -8,13 +8,6 @@
 (A.allInstances - B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
 (A.allInstances - B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
 (A.allInstances->size() + 1)	no-value	
-A.allInstances->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->closure(x | x.dst)->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->closure(x | x.dst)->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->closure(x | x.dst)->closure(x | x.dst->including(null))	value	
-A.allInstances->closure(x | x.dst)->closure(x | x.dst->including(x.src))	value	
-A.allInstances->closure(x | x.dst)->closure(x | x.src.dst)	value	
 A.allInstances->closure(x | x.dst)->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->closure(x | x.dst)->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->closure(x | x.dst)->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -23,9 +16,6 @@ A.allInstances->closure(x | x.dst)->collect(x | (x.d + x.n))->asSet()	no-value	w
 A.allInstances->closure(x | x.dst)->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->closure(x | x.dst)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->closure(x | x.dst->including(null))	value	
-A.allInstances->closure(x | x.dst->including(x.src))	value	
-A.allInstances->closure(x | x.src.dst)	value	
 A.allInstances->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -34,11 +24,6 @@ A.allInstances->collect(x | (x.d + x.n))->asSet()	no-value	warn
 A.allInstances->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->excluding(null)->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->excluding(null)->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->excluding(null)->closure(x | x.dst->including(null))	value	
-A.allInstances->excluding(null)->closure(x | x.dst->including(x.src))	value	
-A.allInstances->excluding(null)->closure(x | x.src.dst)	value	
 A.allInstances->excluding(null)->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->excluding(null)->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->excluding(null)->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -56,11 +41,6 @@ A.allInstances->including(null)->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->including(null)->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->including(null)->collect(x | (x.n + x.n))->asSet()	no-value	warn
 A.allInstances->including(null)->size()	no-value	
-A.allInstances->intersection(A.allInstances)->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->intersection(A.allInstances)->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->intersection(A.allInstances)->closure(x | x.dst->including(null))	value	
-A.allInstances->intersection(A.allInstances)->closure(x | x.dst->including(x.src))	value	
-A.allInstances->intersection(A.allInstances)->closure(x | x.src.dst)	value	
 A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->intersection(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->intersection(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -77,11 +57,6 @@ A.allInstances->intersection(B.allInstances)->collect(x | (x.d + x.n))->asSet()	
 A.allInstances->intersection(B.allInstances)->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->intersection(B.allInstances)->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->reject(x | x.oclIsTypeOf(B))->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->reject(x | x.oclIsTypeOf(B))->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->reject(x | x.oclIsTypeOf(B))->closure(x | x.dst->including(null))	value	
-A.allInstances->reject(x | x.oclIsTypeOf(B))->closure(x | x.dst->including(x.src))	value	
-A.allInstances->reject(x | x.oclIsTypeOf(B))->closure(x | x.src.dst)	value	
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -90,11 +65,6 @@ A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->reject(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->select(x | x.oclIsTypeOf(B))->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->select(x | x.oclIsTypeOf(B))->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->select(x | x.oclIsTypeOf(B))->closure(x | x.dst->including(null))	value	
-A.allInstances->select(x | x.oclIsTypeOf(B))->closure(x | x.dst->including(x.src))	value	
-A.allInstances->select(x | x.oclIsTypeOf(B))->closure(x | x.src.dst)	value	
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + 1))->asSet()	no-value	warn
@@ -103,11 +73,6 @@ A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.d + x.n))->asSet()	
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + 1))->asSet()	no-value	warn
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.d))->asSet()	no-value	warn
 A.allInstances->select(x | x.oclIsTypeOf(B))->collect(x | (x.n + x.n))->asSet()	no-value	warn
-A.allInstances->union(A.allInstances)->closure(x | A.allInstances->including(x.src))	value	
-A.allInstances->union(A.allInstances)->closure(x | B.allInstances->including(x.src))	value	
-A.allInstances->union(A.allInstances)->closure(x | x.dst->including(null))	value	
-A.allInstances->union(A.allInstances)->closure(x | x.dst->including(x.src))	value	
-A.allInstances->union(A.allInstances)->closure(x | x.src.dst)	value	
 A.allInstances->union(A.allInstances)->collect(x | (1 + x.d))->asSet()	no-value	warn
 A.allInstances->union(A.allInstances)->collect(x | (1 + x.n))->asSet()	no-value	warn
 A.allInstances->union(A.allInstances)->collect(x | (x.d + 1))->asSet()	no-value	warn
