@@ -331,13 +331,23 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 			return false;
 		}
 		IClass clazz = ((ObjectType) type).clazz();
-		if (!clazz.isAbstract()) {
+		if (canHaveObject(clazz)) {
 			return false;
 		}
 		for (IClass child : clazz.allChildren()) {
-			if (!child.isAbstract()) {
+			if (canHaveObject(child)) {
 				return false;
 			}
+		}
+		return true;
+	}
+
+	private static boolean canHaveObject(IClass clazz) {
+		if (clazz.isAbstract()) {
+			return false;
+		}
+		if (clazz.getConfigurator() instanceof ClassConfigurator) {
+			return ((ClassConfigurator) clazz.getConfigurator()).getMax() > 0;
 		}
 		return true;
 	}
