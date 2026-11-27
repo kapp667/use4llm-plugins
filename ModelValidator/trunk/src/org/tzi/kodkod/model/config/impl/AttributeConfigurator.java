@@ -300,7 +300,7 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 		}
 		
 		Formula minFormula = Formula.TRUE;
-		if (allValuesDefined) {
+		if (allValuesDefined && !hasNoObjects(attribute.type())) {
 			if (attribute.type().isSet()) {
 				minFormula = undefinedSet.in(Expression.UNIV.join(relation)).not();
 			} else {
@@ -324,6 +324,22 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 
 		LOG.debug("Quantity of " + attribute.name() + ": " + PrintHelper.prettyKodkod(formula));
 		return formula;
+	}
+
+	private static boolean hasNoObjects(Type type) {
+		if (!type.isObjectType()) {
+			return false;
+		}
+		IClass clazz = ((ObjectType) type).clazz();
+		if (!clazz.isAbstract()) {
+			return false;
+		}
+		for (IClass child : clazz.allChildren()) {
+			if (!child.isAbstract()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
