@@ -85,7 +85,6 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 			}
 			
 			set = exp.getOperation().resultType().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
-			object_type_nav = mainVisitor.isObject_type_nav();
 			
 			object = expression.in(undefined).thenElse(undefined, getAsExpression(object));
 			

@@ -192,7 +192,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				}
 				derEnd.derivedExpression().processWithVisitor(this);
 				set = !to.multiplicity().isObjectTypeEnd();
-				object_type_nav = to.multiplicity().isObjectTypeEnd();
 				
 				if(oldSelf != null){
 					variables.put(p.getName(), oldSelf);
@@ -243,7 +242,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 					set = false;
 				}
 				
-				object_type_nav = !set;
 				variables.remove("self");
 				variables.remove(p.getName());
 				if(oldSelf != null){
@@ -273,7 +271,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 			toRole = associationClassEnd(destination, association, fromRole, false);
 		}
 
-		object_type_nav = !set;
 		sourceType = exp.type();
 
 		if (fromRole == -1 || toRole == -1 || fromRole == toRole) {
@@ -287,7 +284,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		arguments.add(fromRole);
 		arguments.add(toRole);
 		arguments.add(isAssociationClass);
-		arguments.add(object_type_nav);
+		arguments.add(!set);
 
 		invokeMethod("navigation", arguments, false);
 	}

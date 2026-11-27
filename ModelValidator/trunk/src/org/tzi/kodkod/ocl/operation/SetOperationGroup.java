@@ -219,11 +219,8 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->isEmpty()
 
-	public final Expression isEmpty(Expression src, Boolean object_type_nav) {
-		if (object_type_nav)
-			return src.eq(undefined).thenElse(booleanTrue, booleanFalse);
-		else
-			return src.eq(undefined_Set).thenElse(undefined, src.no().thenElse(booleanTrue, booleanFalse));
+	public final Expression isEmpty(Expression src) {
+		return src.eq(undefined_Set).thenElse(undefined, src.no().thenElse(booleanTrue, booleanFalse));
 	}
 
 	// OCL: srcExpr->isUnique(v | bodyExpr)
@@ -264,11 +261,8 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	// OCL: srcExpr->notEmpty()
 
-	public final Expression notEmpty(Expression src, Boolean object_type_nav) {
-		if (object_type_nav)
-			return src.eq(undefined).thenElse(booleanFalse, booleanTrue);
-		else
-			return src.eq(undefined_Set).thenElse(undefined, src.some().thenElse(booleanTrue, booleanFalse));
+	public final Expression notEmpty(Expression src) {
+		return src.eq(undefined_Set).thenElse(undefined, src.some().thenElse(booleanTrue, booleanFalse));
 	}
 
 	public Expression oclAsType(Expression src, Expression cls) {
@@ -337,11 +331,8 @@ public class SetOperationGroup extends OCLOperationGroup {
 	
 	// OCL: srcExpr->size()
 
-	public final Expression size(Expression src, Boolean object_type_nav) {
-		if (object_type_nav)
-			return src.eq(undefined).thenElse(IntConstant.constant(0).toExpression(), IntConstant.constant(1).toExpression());
-		else
-			return src.eq(undefined_Set).thenElse(undefined, src.count().toExpression());
+	public final Expression size(Expression src) {
+		return src.eq(undefined_Set).thenElse(undefined, src.count().toExpression());
 	}
 
 	// OCL: srcExpr->sum()

@@ -28,19 +28,13 @@ public class OCLMethodInvoker {
 	 * @param opName
 	 * @param arguments
 	 * @param setOperation
-	 * @param object_type_nav
 	 */
-	public void invoke(String opName, List<Object> arguments, boolean setOperation, boolean object_type_nav) {
+	public void invoke(String opName, List<Object> arguments, boolean setOperation) {
 		OCLOperationLoader operationLoader = new OCLOperationLoader();
 		Method method = operationLoader.getOperationMethod(opName, arguments, setOperation);
 
 		if (method == null) {
-			arguments.add(new Boolean(object_type_nav));
-			method = operationLoader.getOperationMethod(opName, arguments, setOperation);
-
-			if (method == null) {
-				throw new TransformationException("OCL operation " + opName + " is not supported.");
-			}
+			throw new TransformationException("OCL operation " + opName + " is not supported.");
 		}
 
 		try {
