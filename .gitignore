@@ -19,4 +19,10 @@ Thumbs.db
 *.log
 
 # Claude Code session files (settings, hooks, handoffs, local skills): personal to each clone
-.claude/
+# Claude Code: ignore everything under .claude/, then allow each shared path by name
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/privacy-guard/
