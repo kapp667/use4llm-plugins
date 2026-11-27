@@ -93,6 +93,17 @@ public class Flatten_Test extends OCLTest {
 	}
 
 	@Test
+	public void nullElementOfABagIsKeptAsAnUndefinedElement() {
+		test("nullElementOfABagIsKeptAsAnUndefinedElement", "Bag{Set{1}, null}->flatten()");
+	}
+
+	@Test
+	public void undefinedResultOfCollectNestedOnASetIsKeptAsAnUndefinedElement() {
+		test("undefinedResultOfCollectNestedOnASetIsKeptAsAnUndefinedElement",
+				"Set{1,2}->collectNested(i | if i = 1 then oclUndefined(Set(Integer)) else Set{i} endif)->flatten()");
+	}
+
+	@Test
 	public void undefinedResultOfCollectNestedOnASequenceIsSkipped() {
 		test("undefinedResultOfCollectNestedOnASequenceIsSkipped",
 				"Sequence{1,2}->collectNested(i | if i = 1 then oclUndefined(Set(Integer)) else Set{i} endif)->flatten()");
@@ -106,9 +117,10 @@ public class Flatten_Test extends OCLTest {
 						+ " for a Set or a Bag source but skips it for a Sequence or an OrderedSet source.");
 	}
 
-	@Test(expected = TransformationException.class)
+	@Test
 	public void orderedSetWithAnUndefinedElementIsRefused() {
-		toKodkod(toOCLExpression("OrderedSet{OrderedSet{1}, null}->flatten()"));
+		assertRefused("OrderedSet{OrderedSet{1}, null}->flatten()",
+				"Cannot transform `OrderedSet {OrderedSet {1},null}': USE fails to flatten an ordered set that holds an undefined collection.");
 	}
 
 	@Test
