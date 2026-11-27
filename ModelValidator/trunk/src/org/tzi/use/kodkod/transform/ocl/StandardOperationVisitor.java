@@ -46,7 +46,6 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 			expArg.processWithVisitor(visitor);
 			arguments.add(visitor.getObject());
 			set = set || visitor.isSet();
-			object_type_nav = object_type_nav || visitor.isObject_type_nav();
 		}
 		
 		refuseStringOrderAndConcatenation(exp);

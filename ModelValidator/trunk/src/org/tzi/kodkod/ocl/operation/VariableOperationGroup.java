@@ -62,7 +62,8 @@ public class VariableOperationGroup extends OCLOperationGroup {
 
 		if (object_type_end) {
 			returnsSet = false;
-			return srcExpr.eq(undefined).thenElse(undefined, res);
+			// with no link, the object is undefined, as in USE, not an empty set
+			return srcExpr.eq(undefined).thenElse(undefined, res.no().thenElse(undefined, res));
 		} else {
 			returnsSet = true;
 			return srcExpr.eq(undefined).thenElse(undefined_Set, res);
