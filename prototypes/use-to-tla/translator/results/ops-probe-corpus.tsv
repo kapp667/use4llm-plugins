@@ -1,0 +1,3 @@
+model	load	operations	steps	invariants	multiplicities	postconditions	tlc_checks	depth	checks_seconds	tlc_size	distinct_states	size_seconds	operation_refusals
+holes.use	translated	5/5	7/7	0/0	2/2	0/0	violated Mult_A1_E1	6	0.9	no violation	917	1.2	
+statements.use	translated	12/18	14/20	0/0	2/2	1/1	violated Post_C1_failExit_alwaysFails	3	0.9	no violation	12277	5.1	destroy in a body; for over a sequence; new with an object name; operation call statement in a body; operation without body (pre/post only)

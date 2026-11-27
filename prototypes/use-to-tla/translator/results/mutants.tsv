@@ -1,0 +1,12 @@
+mutant	description	cases	pairs	disagree	invariant_level	object_level	in_corpus_cases	in_probe	invariants_hit
+div	Integer div and mod with TLA+ floor division instead of Java truncation	47	45512	90	36	54	0	90	3
+and	and, or, implies strict in undefined instead of USE's Kleene tables	47	45512	5351	344	5007	5079	272	28
+forall	forAll counting an undefined body as true instead of false	47	45512	536	441	95	355	181	64
+select	select keeping elements whose body is undefined	47	45512	101	19	82	0	101	1
+includes	includes/excludes on an undefined collection undefined instead of false	47	45512	130	10	120	72	58	6
+kindof	oclIsKindOf of an undefined value false instead of true (OclVoid conforms to every type)	47	45512	382	43	339	318	64	8
+excluding	including/excluding strict in the element (the first translator bug found)	47	45512	347	93	254	210	137	6
+collect	Set->collect yielding a set instead of a bag	47	45512	187	42	145	0	187	3
+navundef	navigation from an undefined object to a many-end yielding the empty set instead of undefined	47	45512	85	23	62	85	0	9
+eq	= strict in undefined instead of undefined = undefined being true	47	45512	1235	79	1156	751	484	31
+if	if with an undefined condition taking the else branch instead of being undefined	47	45512	72	21	51	0	72	1

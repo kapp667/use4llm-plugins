@@ -1,0 +1,14 @@
+class	construct	invariants	models
+W	DataType	2	1
+W-	subsets/union/redefines association	60	2
+W-	derived association end	5	2
+W-	Tuple	4	2
+W-	Real	4	3
+W-	ExpIterate	2	2
+W-	collection operation subOrderedSet on OSET	2	1
+W-	UnlimitedNatural	2	1
+W-	flattening collect on a sequence	1	1
+W-	DataType	1	1
+W-	collection operation asSequence on BAG	1	1
+P	any on an unordered collection	1	1
+P	Real	1	1

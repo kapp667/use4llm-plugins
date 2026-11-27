@@ -1,0 +1,11 @@
+translator/build/
+translator/results/run/
+translator/results/mutants/
+translator/results/dev/
+*.log
+*.time
+ops-probe/civstat.use
+ops-probe/states/
+*_TTrace_*
+decisions.tsv
+__pycache__/

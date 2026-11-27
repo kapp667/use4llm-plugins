@@ -1,0 +1,24 @@
+case	run	steps	states_compared	states_equal	use_errors	tlc_end	use_end	verdicts_compared	verdicts_agree	result	detail
+soil_civstat_civstat.use	cover-Person__birth	2	3	3	0	reached Person__birth	accepted	0	0	agree	
+soil_civstat_civstat.use	cover-Person__death	3	4	4	0	reached Person__death	accepted	0	0	agree	
+soil_civstat_civstat.use	cover-Person__divorce	6	7	7	0	reached Person__divorce	accepted	0	0	agree	
+soil_civstat_civstat.use	cover-Person__marry	5	6	6	0	reached Person__marry	accepted	0	0	agree	
+soil_civstat_civstat.use	cover-Person__test2	2	4	4	0	reached Person__test2	accepted	0	0	agree	
+soil_civstat_civstat.use	violation	1	2	2	0	invariant Person::attributesDefined	inv Person::attributesDefined; inv Person::nameCapitalThenSmallLetters	1	1	agree	
+soil_projectworld_projectworld.use	cover-Company__hire	3	4	4	0	reached Company__hire	accepted	0	0	agree	
+soil_projectworld_projectworld.use	cover-Company__start	0	0	0	0	not reached in 15681 states		0	0	not reached	
+soil_projectworld_projectworld.use	violation	1	2	2	0	multiplicity Employs::employees	mult Employs::employees	1	1	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21b.use	cover-A__op1	2	4	4	0	reached A__op1	accepted	0	0	agree	
+use-core_src_test_resources_org_tzi_use_parser_t21c.use	cover-A__op1	2	4	4	0	reached A__op1	accepted	0	0	agree	
+use-core_src_test_resources_org_tzi_use_parser_t22b.use	cover-A__op1	0	0	0	0	not reached in 5 states		0	0	not reached	
+use-gui_src_it_resources_testfiles_shell_t052.use	cover-Person__getNameSOILImplemented	2	4	4	0	reached Person__getNameSOILImplemented	accepted	0	0	agree	
+use-gui_src_it_resources_testfiles_shell_t084.use	cover-C__g	2	4	4	0	reached C__g	accepted	0	0	agree	
+use-gui_src_it_resources_testfiles_shell_t084.use	cover-C__i	0	0	0	0	not reached in 17 states		0	0	not reached	
+use-gui_src_it_resources_testfiles_shell_t084.use	violation	2	3	3	0	postcondition C::i::notOne	post notOne	1	1	agree	
+use-gui_src_it_resources_testfiles_shell_t094.use	cover-Person__marry	0	0	0	0	not reached in 5 states		0	0	not reached	
+use-gui_src_it_resources_testfiles_shell_t095.use	cover-Person__marry	0	0	0	0	not reached in 5 states		0	0	not reached	
+use-gui_src_it_resources_testfiles_shell_t105.use	cover-C__f	2	3	3	0	reached C__f	accepted	0	0	agree	
+use-gui_src_it_resources_testfiles_shell_t105.use	cover-D__f	2	3	3	0	reached D__f	accepted	0	0	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	cover-C__inc	2	3	3	0	reached C__inc	accepted	0	0	agree	
+use-gui_src_it_resources_testfiles_shell_t121.use	cover-C__inc2	0	0	0	0	not reached in 25 states		0	0	not reached	
+use-gui_src_it_resources_testfiles_shell_t121.use	violation	2	3	3	0	postcondition C::inc2::aIncremented	post aIncremented	1	1	agree	

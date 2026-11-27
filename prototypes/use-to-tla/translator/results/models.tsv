@@ -1,0 +1,215 @@
+class	case	model	source	verdict	invariants	translated	refused	pairs	disagree	excluded	use_seconds	tlc_eval_seconds	tlc_error
+V	V__Documentation_Cars_Cars.use	Documentation/Cars/Cars.use	validator	translated fully	1	1	0	42	0	0	1.81	1.53	
+-	V__Documentation_Datatypes_Currency.use	Documentation/Datatypes/Currency.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	0	1	0	0	0	1.70	1.37	
+V	V__Documentation_Demo_Demo.use	Documentation/Demo/Demo.use	validator	translated fully	4	4	0	170	0	0	2.03	1.73	
+-	V__Documentation_Fruits_Fruits.use	Documentation/Fruits/Fruits.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	5	5	0	0	0	0	1.77	1.95	
+-	V__Documentation_HowToCheckUMLAndOCLModelsWithUSE_civstat.use	Documentation/HowToCheckUMLAndOCLModelsWithUSE/civstat.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	5	4	1	0	0	0	1.82	1.80	
+V	V__Documentation_Imports_Meetings.use	Documentation/Imports/Meetings.use	validator	translated fully	1	1	0	39	0	0	1.89	1.76	
+-	V__Documentation_tollcoll_tollcoll.use	Documentation/tollcoll/tollcoll.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	3	0	0	0	0	1.96	1.54	
+-	V__Metamodels_OCL2MM_OCL2MM.use	Metamodels/OCL2MM/OCL2MM.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	0	0	0	0	0	0	2.17	1.62	
+-	V__Metamodels_UML13All_UML13All.use	Metamodels/UML13All/UML13All.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	152	152	0	0	0	0	3.61	15.55	
+-	V__Metamodels_UML13Core_UML13Core.use	Metamodels/UML13Core/UML13Core.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	43	43	0	0	0	0	2.83	3.38	
+-	V__Metamodels_UML23_UML2MM.use	Metamodels/UML23/UML2MM.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	54	15	39	0	0	0	2.89	2.78	
+-	V__Metamodels_actionsemantics_actionsemantics.use	Metamodels/actionsemantics/actionsemantics.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	192	190	2	0	0	0	3.54	20.71	
+-	V__Others_CarRental_CarRental2.use	Others/CarRental/CarRental2.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	11	10	1	0	0	0	1.71	1.82	
+-	V__Others_CarRental_CarRental3.use	Others/CarRental/CarRental3.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	12	10	2	0	0	0	2.24	2.52	
+V	V__Others_Ex_ex.use	Others/Ex/ex.use	validator	translated fully	7	7	0	298	0	0	3.00	2.20	
+-	V__Others_Grammar_Grammar.use	Others/Grammar/Grammar.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	4	3	1	0	0	0	2.40	2.03	
+-	V__Others_Lists_Lists.use	Others/Lists/Lists.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	9	9	0	0	0	0	2.06	1.93	
+-	V__Others_Project_Project.use	Others/Project/Project.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	3	0	0	0	0	1.62	1.49	
+-	V__Others_Subsets_composition_2.use	Others/Subsets/composition_2.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.78	1.55	
+-	V__Others_Sudoku_Sudoku.use	Others/Sudoku/Sudoku.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	4	4	0	0	0	0	1.48	1.59	
+-	V__Others_Tree_Tree.use	Others/Tree/Tree.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.98	1.49	
+-	V__Papers_1999_RichtersAndGogolla_OCLmetamodel.use	Papers/1999/RichtersAndGogolla/OCLmetamodel.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	2	2	0	0	0	0	1.61	1.48	
+-	V__Papers_2001_RichtersPhDThesis_EmployeeExtended_EmployeeExtended.use	Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	7	5	2	0	0	0	1.67	1.67	
+-	V__Papers_2003_Ziemann_2003_FMICS_bart.use	Papers/2003/Ziemann_2003_FMICS/bart.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	10	5	5	0	0	0	1.68	1.55	
+-	V__Papers_2005_GogollaBohlingRichters_percom.use	Papers/2005/GogollaBohlingRichters/percom.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	6	6	0	0	0	0	1.81	1.65	
+-	V__Papers_2006_GogollaBuettnerRichters_civstat.use	Papers/2006/GogollaBuettnerRichters/civstat.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	5	4	1	0	0	0	1.85	1.76	
+-	V__generator_english_train.use	generator/english/train.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	8	6	2	0	0	0	1.92	1.88	
+-	V__generator_german_zug.use	generator/german/zug.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	8	6	2	0	0	0	1.76	1.85	
+-	V__monitoring_Employee.use	monitoring/Employee.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.88	1.36	
+-	V__soil_civstat_civstat.use	soil/civstat/civstat.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	5	4	1	0	0	0	1.69	1.57	
+-	V__soil_projectworld_projectworld.use	soil/projectworld/projectworld.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	3	0	0	0	0	1.80	1.42	
+V	V__use-core_src_test_resources_org_tzi_use_parser_bug0009.use	use-core/src/test/resources/org/tzi/use/parser/bug0009.use	validator	translated fully	4	4	0	168	0	0	1.68	1.64	
+V	V__use-core_src_test_resources_org_tzi_use_parser_t11.use	use-core/src/test/resources/org/tzi/use/parser/t11.use	validator	translated fully	2	2	0	79	0	0	1.59	1.28	
+-	V__use-core_src_test_resources_org_tzi_use_parser_t12.use	use-core/src/test/resources/org/tzi/use/parser/t12.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.70		
+-	V__use-core_src_test_resources_org_tzi_use_parser_t13.use	use-core/src/test/resources/org/tzi/use/parser/t13.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.81		
+V	V__use-core_src_test_resources_org_tzi_use_parser_t15.use	use-core/src/test/resources/org/tzi/use/parser/t15.use	validator	translated fully	1	1	0	42	0	0	1.78	1.32	
+-	V__use-core_src_test_resources_org_tzi_use_parser_t16.use	use-core/src/test/resources/org/tzi/use/parser/t16.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.77		
+V	V__use-core_src_test_resources_org_tzi_use_parser_t4.use	use-core/src/test/resources/org/tzi/use/parser/t4.use	validator	translated fully	1	1	0	45	0	0	1.61	1.06	
+-	V__use-core_src_test_resources_org_tzi_use_parser_t5.use	use-core/src/test/resources/org/tzi/use/parser/t5.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.83		
+-	V__use-core_src_test_resources_org_tzi_use_parser_t6.use	use-core/src/test/resources/org/tzi/use/parser/t6.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.67		
+-	V__use-core_src_test_resources_org_tzi_use_parser_t7.use	use-core/src/test/resources/org/tzi/use/parser/t7.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.64		
+-	V__use-core_src_test_resources_org_tzi_use_parser_t9.use	use-core/src/test/resources/org/tzi/use/parser/t9.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	0	1	0	0	0	1.59	1.23	
+V	V__use-gui_src_it_resources_testfiles_shell_imports_t127_import.use	use-gui/src/it/resources/testfiles/shell/imports/t127_import.use	validator	translated fully	1	1	0	45	0	0	1.67	1.37	
+-	V__use-gui_src_it_resources_testfiles_shell_relativepath_library.use	use-gui/src/it/resources/testfiles/shell/relativepath/library.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	2	1	1	0	0	0	1.87	1.39	
+-	V__use-gui_src_it_resources_testfiles_shell_t003.use	use-gui/src/it/resources/testfiles/shell/t003.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	2	2	0	0	0	0	1.40	1.33	
+-	V__use-gui_src_it_resources_testfiles_shell_t015.use	use-gui/src/it/resources/testfiles/shell/t015.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	8	6	2	0	0	0	1.92	1.63	
+V	V__use-gui_src_it_resources_testfiles_shell_t016.use	use-gui/src/it/resources/testfiles/shell/t016.use	validator	translated fully	1	1	0	45	0	0	1.89	1.25	
+V	V__use-gui_src_it_resources_testfiles_shell_t027.use	use-gui/src/it/resources/testfiles/shell/t027.use	validator	translated fully	1	1	0	38	0	0	1.52	1.30	
+-	V__use-gui_src_it_resources_testfiles_shell_t043.use	use-gui/src/it/resources/testfiles/shell/t043.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	30	4	26	0	0	0	1.61	1.52	
+V	V__use-gui_src_it_resources_testfiles_shell_t048.use	use-gui/src/it/resources/testfiles/shell/t048.use	validator	translated fully	2	2	0	78	0	0	1.74	1.69	
+V	V__use-gui_src_it_resources_testfiles_shell_t049.use	use-gui/src/it/resources/testfiles/shell/t049.use	validator	translated fully	1	1	0	21	0	0	1.54	1.21	
+-	V__use-gui_src_it_resources_testfiles_shell_t051.use	use-gui/src/it/resources/testfiles/shell/t051.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	6	6	0	0	0	0	2.04	1.88	
+-	V__use-gui_src_it_resources_testfiles_shell_t054.use	use-gui/src/it/resources/testfiles/shell/t054.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.75	1.65	
+V	V__use-gui_src_it_resources_testfiles_shell_t075.use	use-gui/src/it/resources/testfiles/shell/t075.use	validator	translated fully	2	2	0	80	0	0	1.80	1.46	
+-	V__use-gui_src_it_resources_testfiles_shell_t078.use	use-gui/src/it/resources/testfiles/shell/t078.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	10	10	0	0	0	0	1.86	1.80	
+-	V__use-gui_src_it_resources_testfiles_shell_t082.use	use-gui/src/it/resources/testfiles/shell/t082.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	7	5	2	0	0	0	1.62	1.40	
+-	V__use-gui_src_it_resources_testfiles_shell_t085.use	use-gui/src/it/resources/testfiles/shell/t085.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.78		
+-	V__use-gui_src_it_resources_testfiles_shell_t088.use	use-gui/src/it/resources/testfiles/shell/t088.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.83		
+-	V__use-gui_src_it_resources_testfiles_shell_t093.use	use-gui/src/it/resources/testfiles/shell/t093.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.78	2.10	
+V	V__use-gui_src_it_resources_testfiles_shell_t094.use	use-gui/src/it/resources/testfiles/shell/t094.use	validator	translated fully	1	1	0	41	0	0	1.57	1.41	
+V	V__use-gui_src_it_resources_testfiles_shell_t095.use	use-gui/src/it/resources/testfiles/shell/t095.use	validator	translated fully	1	1	0	41	0	0	1.70	1.25	
+V	V__use-gui_src_it_resources_testfiles_shell_t097.use	use-gui/src/it/resources/testfiles/shell/t097.use	validator	translated fully	1	1	0	40	0	0	1.74	1.39	
+-	V__use-gui_src_it_resources_testfiles_shell_t098.use	use-gui/src/it/resources/testfiles/shell/t098.use	validator	not in corpus (exit 1, check fail, unknown objects, tla did not run)	0	0	0	0	0	0	0.81		
+-	V__use-gui_src_it_resources_testfiles_shell_t101.use	use-gui/src/it/resources/testfiles/shell/t101.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.43	1.29	
+-	V__use-gui_src_it_resources_testfiles_shell_t102.use	use-gui/src/it/resources/testfiles/shell/t102.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	30	29	1	0	0	0	1.89	2.41	
+-	V__use-gui_src_it_resources_testfiles_shell_t103.use	use-gui/src/it/resources/testfiles/shell/t103.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.60	1.34	
+V	V__use-gui_src_it_resources_testfiles_shell_t106.use	use-gui/src/it/resources/testfiles/shell/t106.use	validator	translated fully	2	2	0	84	0	0	1.75	1.05	
+-	V__use-gui_src_it_resources_testfiles_shell_t109.use	use-gui/src/it/resources/testfiles/shell/t109.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	35	34	1	0	0	0	2.11	3.67	
+-	V__use-gui_src_it_resources_testfiles_shell_t113.use	use-gui/src/it/resources/testfiles/shell/t113.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	48	16	32	0	0	0	2.47	2.52	
+-	V__use-gui_src_it_resources_testfiles_shell_t118.use	use-gui/src/it/resources/testfiles/shell/t118.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	1	1	0	0	0	0	1.65	1.62	
+-	V__use-gui_src_it_resources_testfiles_shell_t119.use	use-gui/src/it/resources/testfiles/shell/t119.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	3	0	0	0	0	2.22	1.97	
+V	V__use-gui_src_it_resources_testfiles_shell_t127.use	use-gui/src/it/resources/testfiles/shell/t127.use	validator	translated fully	2	2	0	66	0	0	2.31	1.60	
+-	V__use-gui_src_it_resources_testfiles_shell_t133_imports.use	use-gui/src/it/resources/testfiles/shell/t133_imports.use	validator	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	1	2	0	0	0	2.23	1.77	
+W-	W__Documentation_AggregationsAndCompositions_nocycle01.use	Documentation/AggregationsAndCompositions/nocycle01.use	nocycle01.cmd	no invariants	0	0	0	0	0	0	1.32	1.66	
+W-	W__Documentation_AggregationsAndCompositions_nocycle02.use	Documentation/AggregationsAndCompositions/nocycle02.use	nocycle02.cmd	no invariants	0	0	0	0	0	0	1.01	1.15	
+W-	W__Documentation_AggregationsAndCompositions_nocycle03.use	Documentation/AggregationsAndCompositions/nocycle03.use	nocycle03.cmd	no invariants	0	0	0	0	0	0	1.12	1.12	
+W-	W__Documentation_AggregationsAndCompositions_nocycle04.use	Documentation/AggregationsAndCompositions/nocycle04.use	nocycle04.cmd	no invariants	0	0	0	0	0	0	1.52	1.39	
+W-	W__Documentation_AggregationsAndCompositions_nocycle05.use	Documentation/AggregationsAndCompositions/nocycle05.use	nocycle05.cmd	no invariants	0	0	0	0	0	0	1.42	1.30	
+W-	W__Documentation_AggregationsAndCompositions_nocycle06.use	Documentation/AggregationsAndCompositions/nocycle06.use	nocycle06.cmd	no invariants	0	0	0	0	0	0	1.31	1.44	
+W-	W__Documentation_AggregationsAndCompositions_nocycle07.use	Documentation/AggregationsAndCompositions/nocycle07.use	nocycle07.cmd	no invariants	0	0	0	0	0	0	1.46	1.77	
+W-	W__Documentation_AggregationsAndCompositions_nocycle08.use	Documentation/AggregationsAndCompositions/nocycle08.use	nocycle08.cmd	no invariants	0	0	0	0	0	0	1.58	1.38	
+W-	W__Documentation_AggregationsAndCompositions_noshare01.use	Documentation/AggregationsAndCompositions/noshare01.use	noshare01.cmd	no invariants	0	0	0	0	0	0	1.33	1.48	
+W-	W__Documentation_AggregationsAndCompositions_noshare02.use	Documentation/AggregationsAndCompositions/noshare02.use	noshare02.cmd	no invariants	0	0	0	0	0	0	1.23	1.30	
+W-	W__Documentation_AggregationsAndCompositions_noshare03.use	Documentation/AggregationsAndCompositions/noshare03.use	noshare03.cmd	no invariants	0	0	0	0	0	0	1.18	1.42	
+W-	W__Documentation_AggregationsAndCompositions_noshare04.use	Documentation/AggregationsAndCompositions/noshare04.use	noshare04.cmd	no invariants	0	0	0	0	0	0	1.40	1.61	
+W-	W__Documentation_AggregationsAndCompositions_noshare05.use	Documentation/AggregationsAndCompositions/noshare05.use	noshare05.cmd	no invariants	0	0	0	0	0	0	1.33	1.56	
+W-	W__Documentation_AggregationsAndCompositions_noshare06.use	Documentation/AggregationsAndCompositions/noshare06.use	noshare06.cmd	no invariants	0	0	0	0	0	0	1.38	1.37	
+W-	W__Documentation_AggregationsAndCompositions_noshare07.use	Documentation/AggregationsAndCompositions/noshare07.use	noshare07.cmd	no invariants	0	0	0	0	0	0	1.43	1.20	
+W	W__Documentation_AssociationClass_AssociationClass.use	Documentation/AssociationClass/AssociationClass.use	AssociationClass.cmd	no invariants	0	0	0	0	0	0	1.27	1.38	
+W-	W__Documentation_Cars_Cars.use	Documentation/Cars/Cars.use	Cars.cmd	translated fully	1	1	0	62	0	0	1.43	1.53	
+W-	W__Documentation_Demo_Demo.use	Documentation/Demo/Demo.use	Demo.cmd	translated fully	4	4	0	234	0	0	1.27	1.76	
+W	W__Documentation_Employee_Employee.use	Documentation/Employee/Employee.use	Employee.cmd	no invariants	0	0	0	0	0	0	1.40	1.77	
+W	W__Documentation_Graph_Graph.use	Documentation/Graph/Graph.use	Graph.cmd	no invariants	0	0	0	0	0	0	1.53	1.30	
+W	W__Documentation_NestedOperationCalls_NestedOperationCalls.use	Documentation/NestedOperationCalls/NestedOperationCalls.use	NestedOperationCalls.cmd	no invariants	0	0	0	0	0	0	1.61	1.84	
+W-	W__Metamodels_UML23_UML2MM.use	Metamodels/UML23/UML2MM.use	UML2MM.soil	translated partially	54	15	39	394	0	0	2.48	2.52	
+W-	W__Metamodels_actionsemantics_actionsemantics.use	Metamodels/actionsemantics/actionsemantics.use	actionsemantics.cmd	translated partially	192	190	2	28711	0	0	3.98	24.79	
+W	W__Others_AB_AB.use	Others/AB/AB.use	AB.cmd	no invariants	0	0	0	0	0	0	1.60	1.44	
+W	W__Others_CallSequence_CallSequence.use	Others/CallSequence/CallSequence.use	CallSequence.cmd	no invariants	0	0	0	0	0	0	1.13	1.52	
+W-	W__Others_CarRental_CarRental2.use	Others/CarRental/CarRental2.use	CarRental2.cmd	translated partially	11	10	1	689	0	0	1.33	1.75	
+W-	W__Others_CarRental_CarRental3.use	Others/CarRental/CarRental3.use	CarRental3.cmd	translated partially	12	10	2	727	0	0	2.16	2.46	
+W	W__Others_DerivedProperties_derived.use	Others/DerivedProperties/derived.use	derived.cmd	no invariants	0	0	0	0	0	0	2.08	1.84	
+W-	W__Others_Ex_ex.use	Others/Ex/ex.use	ex.cmd	translated fully	7	7	0	404	0	0	1.76	2.23	
+W-	W__Others_Grammar_Grammar.use	Others/Grammar/Grammar.use	Grammar.cmd	translated partially	4	3	1	272	0	0	2.20	2.26	
+W	W__Others_Job_Job.use	Others/Job/Job.use	Job.cmd	no invariants	0	0	0	0	0	0	1.65	1.45	
+W-	W__Others_Lists_Lists.use	Others/Lists/Lists.use	Lists.cmd	translated fully	9	9	0	892	0	0	1.81	2.40	
+W	W__Others_Math_Math.use	Others/Math/Math.use	Math.cmd	no invariants	0	0	0	0	0	0	1.43	1.29	
+W	W__Others_MultipleInheritance_MultipleInheritance.use	Others/MultipleInheritance/MultipleInheritance.use	MultipleInheritance.cmd	no invariants	0	0	0	0	0	0	1.13	1.14	
+W	W__Others_Polygon_Polygon.use	Others/Polygon/Polygon.use	Polygon.cmd	no invariants	0	0	0	0	0	0	1.27	1.14	
+W	W__Others_RecursiveOperations_RecursiveOperations.use	Others/RecursiveOperations/RecursiveOperations.use	RecursiveOperations.cmd	no invariants	0	0	0	0	0	0	1.20	1.23	
+W	W__Others_ReflexiveAssociation_ReflexiveAssociation.use	Others/ReflexiveAssociation/ReflexiveAssociation.use	ReflexiveAssociation.cmd	no invariants	0	0	0	0	0	0	1.29	1.39	
+W	W__Others_Subsets_composition_1.use	Others/Subsets/composition_1.use	composition_1.cmd	no invariants	0	0	0	0	0	0	1.16	1.39	
+W-	W__Others_Subsets_composition_2.use	Others/Subsets/composition_2.use	composition_2.cmd	translated fully	1	1	0	39	0	0	1.43	1.41	
+W	W__Others_Subsets_missingConstraints.use	Others/Subsets/missingConstraints.use	missingConstraints.cmd	no invariants	0	0	0	0	0	0	1.02	1.30	
+W	W__Others_SwapLinks_SwapLinks.use	Others/SwapLinks/SwapLinks.use	SwapLinks.cmd	no invariants	0	0	0	0	0	0	1.09	1.41	
+W-	W__Others_Tree_Tree.use	Others/Tree/Tree.use	Tree.cmd	translated fully	1	1	0	212	0	0	1.41	1.93	
+W-	W__Papers_2001_RichtersPhDThesis_EmployeeExtended_EmployeeExtended.use	Papers/2001/RichtersPhDThesis/EmployeeExtended/EmployeeExtended.use	EmployeeExtended.cmd	translated partially	7	5	2	273	0	0	1.71	1.76	
+W	W__Papers_2001_RichtersPhDThesis_NestedOperationCalls_NestedOperationCalls.use	Papers/2001/RichtersPhDThesis/NestedOperationCalls/NestedOperationCalls.use	NestedOperationCalls.cmd	no invariants	0	0	0	0	0	0	1.49	1.32	
+P	W__probes_semantics_Probe.use	probes/semantics/Probe.use	Probe.cmd	translated partially	50	48	2	5184	0	0	1.94	3.90	
+W	W__use-gui_src_it_resources_testfiles_shell_t002.use	use-gui/src/it/resources/testfiles/shell/t002.use	t002.in	no invariants	0	0	0	0	0	0	1.14	1.25	
+W-	W__use-gui_src_it_resources_testfiles_shell_t003.use	use-gui/src/it/resources/testfiles/shell/t003.use	t003.in	translated fully	2	2	0	128	0	0	1.12	1.25	
+W	W__use-gui_src_it_resources_testfiles_shell_t004.use	use-gui/src/it/resources/testfiles/shell/t004.use	t004.in	no invariants	0	0	0	0	0	0	1.16	1.40	
+W	W__use-gui_src_it_resources_testfiles_shell_t005.use	use-gui/src/it/resources/testfiles/shell/t005.use	t005.in	no invariants	0	0	0	0	0	0	1.14	1.16	
+W	W__use-gui_src_it_resources_testfiles_shell_t006.use	use-gui/src/it/resources/testfiles/shell/t006.use	t006.in	no invariants	0	0	0	0	0	0	1.15	1.27	
+W	W__use-gui_src_it_resources_testfiles_shell_t007.use	use-gui/src/it/resources/testfiles/shell/t007.use	t007.in	no invariants	0	0	0	0	0	0	1.08	1.21	
+W	W__use-gui_src_it_resources_testfiles_shell_t008.use	use-gui/src/it/resources/testfiles/shell/t008.use	t008.in	no invariants	0	0	0	0	0	0	0.98	1.28	
+W	W__use-gui_src_it_resources_testfiles_shell_t009.use	use-gui/src/it/resources/testfiles/shell/t009.use	t009.in	no invariants	0	0	0	0	0	0	1.28	1.12	
+W	W__use-gui_src_it_resources_testfiles_shell_t010.use	use-gui/src/it/resources/testfiles/shell/t010.use	t010.in	no invariants	0	0	0	0	0	0	1.16	1.18	
+W	W__use-gui_src_it_resources_testfiles_shell_t011.use	use-gui/src/it/resources/testfiles/shell/t011.use	t011.in	no invariants	0	0	0	0	0	0	1.11	1.17	
+W-	W__use-gui_src_it_resources_testfiles_shell_t012.use	use-gui/src/it/resources/testfiles/shell/t012.use	t012.in	no invariants	0	0	0	0	0	0	1.22	1.29	
+W	W__use-gui_src_it_resources_testfiles_shell_t013.use	use-gui/src/it/resources/testfiles/shell/t013.use	t013.in	no invariants	0	0	0	0	0	0	1.02	1.04	
+W-	W__use-gui_src_it_resources_testfiles_shell_t015.use	use-gui/src/it/resources/testfiles/shell/t015.use	t015.in	translated partially	8	6	2	157	0	0	1.46	1.61	
+W-	W__use-gui_src_it_resources_testfiles_shell_t016.use	use-gui/src/it/resources/testfiles/shell/t016.use	t016.in	translated fully	1	1	0	30	0	14	1.42	1.19	
+W	W__use-gui_src_it_resources_testfiles_shell_t017.use	use-gui/src/it/resources/testfiles/shell/t017.use	t017.in	no invariants	0	0	0	0	0	0	1.10	1.22	
+-	W__use-gui_src_it_resources_testfiles_shell_t018.use	use-gui/src/it/resources/testfiles/shell/t018.use	t018.in	not in corpus (exit 0, check ok, 0 objects, tla ran)	0	0	0	0	0	0	1.22	1.12	
+W	W__use-gui_src_it_resources_testfiles_shell_t019.use	use-gui/src/it/resources/testfiles/shell/t019.use	t019.in	no invariants	0	0	0	0	0	0	1.34	1.58	
+W	W__use-gui_src_it_resources_testfiles_shell_t022.use	use-gui/src/it/resources/testfiles/shell/t022.use	t022.in	no invariants	0	0	0	0	0	0	1.27	1.41	
+W	W__use-gui_src_it_resources_testfiles_shell_t023.use	use-gui/src/it/resources/testfiles/shell/t023.use	t023.in	no invariants	0	0	0	0	0	0	1.35	1.43	
+W	W__use-gui_src_it_resources_testfiles_shell_t024.use	use-gui/src/it/resources/testfiles/shell/t024.use	t024.in	no invariants	0	0	0	0	0	0	1.29	1.27	
+W	W__use-gui_src_it_resources_testfiles_shell_t025.use	use-gui/src/it/resources/testfiles/shell/t025.use	t025.in	no invariants	0	0	0	0	0	0	1.27	1.57	
+W-	W__use-gui_src_it_resources_testfiles_shell_t028.use	use-gui/src/it/resources/testfiles/shell/t028.use	t028.in	no invariants	0	0	0	0	0	0	1.19	1.88	
+W-	W__use-gui_src_it_resources_testfiles_shell_t029.use	use-gui/src/it/resources/testfiles/shell/t029.use	t029.in	no invariants	0	0	0	0	0	0	1.21	1.63	
+W	W__use-gui_src_it_resources_testfiles_shell_t030.use	use-gui/src/it/resources/testfiles/shell/t030.use	t030.in	no invariants	0	0	0	0	0	0	1.16	1.56	
+W	W__use-gui_src_it_resources_testfiles_shell_t031.use	use-gui/src/it/resources/testfiles/shell/t031.use	t031.in	no invariants	0	0	0	0	0	0	1.21	1.08	
+W-	W__use-gui_src_it_resources_testfiles_shell_t032.use	use-gui/src/it/resources/testfiles/shell/t032.use	t032.in	no invariants	0	0	0	0	0	0	1.25	1.34	
+W-	W__use-gui_src_it_resources_testfiles_shell_t033.use	use-gui/src/it/resources/testfiles/shell/t033.use	t033.in	no invariants	0	0	0	0	0	0	1.24	1.46	
+W-	W__use-gui_src_it_resources_testfiles_shell_t034.use	use-gui/src/it/resources/testfiles/shell/t034.use	t034.in	no invariants	0	0	0	0	0	0	1.37	1.30	
+W-	W__use-gui_src_it_resources_testfiles_shell_t035.use	use-gui/src/it/resources/testfiles/shell/t035.use	t035.in	no invariants	0	0	0	0	0	0	1.46	1.41	
+W-	W__use-gui_src_it_resources_testfiles_shell_t036.use	use-gui/src/it/resources/testfiles/shell/t036.use	t036.in	no invariants	0	0	0	0	0	0	1.38	0.92	
+W-	W__use-gui_src_it_resources_testfiles_shell_t037.use	use-gui/src/it/resources/testfiles/shell/t037.use	t037.in	no invariants	0	0	0	0	0	0	1.11	1.38	
+W	W__use-gui_src_it_resources_testfiles_shell_t038.use	use-gui/src/it/resources/testfiles/shell/t038.use	t038.in	no invariants	0	0	0	0	0	0	1.09	1.13	
+W	W__use-gui_src_it_resources_testfiles_shell_t042.use	use-gui/src/it/resources/testfiles/shell/t042.use	t042.in	no invariants	0	0	0	0	0	0	1.10	1.21	
+W	W__use-gui_src_it_resources_testfiles_shell_t044.use	use-gui/src/it/resources/testfiles/shell/t044.use	t044.in	no invariants	0	0	0	0	0	0	1.27	1.41	
+W	W__use-gui_src_it_resources_testfiles_shell_t046.use	use-gui/src/it/resources/testfiles/shell/t046.use	t046.in	no invariants	0	0	0	0	0	0	1.15	1.16	
+W	W__use-gui_src_it_resources_testfiles_shell_t047.use	use-gui/src/it/resources/testfiles/shell/t047.use	t047.in	no invariants	0	0	0	0	0	0	1.23	1.26	
+W-	W__use-gui_src_it_resources_testfiles_shell_t048.use	use-gui/src/it/resources/testfiles/shell/t048.use	t048.in	translated fully	2	2	0	114	0	0	1.31	1.34	
+W-	W__use-gui_src_it_resources_testfiles_shell_t049.use	use-gui/src/it/resources/testfiles/shell/t049.use	t049.in	translated fully	1	1	0	21	0	0	1.23	1.32	
+W	W__use-gui_src_it_resources_testfiles_shell_t050.use	use-gui/src/it/resources/testfiles/shell/t050.use	t050.in	no invariants	0	0	0	0	0	0	1.18	1.06	
+W-	W__use-gui_src_it_resources_testfiles_shell_t051.use	use-gui/src/it/resources/testfiles/shell/t051.use	t051.in	translated fully	6	6	0	332	0	0	1.38	2.03	
+W	W__use-gui_src_it_resources_testfiles_shell_t052.use	use-gui/src/it/resources/testfiles/shell/t052.use	t052.in	no invariants	0	0	0	0	0	0	1.34	1.45	
+W	W__use-gui_src_it_resources_testfiles_shell_t055.use	use-gui/src/it/resources/testfiles/shell/t055.use	t055.in	no invariants	0	0	0	0	0	0	1.06	1.50	
+W-	W__use-gui_src_it_resources_testfiles_shell_t058.use	use-gui/src/it/resources/testfiles/shell/t058.use	t058.in	no invariants	0	0	0	0	0	0	1.20	1.52	
+W-	W__use-gui_src_it_resources_testfiles_shell_t059.use	use-gui/src/it/resources/testfiles/shell/t059.use	t059.in	no invariants	0	0	0	0	0	0	1.40	1.32	
+W-	W__use-gui_src_it_resources_testfiles_shell_t060.use	use-gui/src/it/resources/testfiles/shell/t060.use	t060.in	no invariants	0	0	0	0	0	0	1.12	1.14	
+W-	W__use-gui_src_it_resources_testfiles_shell_t061.use	use-gui/src/it/resources/testfiles/shell/t061.use	t061.in	no invariants	0	0	0	0	0	0	1.18	1.33	
+W-	W__use-gui_src_it_resources_testfiles_shell_t062.use	use-gui/src/it/resources/testfiles/shell/t062.use	t062.in	no invariants	0	0	0	0	0	0	1.28	1.14	
+W-	W__use-gui_src_it_resources_testfiles_shell_t063.use	use-gui/src/it/resources/testfiles/shell/t063.use	t063.in	no invariants	0	0	0	0	0	0	1.22	1.23	
+W-	W__use-gui_src_it_resources_testfiles_shell_t064.use	use-gui/src/it/resources/testfiles/shell/t064.use	t064.in	no invariants	0	0	0	0	0	0	1.13	1.33	
+W-	W__use-gui_src_it_resources_testfiles_shell_t065.use	use-gui/src/it/resources/testfiles/shell/t065.use	t065.in	no invariants	0	0	0	0	0	0	1.29	1.16	
+W-	W__use-gui_src_it_resources_testfiles_shell_t066.use	use-gui/src/it/resources/testfiles/shell/t066.use	t066.in	no invariants	0	0	0	0	0	0	1.36	1.23	
+W-	W__use-gui_src_it_resources_testfiles_shell_t067.use	use-gui/src/it/resources/testfiles/shell/t067.use	t067.in	no invariants	0	0	0	0	0	0	1.14	1.31	
+W-	W__use-gui_src_it_resources_testfiles_shell_t068.use	use-gui/src/it/resources/testfiles/shell/t068.use	t068.in	no invariants	0	0	0	0	0	0	1.18	1.32	
+W-	W__use-gui_src_it_resources_testfiles_shell_t069.use	use-gui/src/it/resources/testfiles/shell/t069.use	t069.in	no invariants	0	0	0	0	0	0	1.15	1.25	
+W-	W__use-gui_src_it_resources_testfiles_shell_t070.use	use-gui/src/it/resources/testfiles/shell/t070.use	t070.in	no invariants	0	0	0	0	0	0	1.24	1.36	
+W-	W__use-gui_src_it_resources_testfiles_shell_t071.use	use-gui/src/it/resources/testfiles/shell/t071.use	t071.in	no invariants	0	0	0	0	0	0	1.12	1.30	
+W	W__use-gui_src_it_resources_testfiles_shell_t075.use	use-gui/src/it/resources/testfiles/shell/t075.use	t075.in	translated fully	2	2	0	80	0	0	1.08	1.21	
+W	W__use-gui_src_it_resources_testfiles_shell_t076.use	use-gui/src/it/resources/testfiles/shell/t076.use	t076.in	no invariants	0	0	0	0	0	0	1.35	1.41	
+W	W__use-gui_src_it_resources_testfiles_shell_t078.use	use-gui/src/it/resources/testfiles/shell/t078.use	t078.in	translated fully	10	10	0	616	0	0	1.27	1.68	
+W	W__use-gui_src_it_resources_testfiles_shell_t081.use	use-gui/src/it/resources/testfiles/shell/t081.use	t081.in	no invariants	0	0	0	0	0	0	1.15	1.60	
+-	W__use-gui_src_it_resources_testfiles_shell_t084.use	use-gui/src/it/resources/testfiles/shell/t084.use	t084.in	not in corpus (exit 0, check fail, 2 objects, tla did not run)	0	0	0	0	0	0	1.11		
+W	W__use-gui_src_it_resources_testfiles_shell_t086.use	use-gui/src/it/resources/testfiles/shell/t086.use	t086.in	no invariants	0	0	0	0	0	0	1.35	1.79	
+W	W__use-gui_src_it_resources_testfiles_shell_t089.use	use-gui/src/it/resources/testfiles/shell/t089.use	t089.in	no invariants	0	0	0	0	0	0	1.43	1.49	
+W	W__use-gui_src_it_resources_testfiles_shell_t090.use	use-gui/src/it/resources/testfiles/shell/t090.use	t090.in	no invariants	0	0	0	0	0	0	1.65	1.87	
+W	W__use-gui_src_it_resources_testfiles_shell_t092.use	use-gui/src/it/resources/testfiles/shell/t092.use	t092.in	no invariants	0	0	0	0	0	0	1.46	1.34	
+W	W__use-gui_src_it_resources_testfiles_shell_t094.use	use-gui/src/it/resources/testfiles/shell/t094.use	t094.in	translated fully	1	1	0	84	0	0	1.34	1.95	
+-	W__use-gui_src_it_resources_testfiles_shell_t095.use	use-gui/src/it/resources/testfiles/shell/t095.use	t095.in	not in corpus (exit 0, check fail, 3 objects, tla did not run)	0	0	0	0	0	0	1.21		
+W	W__use-gui_src_it_resources_testfiles_shell_t096.use	use-gui/src/it/resources/testfiles/shell/t096.use	t096.in	no invariants	0	0	0	0	0	0	1.13	1.33	
+W	W__use-gui_src_it_resources_testfiles_shell_t099.use	use-gui/src/it/resources/testfiles/shell/t099.use	t099.in	no invariants	0	0	0	0	0	0	1.24	1.41	
+W	W__use-gui_src_it_resources_testfiles_shell_t100.use	use-gui/src/it/resources/testfiles/shell/t100.use	t100.in	no invariants	0	0	0	0	0	0	1.30	1.31	
+W-	W__use-gui_src_it_resources_testfiles_shell_t101.use	use-gui/src/it/resources/testfiles/shell/t101.use	t101.in	translated fully	1	1	0	105	0	0	12.62	17.59	
+W	W__use-gui_src_it_resources_testfiles_shell_t105.use	use-gui/src/it/resources/testfiles/shell/t105.use	t105.in	no invariants	0	0	0	0	0	0	1.28	1.21	
+W	W__use-gui_src_it_resources_testfiles_shell_t107.use	use-gui/src/it/resources/testfiles/shell/t107.use	t107.in	no invariants	0	0	0	0	0	0	1.23	1.23	
+W-	W__use-gui_src_it_resources_testfiles_shell_t109.use	use-gui/src/it/resources/testfiles/shell/t109.use	t109.in	translated partially	35	34	1	2777	0	0	1.73	4.35	
+W	W__use-gui_src_it_resources_testfiles_shell_t111.use	use-gui/src/it/resources/testfiles/shell/t111.use	t111.in	no invariants	0	0	0	0	0	0	1.44	2.05	
+W	W__use-gui_src_it_resources_testfiles_shell_t112.use	use-gui/src/it/resources/testfiles/shell/t112.use	t112.in	no invariants	0	0	0	0	0	0	1.72	1.36	
+W-	W__use-gui_src_it_resources_testfiles_shell_t113.use	use-gui/src/it/resources/testfiles/shell/t113.use	t113.in	translated partially	48	16	32	1277	0	0	4.74	2.59	
+W-	W__use-gui_src_it_resources_testfiles_shell_t114.use	use-gui/src/it/resources/testfiles/shell/t114.use	t114.in	no invariants	0	0	0	0	0	0	1.49	1.50	
+W-	W__use-gui_src_it_resources_testfiles_shell_t115.use	use-gui/src/it/resources/testfiles/shell/t115.use	t115.in	no invariants	0	0	0	0	0	0	1.56	1.33	
+W-	W__use-gui_src_it_resources_testfiles_shell_t116.use	use-gui/src/it/resources/testfiles/shell/t116.use	t116.in	no invariants	0	0	0	0	0	0	1.29	1.48	
+W	W__use-gui_src_it_resources_testfiles_shell_t118.use	use-gui/src/it/resources/testfiles/shell/t118.use	t118.in	translated fully	1	1	0	111	0	0	1.14	1.47	
+-	W__use-gui_src_it_resources_testfiles_shell_t119.use	use-gui/src/it/resources/testfiles/shell/t119.use	t119.in	not in corpus (exit 0, check ok, 0 objects, tla ran)	3	3	0	0	0	0	1.48	1.51	
+W	W__use-gui_src_it_resources_testfiles_shell_t120.use	use-gui/src/it/resources/testfiles/shell/t120.use	t120.in	no invariants	0	0	0	0	0	0	1.58	1.63	
+-	W__use-gui_src_it_resources_testfiles_shell_t121.use	use-gui/src/it/resources/testfiles/shell/t121.use	t121.in	not in corpus (exit 0, check fail, 1 objects, tla did not run)	0	0	0	0	0	0	1.30		
+W-	W__use-gui_src_it_resources_testfiles_shell_t122.use	use-gui/src/it/resources/testfiles/shell/t122.use	t122.in	no invariants	0	0	0	0	0	0	1.54	1.93	
+W	W__use-gui_src_it_resources_testfiles_shell_t123.use	use-gui/src/it/resources/testfiles/shell/t123.use	t123.in	no invariants	0	0	0	0	0	0	1.61	1.58	
+W	W__use-gui_src_it_resources_testfiles_shell_t124.use	use-gui/src/it/resources/testfiles/shell/t124.use	t124.in	no invariants	0	0	0	0	0	0	0.98	1.58	
+W	W__use-gui_src_it_resources_testfiles_shell_t125.use	use-gui/src/it/resources/testfiles/shell/t125.use	t125.in	no invariants	0	0	0	0	0	0	1.53	1.66	
+W	W__use-gui_src_it_resources_testfiles_shell_t126.use	use-gui/src/it/resources/testfiles/shell/t126.use	t126.in	no invariants	0	0	0	0	0	0	1.51	1.51	
+W	W__use-gui_src_it_resources_testfiles_shell_t127.use	use-gui/src/it/resources/testfiles/shell/t127.use	t127.in	translated fully	2	2	0	79	0	0	1.48	1.88	
+W	W__use-gui_src_it_resources_testfiles_shell_t128.use	use-gui/src/it/resources/testfiles/shell/t128.use	t128.in	no invariants	0	0	0	0	0	0	1.79	1.71	
+-	W__use-gui_src_it_resources_testfiles_shell_t129.use	use-gui/src/it/resources/testfiles/shell/t129.use	t129.in	not in corpus (exit 0, check ok, 0 objects, tla ran)	0	0	0	0	0	0	1.36	1.45	
+-	W__use-gui_src_it_resources_testfiles_shell_t130.use	use-gui/src/it/resources/testfiles/shell/t130.use	t130.in	not in corpus (exit 0, check ok, 0 objects, tla ran)	0	0	0	0	0	0	1.38	1.73	
+W	W__use-gui_src_it_resources_testfiles_shell_t131.use	use-gui/src/it/resources/testfiles/shell/t131.use	t131.in	no invariants	0	0	0	0	0	0	1.32	1.60	
+W	W__use-gui_src_it_resources_testfiles_shell_t132.use	use-gui/src/it/resources/testfiles/shell/t132.use	t132.in	no invariants	0	0	0	0	0	0	1.34	1.47	
+W	W__use-gui_src_it_resources_testfiles_shell_t133_imports.use	use-gui/src/it/resources/testfiles/shell/t133_imports.use	t133_imports.in	translated partially	3	1	2	46	0	0	1.47	1.90	

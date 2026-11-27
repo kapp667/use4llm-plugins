@@ -1,0 +1,18 @@
+construct	invariants	models
+(models with invariants)	831	64
+(translated)	701	41 fully, 21 partially, 2 none
+subsets/union/redefines association	60	2
+any on an unordered collection	27	3
+Real	7	5
+collection operation subOrderedSet on OSET	6	3
+String operation substring	5	5
+derived association end	5	2
+Tuple	5	3
+DataType	4	3
+query operation with pre/postconditions	3	1
+ExpIterate	2	2
+UnlimitedNatural	2	1
+flattening collect on a sequence	1	1
+ExpIsKindOf on non-object	1	1
+OclAny-typed expression	1	1
+collection operation asSequence on BAG	1	1

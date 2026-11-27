@@ -1,0 +1,69 @@
+construct	cases	by_class
+ExpAllInstances	47	P:1 V:19 W:6 W-:21
+ExpForAll	47	P:1 V:19 W:6 W-:21
+ExpVariable	40	P:1 V:13 W:5 W-:21
+ExpAttrOp	30	P:1 V:10 W:3 W-:16
+ExpNavigation	30	P:1 V:7 W:4 W-:18
+ExpConstInteger	22	P:1 V:8 W:2 W-:11
+ExpStdOp:size	20	P:1 V:4 W:3 W-:12
+ExpStdOp:<=	18	P:1 V:6 W:3 W-:8
+ExpStdOp:=	17	P:1 V:4 W:2 W-:10
+ExpStdOp:implies	14	P:1 V:3 W:1 W-:9
+ExpStdOp:>=	12	P:1 V:4 W-:7
+ExpConstBoolean	11	V:6 W:1 W-:4
+ExpObjOp	11	P:1 V:3 W:1 W-:6
+ExpSetLiteral	11	P:1 V:2 W:2 W-:6
+ExpStdOp:>	11	P:1 V:2 W:1 W-:7
+ExpStdOp:notEmpty	10	P:1 V:1 W-:8
+ExpExists	9	P:1 V:2 W:1 W-:5
+ExpStdOp:<>	9	P:1 W:1 W-:7
+ExpStdOp:includes	9	P:1 W-:8
+ExpStdOp:includesAll	9	V:2 W-:7
+ExpStdOp:and	8	P:1 W:1 W-:6
+ExpStdOp:isDefined	8	P:1 V:1 W-:6
+ExpStdOp:not	8	P:1 W:1 W-:6
+ExpStdOp:or	8	P:1 V:1 W:1 W-:5
+ExpCollect	6	P:1 W-:5
+ExpIf	6	P:1 W-:5
+ExpStdOp:asSet	6	P:1 W-:5
+ExpStdOp:isEmpty	6	P:1 W-:5
+ExpConstEnum	5	P:1 V:1 W:1 W-:2
+ExpObjAsSet	5	W-:5
+ExpSelect	5	P:1 W-:4
+ExpStdOp:xor	5	P:1 W-:4
+ExpUndefined	5	P:1 V:2 W:2
+ExpStdOp:<	4	P:1 W-:3
+ExpStdOp:excludes	4	P:1 W:1 W-:2
+ExpStdOp:excluding	4	P:1 V:2 W:1
+ExpStdOp:including	4	P:1 W-:3
+ExpStdOp:isUndefined	4	P:1 W-:3
+ExpStdOp:union	4	W-:4
+ExpAsType	3	P:1 W-:2
+ExpConstString	3	P:1 W:1 W-:1
+ExpEmptyCollection	3	W-:3
+ExpIsKindOf	3	P:1 W-:2
+ExpSequenceLiteral	3	P:1 W-:2
+ExpStdOp:+	3	P:1 V:1 W:1
+ExpStdOp:-	3	P:1 W:1 W-:1
+ExpStdOp:at	3	P:1 W:1 W-:1
+ExpStdOp:flatten	3	W-:3
+ExpStdOp:intersection	3	W-:3
+ExpClosure	2	P:1 W:1
+ExpIsTypeOf	2	P:1 W-:1
+ExpIsUnique	2	P:1 W-:1
+ExpLet	2	P:1 W-:1
+ExpReject	2	P:1 W-:1
+ExpStdOp:asBag	2	W-:2
+ExpStdOp:count	2	P:1 W-:1
+ExpStdOp:last	2	P:1 W-:1
+ExpNavigationClassifierSource	1	W-:1
+ExpOne	1	P:1
+ExpStdOp:*	1	P:1
+ExpStdOp:append	1	W-:1
+ExpStdOp:concat	1	P:1
+ExpStdOp:div	1	P:1
+ExpStdOp:excludesAll	1	W-:1
+ExpStdOp:first	1	P:1
+ExpStdOp:mod	1	P:1
+ExpStdOp:prepend	1	W-:1
+ExpStdOp:sum	1	P:1

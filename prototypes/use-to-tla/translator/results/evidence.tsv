@@ -1,0 +1,7 @@
+class	models	distinct_invariants	inv_true	inv_false	inv_undefined	inv_error	obj_true	obj_false	obj_undefined	obj_error
+# cells: agree/disagree pairs by USE's value
+W	6	17	301/0	56/0	0/0	0/0	600/0	46/0	13/0	0/0
+W-	21	325	6119/0	696/0	0/0	10/0	29302/0	1381/0	342/0	0/0
+V	19	36	546/0	210/0	0/0	0/0	476/0	95/0	135/0	0/0
+P	1	48	382/0	626/0	0/0	0/0	2480/0	1197/0	499/0	0/0
+W+W-+V distinct	37	357								

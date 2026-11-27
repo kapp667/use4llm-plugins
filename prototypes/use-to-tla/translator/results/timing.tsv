@@ -1,0 +1,48 @@
+class	case	translated_invariants	objects_S0	tlc_eval_seconds	tlc_mc_seconds	tlc_viol_seconds	plugin_use_ms	plugin_translate_ms
+V	V__Documentation_Cars_Cars.use	1	1	1.53	1.30	1.42	23	24
+V	V__Documentation_Demo_Demo.use	4	3	1.73	1.66	1.76	45	39
+V	V__Documentation_Imports_Meetings.use	1	1	1.76	1.44	1.54	35	19
+V	V__Others_Ex_ex.use	7	3	2.20	2.10	1.56	50	81
+V	V__use-core_src_test_resources_org_tzi_use_parser_bug0009.use	4	1	1.64	1.25	1.27	33	46
+V	V__use-core_src_test_resources_org_tzi_use_parser_t11.use	2	2	1.28	1.22		58	21
+V	V__use-core_src_test_resources_org_tzi_use_parser_t15.use	1	2	1.32	1.09	1.32	18	15
+V	V__use-core_src_test_resources_org_tzi_use_parser_t4.use	1	1	1.06	1.36		19	21
+V	V__use-gui_src_it_resources_testfiles_shell_imports_t127_import.use	1	1	1.37	1.30		23	13
+V	V__use-gui_src_it_resources_testfiles_shell_t016.use	1	2	1.25	1.17	1.10	36	41
+V	V__use-gui_src_it_resources_testfiles_shell_t027.use	1	2	1.30	1.32		12	9
+V	V__use-gui_src_it_resources_testfiles_shell_t048.use	2	1	1.69	1.49	1.28	12	13
+V	V__use-gui_src_it_resources_testfiles_shell_t049.use	1	1	1.21	1.09	1.60	27	15
+V	V__use-gui_src_it_resources_testfiles_shell_t075.use	2	1	1.46	1.27	1.30	41	38
+V	V__use-gui_src_it_resources_testfiles_shell_t094.use	1	1	1.41	1.31		18	33
+V	V__use-gui_src_it_resources_testfiles_shell_t095.use	1	1	1.25	1.28		28	48
+V	V__use-gui_src_it_resources_testfiles_shell_t097.use	1	3	1.39	1.37	1.30	31	36
+V	V__use-gui_src_it_resources_testfiles_shell_t106.use	2	1	1.05	1.28		28	11
+V	V__use-gui_src_it_resources_testfiles_shell_t127.use	2	1	1.60	1.76		58	15
+W-	W__Documentation_Cars_Cars.use	1	2	1.53	1.38	1.60	13	26
+W-	W__Documentation_Demo_Demo.use	4	5	1.76	1.50	1.86	75	75
+W-	W__Metamodels_UML23_UML2MM.use	15	2	2.52	2.16	1.82	217	220
+W-	W__Metamodels_actionsemantics_actionsemantics.use	190	99	24.79	5.08	4.99	580	410
+W-	W__Others_CarRental_CarRental2.use	10	13	1.75	1.66	1.53	99	81
+W-	W__Others_CarRental_CarRental3.use	10	15	2.46	2.11	2.04	178	119
+W-	W__Others_Ex_ex.use	7	5	2.23	1.94	2.22	129	60
+W-	W__Others_Grammar_Grammar.use	3	19	2.26	1.77	1.79	135	126
+W-	W__Others_Lists_Lists.use	9	9	2.40	1.61	1.59	206	128
+W-	W__Others_Subsets_composition_2.use	1	3	1.41	1.45	1.38	42	161
+W-	W__Others_Tree_Tree.use	1	9	1.93	1.49	1.65	148	101
+W-	W__Papers_2001_RichtersPhDThesis_EmployeeExtended_EmployeeExtended.use	5	5	1.76	1.46	1.54	75	69
+P	W__probes_semantics_Probe.use	48	4	3.90	1.83	1.72	218	154
+W-	W__use-gui_src_it_resources_testfiles_shell_t003.use	2	3	1.25	1.32	1.23	40	51
+W-	W__use-gui_src_it_resources_testfiles_shell_t015.use	6	1	1.61	1.51	1.39	31	88
+W-	W__use-gui_src_it_resources_testfiles_shell_t016.use	1	3	1.19	1.24	1.25	34	38
+W-	W__use-gui_src_it_resources_testfiles_shell_t048.use	2	2	1.34	1.14	1.52	45	12
+W-	W__use-gui_src_it_resources_testfiles_shell_t049.use	1	4	1.32	1.27	1.33	30	29
+W-	W__use-gui_src_it_resources_testfiles_shell_t051.use	6	15	2.03	1.62	1.84	41	30
+W	W__use-gui_src_it_resources_testfiles_shell_t075.use	2	1	1.21	1.23	1.42	35	26
+W	W__use-gui_src_it_resources_testfiles_shell_t078.use	10	7	1.68	1.46	1.68	32	34
+W	W__use-gui_src_it_resources_testfiles_shell_t094.use	1	3	1.95	1.60		42	80
+W-	W__use-gui_src_it_resources_testfiles_shell_t101.use	1	5967	17.59	16.17		1255	1042
+W-	W__use-gui_src_it_resources_testfiles_shell_t109.use	34	23	4.35	2.67	2.67	226	184
+W-	W__use-gui_src_it_resources_testfiles_shell_t113.use	16	34	2.59	2.08	1.87	2417	345
+W	W__use-gui_src_it_resources_testfiles_shell_t118.use	1	4	1.47	1.53		35	72
+W	W__use-gui_src_it_resources_testfiles_shell_t127.use	2	1	1.88	1.58		28	14
+W	W__use-gui_src_it_resources_testfiles_shell_t133_imports.use	1	11	1.90	1.88	1.99	71	56

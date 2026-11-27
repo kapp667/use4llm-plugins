@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?use version="3.1.0"?>
+<plugin name="Use2TlaPlugin" version="0.1">
+	<commands>
+		<command shellcmd="tla"
+			label="tla"
+			help="Usage: tla 'outdir' [K] [seed]; writes K mutated states of the current state, USE's invariant values on them, and a TLA+ translation of the model's invariants and states to 'outdir'."
+			class="org.tzi.use.plugin.tla.TlaCommand"
+			id="org.tzi.use.plugin.tla.TlaCommand">
+		</command>
+		<command shellcmd="tlaops"
+			label="tlaops"
+			help="Usage: tlaops (settings file | default) 'outdir' [module]; translates the operations of the model under the settings into a TLA+ specification for TLC."
+			class="org.tzi.use.plugin.tla.TlaOpsCommand"
+			id="org.tzi.use.plugin.tla.TlaOpsCommand">
+		</command>
+		<command shellcmd="infotla"
+			label="infotla"
+			help="Usage: infotla 'file' 'label' [expr ;; expr ...]; appends the label, the current state in the state shape of tlaops and the value of each expression to 'file'. Runs while an evaluation is paused."
+			class="org.tzi.use.plugin.tla.InfoTlaCommand"
+			id="org.tzi.use.plugin.tla.InfoTlaCommand">
+		</command>
+	</commands>
+</plugin>
