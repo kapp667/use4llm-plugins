@@ -39,6 +39,10 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 
 	/**
 	 * Enrich the given model with the information of the object diagram.
+	 *
+	 * @throws IllegalStateException
+	 *             if the extraction fails. The model then holds only a part of
+	 *             the object diagram, so the caller must not validate it.
 	 */
 	@Override
 	public void enrichModel(MSystem mSystem,IModel model) {
@@ -46,14 +50,10 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 			MSystemState systemState = mSystem.state();
 			extractObjects(model, systemState);
 			extractLinks(model, systemState);
-			LOG.info(LogMessages.objDiagramExtractionSuccessful);			
 		} catch (Exception e) {
-			if (LOG.isDebugEnabled()) {
-				LOG.error(LogMessages.objDiagramExtractionError);
-			} else {
-				LOG.error(LogMessages.objDiagramExtractionError + " " + e);
-			}
+			throw new IllegalStateException(LogMessages.objDiagramExtractionError, e);
 		}
+		LOG.info(LogMessages.objDiagramExtractionSuccessful);
 	}
 
 	/**

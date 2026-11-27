@@ -10,7 +10,7 @@ USE's current state.
 - `validate-unsat` reports `UNSATISFIABLE` when no diagram fits the bounds.
 - `validate-default` with no argument writes `<model>.properties` beside the model and solves with it.
 - `validate-section` picks a named configuration section of a properties file.
-- `validate-refuse` (not verified) is the expected refusal of an invalid configuration before any search.
+- `validate-refuse` is the expected refusal of an invalid configuration before any search.
 
 ## How to get to it (user POV)
 
@@ -31,13 +31,21 @@ Preconditions:
   `info state` with `Person : 1` and `Pet : 1`, and `checked 2 invariants ..., 0 failures.` Judge prints `PASS`.
 - **UNSAT.** Run `scripts/drive.sh <work> fixtures/pets.use fixtures/validate-unsat.cmd <evidence>/validate-unsat`,
   then `scripts/judge.sh <evidence>/validate-unsat --expect UNSAT`. The transcript has
-  `INFO: TRIVIALLY_UNSATISFIABLE` and an `INFO: Unsatisfiable proof:` line.- **Wrong verdict is loud.** `scripts/judge.sh <evidence>/validate-unsat --expect SAT` must exit 1 with
+  `INFO: TRIVIALLY_UNSATISFIABLE` and an `INFO: Unsatisfiable proof:` line.
+- **Wrong verdict is loud.** `scripts/judge.sh <evidence>/validate-unsat --expect SAT` must exit 1 with
   `FAIL: expected verdict SAT, got UNSAT`. `scripts/prove.sh` runs this control.
 - **Default bounds.** Write a command file with `mv -validate`, `info state`, `check`, `exit`. The file
   `pets.properties` appears in `<evidence>/<name>/run`. Judge with `--expect SAT` or `--expect UNSAT` as the
   model dictates; on Pets the default gives UNSAT (see Gotchas), so `--expect UNSAT` is the right answer.
-- **Refusal.** Not covered by `prove.sh`. Run `mv -validate pets-badbounds.properties` and read the
-  transcript. `mv -vc` names the broken rule and is verified (see `validate-config.md`).
+- **Refusal.** Run `mv -validate pets-badbounds.properties`. A configuration that breaks a stopping rule is
+  refused before any search, with two `ERROR` lines and no verdict (measured with `mv -validate pets-badbounds.properties` on the Pets fixture):
+  `ERROR: The configuration breaks these rules. mv -vc also reports rules that do not stop the search.` followed
+  by the rule, its values and the fixes, then
+  `ERROR: Error while reading .properties file. The model validator does not search with this configuration.`
+  `mv -vc` names the broken rule too (see `validate-config.md`).
+- **Other refusals.** These also end with an `ERROR` and no verdict. An object diagram extraction that fails
+  (`AbstractPlugin.enrichModel`). Elements the translation cannot transform (`KodkodModelValidator`). An
+  `<assoc>_max` below the number of listed links (`PropertyConfigurationVisitor`).
 
 ## Gotchas
 

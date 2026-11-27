@@ -180,6 +180,13 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 			configurator.setSpecificValues(specificValues);
 		}
 
+		if (type.isReal()) {
+			setRealRange(type, (RealConfigurator) configurator);
+			type.setConfigurator(configurator);
+			super.visitConfigurableType(type);
+			return;
+		}
+
 		int min;
 		int max;
 		int defaultMin;
@@ -196,12 +203,6 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 			
 			defaultMin = DefaultConfigurationValues.stringMin;
 			defaultMax = DefaultConfigurationValues.stringMax;
-		} else if (type.isReal()) {
-			min = readSizeDouble(type.name() + PropertyEntry.realValuesMin, Integer.MIN_VALUE, true);
-			max = readSizeDouble(type.name() + PropertyEntry.realValuesMax, Integer.MIN_VALUE, true);
-			
-			defaultMin = (int) DefaultConfigurationValues.realMin;
-			defaultMax = (int) DefaultConfigurationValues.realMax;
 		}
 		else {
 			error("Unknown Configurable Type");
@@ -309,14 +310,23 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 		if(values.size() > 0){
 			configurator.setSpecificValues(values);
 		}
+		String minName = association.name() + PropertyEntry.linksMin;
+		String maxName = association.name() + PropertyEntry.linksMax;
+		int min;
+		int max;
 		if (association instanceof UnionAssociation) {
 			// its links follow from its subsetting associations: no default number of links
-			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, 0, false),
-					readSize(association.name() + PropertyEntry.linksMax, -1, false));
+			min = readSize(minName, 0, false);
+			max = readSize(maxName, -1, false);
 		} else {
-			configurator.setLimits(readSize(association.name() + PropertyEntry.linksMin, DefaultConfigurationValues.linksPerAssocMin, false),
-					readSize(association.name() + PropertyEntry.linksMax, DefaultConfigurationValues.linksPerAssocMax, false));
+			min = readSize(minName, DefaultConfigurationValues.linksPerAssocMin, false);
+			max = readSize(maxName, DefaultConfigurationValues.linksPerAssocMax, false);
 		}
+		// Without a max key the default max applies, and the listed links still raise it.
+		if (config.containsKey(maxName) && max != -1 && max < values.size()) {
+			error(LogMessages.linksMaxBelowListedLinksError(maxName, max, values.size()));
+		}
+		configurator.setLimits(min, max);
 		association.setConfigurator(configurator);
 	}
 
@@ -339,20 +349,36 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 		return limit;
 	}
 	
-	private int readSizeDouble(String name, int errorValue, boolean allowNegative) {
-		int limit = 0;
+	/**
+	 * Sets the Real bounds as the file gives them. A bound the file does not set takes its default.
+	 */
+	private void setRealRange(ConfigurableType type, RealConfigurator configurator) {
+		double min = readRealBound(type.name() + PropertyEntry.realValuesMin);
+		double max = readRealBound(type.name() + PropertyEntry.realValuesMax);
+		if (Double.isNaN(min) && Double.isNaN(max)) {
+			return;
+		}
+		if (Double.isNaN(min)) {
+			min = DefaultConfigurationValues.realMin;
+		}
+		if (Double.isNaN(max)) {
+			max = DefaultConfigurationValues.realMax;
+		}
+		configurator.setRealRange(min, max);
+	}
+
+	/**
+	 * Reads a Real bound without rounding. Returns NaN when the file does not set a number.
+	 */
+	private double readRealBound(String name) {
 		try {
-			limit = (int) Math.round(config.getDouble(name));
-			if (!allowNegative && limit < -1) {
-				limit = 0;
-			}
+			return config.getDouble(name);
 		} catch (ConversionException e) {
 			warning(name + ": " + LogMessages.sizeConfigWarning(name));
-			limit = errorValue;
+			return Double.NaN;
 		} catch (NoSuchElementException e) {
-			limit = errorValue;
+			return Double.NaN;
 		}
-		return limit;
 	}
 
 	/**

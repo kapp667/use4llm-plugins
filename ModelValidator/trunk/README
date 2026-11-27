@@ -55,3 +55,12 @@ target type is a collection, as in Set{1, 2}->oclIsKindOf(Set(Integer)) or
 value, which it computes for a collection from its elements. The plugin does not
 compute that type. A test on each element, such as
 Set{1, 2}->forAll(x | x.oclIsKindOf(Integer)), is translated.
+
+Origin of mv -vc
+
+The rules that mv -vc checks, their messages and the command come from the
+configuration checker of ModelValidator 5.2.0, written at the University of
+Bremen like the rest of this plugin. Its source is not published upstream. The
+copy used is use-validator/src/main/java in the GitHub repository
+vune0210/Use_web at commit fc89009. The tests of this repository check each rule
+that the plugin keeps.

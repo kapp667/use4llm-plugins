@@ -180,6 +180,79 @@ public class KodkodValidateCmd_Test {
 		assertTrue(output, output.contains("SATISFIABLE"));
 	}
 
+	@Test
+	public void keepsTheAttributeMaxWhenEveryObjectHasAValue() throws Exception {
+		open("model D\nclass C\nattributes\n  x : Integer\nend\n");
+		String output = check(file("alldefined.properties", "[alldefined]\nInteger_min = 1\nInteger_max = 1\nC_min = 2\nC_max = 2\nC_x_min = -1\nC_x_max = 1\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO UNSATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWhenTheAttributeMaxAllowsEveryObjectAValue() throws Exception {
+		open("model D\nclass C\nattributes\n  x : Integer\nend\n");
+		String output = check(file("alldefined.properties", "[alldefined]\nInteger_min = 1\nInteger_max = 1\nC_min = 2\nC_max = 2\nC_x_min = -1\nC_x_max = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
+	@Test
+	public void refusesMoreRequiredLinksThanTheLinkMax() throws Exception {
+		open("model L\nclass A\nend\nclass C\nend\n"
+				+ "association sub between\n  A[*] role as\n  C[*] role cs\nend\n");
+		String output = check(file("links.properties", "[links]\nA_min = 2\nA_max = 2\nA = Set{a1,a2}\n"
+				+ "C_min = 1\nC_max = 1\nC = Set{c1}\nsub = Set{(a1, c1), (a2, c1)}\nsub_min = 0\nsub_max = 1\n"));
+		assertTrue(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("sub"));
+		assertFalse(output, output.contains("SATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWithRequiredLinksBetweenTheLinkMinAndMax() throws Exception {
+		open("model L\nclass A\nend\nclass C\nend\n"
+				+ "association sub between\n  A[*] role as\n  C[*] role cs\nend\n");
+		String output = check(file("links.properties", "[links]\nA_min = 2\nA_max = 2\nA = Set{a1,a2}\n"
+				+ "C_min = 1\nC_max = 1\nC = Set{c1}\nsub = Set{(a1, c1), (a2, c1)}\nsub_min = 0\nsub_max = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("SATISFIABLE"));
+		assertFalse(output, output.contains("UNSATISFIABLE"));
+	}
+
+	@Test
+	public void keepsARealBoundThatIsNotAnInteger() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Real\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 0.4\nReal_max = 0.4\nReal_step = 0.5\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = -1\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, "0.4", realValue());
+	}
+
+	private String realValue() {
+		return session.system().state().allObjects().iterator().next().state(session.system().state())
+				.attributeValue("r").toString();
+	}
+
+	@Test
+	public void solvesWithAListedRealValueOfThreeDecimals() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Real\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 1\nReal_max = 2\nReal_step = 0.125\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = -1\nC_r = Set{1.125}\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, "1.125", realValue());
+	}
+
+	@Test
+	public void keepsAGeneratedRealValueOfThreeDecimals() throws Exception {
+		open("model R\nclass C\nattributes\n  r : Set(Real)\nend\n");
+		String output = check(file("real.properties", "[real]\nReal_min = 1\nReal_max = 2\nReal_step = 0.875\n"
+				+ "C_min = 1\nC_max = 1\nC_r_min = -1\nC_r_minSize = 2\nC_r_maxSize = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+		assertEquals(output, "Set{1.0,1.875}", realValue());
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
