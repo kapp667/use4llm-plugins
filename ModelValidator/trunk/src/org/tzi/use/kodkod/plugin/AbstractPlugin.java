@@ -47,10 +47,19 @@ public abstract class AbstractPlugin {
 
 	/**
 	 * Enriches the model with a given object diagram (automatic diagram extraction).
+	 *
+	 * @return false if the extraction failed. The error is logged then, and the
+	 *         caller must not validate the model.
 	 */
-	protected void enrichModel() {
+	protected boolean enrichModel() {
 		ModelEnricher enricher = KodkodModelValidatorConfiguration.getInstance().getModelEnricher();
-		enricher.enrichModel(mSystem, model());
+		try {
+			enricher.enrichModel(mSystem, model());
+			return true;
+		} catch (IllegalStateException e) {
+			LOG.error(e.getMessage() + " " + e.getCause());
+			return false;
+		}
 	}
 
 	protected IModel model() {

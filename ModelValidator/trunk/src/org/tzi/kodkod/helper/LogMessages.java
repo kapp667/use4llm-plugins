@@ -431,6 +431,11 @@ public final class LogMessages {
 		return String.format(message, inQuotes(invariant.qualifiedName()));
 	}
 
+	public static String structureError(String report) {
+		return "USE finds a structure error in the object diagram of the solution. The translation and USE disagree here, so the solution is not valid. USE reports: "
+				+ report.trim().replaceAll("\\s+", " ");
+	}
+
 	public static String flagChangeInfo(IInvariant inv, boolean didDisable) {
 		String message;
 		if(didDisable){

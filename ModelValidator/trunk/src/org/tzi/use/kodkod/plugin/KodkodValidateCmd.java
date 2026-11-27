@@ -51,8 +51,9 @@ public class KodkodValidateCmd extends ConfigurablePlugin implements IPluginShel
 		try {
 			StringWriter errorBuffer = new StringWriter();
 			configureModel(new PrintWriter(errorBuffer, true));
-			enrichModel();
-			validate(createValidator());
+			if (enrichModel()) {
+				validate(createValidator());
+			}
 			if(errorBuffer.getBuffer().length() > 0){
 				LOG.warn(errorBuffer.toString());
 			}
@@ -111,8 +112,9 @@ public class KodkodValidateCmd extends ConfigurablePlugin implements IPluginShel
 		try {
 			StringWriter errorBuffer = new StringWriter();
 			configureModel(config, new PrintWriter(errorBuffer, true));
-			enrichModel();
-			validate(createValidator());
+			if (enrichModel()) {
+				validate(createValidator());
+			}
 			if(errorBuffer.getBuffer().length() > 0){
 				LOG.warn(errorBuffer.toString());
 			}
