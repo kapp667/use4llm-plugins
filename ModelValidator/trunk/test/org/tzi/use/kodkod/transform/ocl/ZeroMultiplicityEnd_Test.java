@@ -3,9 +3,8 @@ package org.tzi.use.kodkod.transform.ocl;
 import org.junit.Test;
 
 /**
- * USE types the navigation to an association end as an object when no range of
- * the end's multiplicity goes above 1. The end noEmployer has the multiplicity
- * 0, so the navigation to it is an object, and undefined.
+ * In USE, the navigation to an end of multiplicity 0 is typed as an object, so
+ * it is undefined, not an empty set.
  */
 public class ZeroMultiplicityEnd_Test extends OCLTest {
 
@@ -22,5 +21,10 @@ public class ZeroMultiplicityEnd_Test extends OCLTest {
 	@Test
 	public void aZeroEndAsASetIsEmpty() {
 		test("aZeroEndAsASetIsEmpty", "Person.allInstances()->select(p | p.noEmployer->isEmpty())->size()");
+	}
+
+	@Test
+	public void theNavigationToAnAssociationClassAcrossAZeroEndIsUndefined() {
+		test("theNavigationToAnAssociationClassAcrossAZeroEndIsUndefined", "ada.idle_AC");
 	}
 }
