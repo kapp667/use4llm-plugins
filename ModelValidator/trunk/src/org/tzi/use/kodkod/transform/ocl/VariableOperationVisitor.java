@@ -180,6 +180,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		}
 		
 		if(assoc.isBinaryAssociation()){
+			Expression source = (Expression) object;
 			Parameter p = derEnd.derivedParameters().get(0);
 			if(to == derEnd){
 				// apply derived expression
@@ -218,8 +219,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 					throw new TransformationException("Could not identify non-derived association end of binary association " + StringUtil.inQuotes(assoc.name()) + ".");
 				}
 
-				Node oldObject = object;
-
 				//TODO variable (name) generator
 				Variable x = Variable.unary("ms");
 				Node oldVar = variables.get(p.getName());
@@ -232,7 +231,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				derEnd.derivedExpression().processWithVisitor(this);
 				
 				Expression newObject = (Expression) object;
-				object = ((Expression) oldObject).in(newObject).comprehension(x.oneOf(nonDerEnd.associatedClass().inheritanceOrRegularRelation()));
+				object = source.in(newObject).comprehension(x.oneOf(nonDerEnd.associatedClass().inheritanceOrRegularRelation()));
 				set = true;
 				
 				if(to.multiplicity().isObjectTypeEnd()){
@@ -251,6 +250,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 					variables.put(p.getName(), oldVar);
 				}
 			}
+			object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, (Expression) object);
 		} else {
 			// n-Ary assoc
 			// TODO implement derived associations
