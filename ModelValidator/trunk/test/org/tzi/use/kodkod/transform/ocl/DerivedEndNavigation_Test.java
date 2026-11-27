@@ -64,4 +64,14 @@ public class DerivedEndNavigation_Test extends OCLTest {
 	public void selectByAttributeAfterForwardToAnObject() {
 		test("selectByAttributeAfterForwardToAnObject", "Person.allInstances()->select(p | p.checkedEmployer.name = 'IBM')->size()");
 	}
+
+	@Test
+	public void backwardInAnOperationOfTheOtherClass() {
+		test("backwardInAnOperationOfTheOtherClass", "ibm.namedStaff()");
+	}
+
+	@Test
+	public void forwardInAnOperationOfTheOtherClass() {
+		test("forwardInAnOperationOfTheOtherClass", "ibm.namedStaffBySelect()");
+	}
 }
