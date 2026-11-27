@@ -86,3 +86,8 @@ association DerivedStaff between
   Company[0..1] role staffEmployer
   Person[*] role staff derived = Person.allInstances()->select(employee | employee.employerAC = self)
 end
+
+association Unemployment between
+  Person[*] role unemployed
+  Company[0] role noEmployer
+end
