@@ -269,4 +269,14 @@ public class Let_Test extends OCLTest {
 		test("variableBoundToAnUndefinedSetOfATypeHasNoSize", "let s = oclUndefined(Set(Integer)) in s->size()");
 	}
 
+	@Test
+	public void bagVariableBoundToNullIsNotKnownToBeEmpty() {
+		test("bagVariableBoundToNullIsNotKnownToBeEmpty", "let b : Bag(Integer) = null in b->isEmpty()");
+	}
+
+	@Test
+	public void orderedSetVariableBoundToNullIsNotKnownToBeEmpty() {
+		test("orderedSetVariableBoundToNullIsNotKnownToBeEmpty", "let o : OrderedSet(Integer) = null in o->isEmpty()");
+	}
+
 }

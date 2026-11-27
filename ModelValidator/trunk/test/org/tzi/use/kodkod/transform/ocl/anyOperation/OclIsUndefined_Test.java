@@ -102,4 +102,14 @@ public class OclIsUndefined_Test extends OCLTest {
 		test("test14", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeIsUndefined() {
+		test("undefinedSetOfATypeIsUndefined", "oclUndefined(Set(Integer))->oclIsUndefined()");
+	}
+
+	@Test
+	public void undefinednessOfEachElementOfAnUndefinedSetOfATypeIsUndefined() {
+		test("undefinednessOfEachElementOfAnUndefinedSetOfATypeIsUndefined", "oclUndefined(Set(Integer)).oclIsUndefined()");
+	}
+
 }

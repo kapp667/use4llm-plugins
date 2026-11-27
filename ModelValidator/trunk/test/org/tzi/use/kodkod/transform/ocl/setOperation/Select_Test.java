@@ -445,4 +445,9 @@ public class Select_Test extends OCLTest {
 		test("selectionByKindFromAnUndefinedSetOfATypeIsUndefined", "oclUndefined(Set(Person))->selectByKind(Person)");
 	}
 
+	@Test
+	public void selectionFromAnUndefinedSetOfATypeIsUndefined() {
+		test("selectionFromAnUndefinedSetOfATypeIsUndefined", "oclUndefined(Set(Integer))->select(i | i > 0)");
+	}
+
 }
