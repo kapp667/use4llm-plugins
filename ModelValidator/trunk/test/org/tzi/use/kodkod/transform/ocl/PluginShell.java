@@ -15,10 +15,6 @@ import org.tzi.use.main.shell.runtime.IPluginShellCmd;
 import org.tzi.use.runtime.shell.IPluginShellCmdDelegate;
 import org.tzi.use.uml.sys.MSystem;
 
-/**
- * A session of USE with the plugin, opened as the shell of USE opens one, that
- * keeps what the commands of the plugin log.
- */
 class PluginShell {
 
 	private final StringWriter log = new StringWriter();
@@ -27,8 +23,6 @@ class PluginShell {
 
 	PluginShell(String spec) {
 		Logger.getLogger("org.tzi").addAppender(appender);
-		// As in USE, the plugin watches the session before the model is opened, so it
-		// transforms the model under test, not one left over from an earlier test.
 		session.setSystem(new MSystem(TestSpecifications.compile("model Empty\n")));
 		PluginModelFactory.INSTANCE.registerForSession(session);
 		session.setSystem(new MSystem(TestSpecifications.compile(spec)));
@@ -38,12 +32,7 @@ class PluginShell {
 		Options.doPLUGIN = plugins;
 	}
 
-	/**
-	 * Runs a command of the plugin and returns what it logged and what it wrote to
-	 * standard error.
-	 */
 	String run(IPluginShellCmdDelegate command, String... arguments) {
-		final String[] argumentList = arguments;
 		int start = log.getBuffer().length();
 		PrintStream standardError = System.err;
 		ByteArrayOutputStream written = new ByteArrayOutputStream();
@@ -71,12 +60,12 @@ class PluginShell {
 
 				@Override
 				public String getCmdArguments() {
-					return " " + String.join(" ", argumentList);
+					return " " + String.join(" ", arguments);
 				}
 
 				@Override
 				public String[] getCmdArgumentList() {
-					return argumentList;
+					return arguments;
 				}
 			});
 		} finally {
@@ -85,9 +74,6 @@ class PluginShell {
 		return log.getBuffer().substring(start) + written;
 	}
 
-	/**
-	 * Runs a line in the shell of USE, as a user types it.
-	 */
 	void type(String line) {
 		Shell.getInstance().processLineSafely(line);
 	}

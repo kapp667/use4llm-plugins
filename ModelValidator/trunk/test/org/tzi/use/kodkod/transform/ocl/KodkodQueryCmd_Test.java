@@ -16,12 +16,6 @@ import org.tzi.use.kodkod.plugin.KodkodQueryCmd;
 import org.tzi.use.kodkod.plugin.KodkodScrollingValidateCmd;
 import org.tzi.use.kodkod.plugin.KodkodValidateCmd;
 
-/**
- * Tests mv ? on the object diagram of a solution. The value it prints is USE's,
- * since the translation can evaluate an expression differently. It compares that
- * value with the solution only while USE shows the diagram of the solution, so
- * that a difference it reports is one of the translation and not of the diagram.
- */
 public class KodkodQueryCmd_Test {
 
 	private static final String SPEC = "model M\n"
@@ -101,6 +95,32 @@ public class KodkodQueryCmd_Test {
 	}
 
 	@Test
+	public void doesNotCompareOnceAnObjectIsCreated() throws Exception {
+		solve();
+		shell.type("!create person3 : Person");
+		String output = query("Person.allInstances->size()");
+		assertTrue(output, output.contains("INFO 3 : Integer"));
+		assertNotComparedWithoutError(output);
+	}
+
+	@Test
+	public void doesNotCompareOnceAnObjectIsDestroyed() throws Exception {
+		solve();
+		shell.type("!destroy person2");
+		String output = query("Person.allInstances->size()");
+		assertTrue(output, output.contains("INFO 1 : Integer"));
+		assertNotComparedWithoutError(output);
+	}
+
+	@Test
+	public void doesNotCompareOnceTheLastStatementIsUndone() throws Exception {
+		solve();
+		shell.type("undo");
+		String output = query("Person.allInstances->size()");
+		assertNotComparedWithoutError(output);
+	}
+
+	@Test
 	public void reportsAnIntegerThatOverflowsInTheTranslation() throws Exception {
 		solve();
 		String output = query("3 * 3 * 3");
@@ -177,6 +197,16 @@ public class KodkodQueryCmd_Test {
 		assertTrue(output, output.contains("INFO 6 : Integer"));
 		assertNotComparedWithoutError(output);
 		assertTrue(output, lineStartingWith(output, "INFO " + NOT_COMPARED).contains("five"));
+	}
+
+	@Test
+	public void comparesAnIteratorVariableThatHidesABoundVariable() throws Exception {
+		solve();
+		shell.type("!person2 := person1");
+		String output = query("Person.allInstances->select(person2 | person2.age >= 0)->size()");
+		assertTrue(output, output.contains("INFO 2 : Integer"));
+		assertFalse(output, output.contains(NOT_COMPARED));
+		assertFalse(output, output.contains("ERROR"));
 	}
 
 	private static void assertNotComparedWithoutError(String output) {

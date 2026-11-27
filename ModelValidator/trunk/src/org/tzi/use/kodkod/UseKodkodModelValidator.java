@@ -49,7 +49,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * Handles a satisfiable solution.
 	 */
 	protected void handleSolution() {
-		if(createSolutionDiagram()){
+		if(showDiagramAndCacheEvaluator()){
 			LOG.info("USE found errors in the solution. Trying to find a new solution!");
 			
 			session.reset();
@@ -76,11 +76,11 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	}
 	
 	/**
-	 * Creates the object diagram of the solution just found, as
-	 * createObjectDiagram does. Once USE accepts the diagram, queries compare
-	 * their value in it with the solution.
+	 * Creates the object diagram of the solution just found, as showDiagram
+	 * does. Once USE accepts the diagram, queries compare their value in it
+	 * with the solution.
 	 */
-	protected boolean createSolutionDiagram() {
+	protected boolean showDiagramAndCacheEvaluator() {
 		Diagram diagram = showInUse(solution.instance().relationTuples());
 		if (diagram == Diagram.ACCEPTED) {
 			KodkodQueryCache.INSTANCE.cache(evaluator, session.system().state());
@@ -93,7 +93,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * finds an error in it, a structure error or an invariant that USE finds
 	 * false, so that the caller looks for another solution.
 	 */
-	protected boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples) {
+	protected boolean showDiagram(Map<Relation, TupleSet> relationTuples) {
 		return showInUse(relationTuples) == Diagram.REFUSED;
 	}
 

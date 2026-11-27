@@ -56,11 +56,50 @@ public class SolutionValueReader {
 		}
 	}
 
-	/**
-	 * Evaluates the translation of an expression in a solution. Returns a
-	 * TupleSet, an Integer or a Boolean, as the kind of the translation is.
-	 */
-	public static Object evaluate(Evaluator evaluator, Node translation) {
+	public sealed interface Reading {
+		/**
+		 * An unreadable result is not compared, so it disagrees with no value.
+		 */
+		boolean disagreesWith(Value useValue);
+	}
+
+	public record Read(Value value) implements Reading {
+		@Override
+		public boolean disagreesWith(Value useValue) {
+			return !value.equals(useValue);
+		}
+
+		@Override
+		public String toString() {
+			return value.toString();
+		}
+	}
+
+	public record NoValue(TupleSet tuples) implements Reading {
+		@Override
+		public boolean disagreesWith(Value useValue) {
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return tuples.toString();
+		}
+	}
+
+	public record Unreadable(String reason) implements Reading {
+		@Override
+		public boolean disagreesWith(Value useValue) {
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return reason;
+		}
+	}
+
+	private static Object evaluate(Evaluator evaluator, Node translation) {
 		if (translation instanceof Formula) {
 			return evaluator.evaluate((Formula) translation);
 		}
@@ -71,37 +110,47 @@ public class SolutionValueReader {
 	}
 
 	/**
-	 * Returns the value that a result of evaluate stands for, for an expression
-	 * of the given type. A collection is read as the set of its elements, as the
-	 * translation represents it. Returns null if the result stands for no value,
-	 * as the empty set that Kodkod gives an Integer outside the bounds.
+	 * An Integer outside the bounds of the solution gives the empty set, read as
+	 * NoValue.
 	 */
-	public Value read(Object result, Type type) {
+	public Reading read(Evaluator evaluator, Node translation, Type type) {
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !type.isTypeOfSet()) {
+			return new Unreadable("the translation represents a " + type + " by a set");
+		}
+		Object result = evaluate(evaluator, translation);
 		if (result instanceof Boolean) {
-			return BooleanValue.get((Boolean) result);
+			return new Read(BooleanValue.get((Boolean) result));
 		}
 		if (result instanceof Integer) {
-			return IntegerValue.valueOf((Integer) result);
+			return new Read(IntegerValue.valueOf((Integer) result));
 		}
 		TupleSet tuples = (TupleSet) result;
 		if (tuples.arity() != 1) {
-			return null;
+			return unreadable(tuples);
 		}
 		if (!type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
-			return tuples.size() == 1 ? valueOf(tuples.iterator().next().atom(0)) : null;
+			if (tuples.size() != 1) {
+				return new NoValue(tuples);
+			}
+			Value value = valueOf(tuples.iterator().next().atom(0));
+			return value == null ? unreadable(tuples) : new Read(value);
 		}
 		if (tuples.size() == 1 && TypeConstants.UNDEFINED_SET.equals(tuples.iterator().next().atom(0))) {
-			return UndefinedValue.instance;
+			return new Read(UndefinedValue.instance);
 		}
 		List<Value> elements = new ArrayList<Value>();
 		for (Tuple tuple : tuples) {
 			Value element = valueOf(tuple.atom(0));
 			if (element == null) {
-				return null;
+				return unreadable(tuples);
 			}
 			elements.add(element);
 		}
-		return new SetValue(((CollectionType) type).elemType(), elements);
+		return new Read(new SetValue(((CollectionType) type).elemType(), elements));
+	}
+
+	private static Unreadable unreadable(TupleSet tuples) {
+		return new Unreadable("cannot read the Kodkod result " + tuples);
 	}
 
 	private Value valueOf(Object atom) {

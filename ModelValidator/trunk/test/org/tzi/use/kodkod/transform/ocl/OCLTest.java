@@ -45,6 +45,8 @@ import org.tzi.use.config.Options;
 import org.tzi.use.config.Options.WarningType;
 import org.tzi.use.kodkod.plugin.PluginModelFactory;
 import org.tzi.use.kodkod.solution.SolutionValueReader;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Read;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
 import org.tzi.use.kodkod.transform.enrich.ObjectDiagramModelEnricher;
 import org.tzi.use.main.Session;
 import org.tzi.use.main.shell.Shell;
@@ -54,6 +56,10 @@ import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.ModelFactory;
+import org.tzi.use.uml.ocl.type.CollectionType;
+import org.tzi.use.uml.ocl.type.Type;
+import org.tzi.use.uml.ocl.type.Type.VoidHandling;
+import org.tzi.use.uml.ocl.type.TypeFactory;
 import org.tzi.use.uml.ocl.value.CollectionValue;
 import org.tzi.use.uml.ocl.value.SetValue;
 import org.tzi.use.uml.ocl.value.Value;
@@ -432,15 +438,18 @@ public class OCLTest {
 
 	/**
 	 * Evaluates the translated expression on the Kodkod instance of the object
-	 * diagram and converts the result to a USE value.
+	 * diagram and converts the result to a USE value, a collection to a set.
 	 */
 	protected Value evaluateKodkod(Object transform, org.tzi.use.uml.ocl.expr.Expression expression) {
-		Object result = SolutionValueReader.evaluate(kodkodEvaluator, (Node) transform);
-		Value value = new SolutionValueReader(mSystem.state()).read(result, expression.type());
-		if (value == null) {
-			throw new AssertionError("The harness cannot convert the Kodkod result " + result + " to a USE value");
+		Type type = expression.type();
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
+			type = TypeFactory.mkSet(((CollectionType) type).elemType());
 		}
-		return value;
+		Reading reading = new SolutionValueReader(mSystem.state()).read(kodkodEvaluator, (Node) transform, type);
+		if (!(reading instanceof Read read)) {
+			throw new AssertionError("The harness cannot convert the Kodkod result to a USE value: " + reading);
+		}
+		return read.value();
 	}
 
 	public static void main(String[] args) {
