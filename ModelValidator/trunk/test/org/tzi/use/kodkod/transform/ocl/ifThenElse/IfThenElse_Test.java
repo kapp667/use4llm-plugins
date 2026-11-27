@@ -277,4 +277,14 @@ public class IfThenElse_Test extends OCLTest {
 		test("test39", ocl, expected);
 	}
 
+	@Test
+	public void setWithAnUndefinedConditionIsUndefined() {
+		test("setWithAnUndefinedConditionIsUndefined", "if ada.alive then Set{1} else Set{2} endif");
+	}
+
+	@Test
+	public void setWithAnUndefinedConditionHasNoSize() {
+		test("setWithAnUndefinedConditionHasNoSize", "(if ada.alive then Set{1} else Set{2} endif)->size()");
+	}
+
 }
