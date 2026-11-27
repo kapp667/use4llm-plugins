@@ -20,6 +20,7 @@ import org.tzi.kodkod.model.impl.DerivedAssociationEnd;
 import org.tzi.kodkod.model.impl.DerivedAssociationEnd.Parameter;
 import org.tzi.kodkod.model.impl.UnionAssociation;
 import org.tzi.kodkod.model.type.ObjectType;
+import org.tzi.kodkod.model.type.SetType;
 import org.tzi.kodkod.model.type.Type;
 import org.tzi.kodkod.model.type.TypeFactory;
 import org.tzi.use.graph.DirectedGraph;
@@ -149,7 +150,7 @@ public class ModelTransformator {
 
 		for (MAttribute mAttribute : attributes) {
 			Type type = typeConverter.convert(mAttribute.type());
-			if (type != null) {
+			if (type != null && (mAttribute.isDerived() || !holdsOclAny(type))) {
 				IAttribute attr;
 				if(mAttribute.isDerived()){
 					attr = factory.createDerivedAttribute(model, mAttribute.name(), type, clazz, mAttribute.getDeriveExpression());
@@ -159,6 +160,10 @@ public class ModelTransformator {
 				clazz.addAttribute(attr);
 			}
 		}
+	}
+
+	private static boolean holdsOclAny(Type type) {
+		return type.isAny() || type.isSet() && holdsOclAny(((SetType) type).elemType());
 	}
 
 	private void transformSimpleAssociations(IModel model, List<MAssociation> mAssociations) {

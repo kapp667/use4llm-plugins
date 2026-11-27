@@ -161,6 +161,11 @@ public final class LogMessages {
 		return "Cannot transform association " + inQuotes(association) + ": qualified association ends are not supported.";
 	}
 
+	public static String untransformedAttributeError(String expression, String attribute, String type) {
+		return "Cannot transform " + inQuotes(expression) + ": the transformation does not represent the values of the attribute "
+				+ inQuotes(attribute) + " of type " + inQuotes(type) + ".";
+	}
+
 	public static String collectionOfCollectionsError(String expression) {
 		return "Cannot transform " + inQuotes(expression) + ": collections of collections are not supported.";
 	}
