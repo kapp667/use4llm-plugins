@@ -121,6 +121,16 @@ association NamedJob between
   Company[0..1] role namedEmployer derived = if self.name.isDefined() then self.employerAC else null endif
 end
 
+association NullStaff between
+  Company[*] role nullEmployer
+  Person[*] role nullStaff derived = null
+end
+
+association StaffFriendship between
+  Company[*] role staffFriendEmployer
+  Person[*] role staffFriend derived = self.employeeAC->collect(p | p.bestFriend)->asSet()
+end
+
 associationclass Idle_AC between
   Person[*] role idler
   Company[0] role idleEmployer
