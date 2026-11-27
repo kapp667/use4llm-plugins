@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.kodkod.plugin.KodkodQueryCmd;
 import org.tzi.use.kodkod.plugin.KodkodScrollingValidateCmd;
 import org.tzi.use.kodkod.plugin.KodkodValidateCmd;
@@ -109,6 +110,20 @@ public class KodkodQueryCmd_Test {
 		shell.type("!destroy person2");
 		String output = query("Person.allInstances->size()");
 		assertTrue(output, output.contains("INFO 1 : Integer"));
+		assertNotComparedWithoutError(output);
+	}
+
+	@Test
+	public void doesNotCompareOnceTheStateChangedWithoutAnEvent() throws Exception {
+		solve();
+		UseSystemApi nativeApi = UseSystemApi.create(shell.system(), false);
+		nativeApi.setAttributeValue("person1", "age", "7");
+		String output = query("person1.age");
+		assertTrue(output, output.contains("INFO 7 : Integer"));
+		assertNotComparedWithoutError(output);
+		nativeApi.createObject("Person", "person3");
+		output = query("Person.allInstances->size()");
+		assertTrue(output, output.contains("INFO 3 : Integer"));
 		assertNotComparedWithoutError(output);
 	}
 
