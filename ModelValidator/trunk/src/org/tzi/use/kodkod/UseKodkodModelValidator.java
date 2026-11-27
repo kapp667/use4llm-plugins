@@ -53,8 +53,9 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 			
 			session.reset();
 			newSolution(solution.instance().relationTuples());
+		} else {
+			evaluateInactiveInvariants();
 		}
-		evaluateInactiveInvariants();
 	}
 
 	@Override
@@ -74,9 +75,9 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	}
 	
 	/**
-	 * Starts the object diagram creation.
-	 * 
-	 * @param relationTuples
+	 * Creates the object diagram of the solution in USE. Returns true when USE
+	 * finds an error in it, a structure error or an invariant that USE finds
+	 * false, so that the caller looks for another solution.
 	 */
 	protected boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples) {
 		LOG.info(LogMessages.objDiagramCreation);
@@ -85,8 +86,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 		ObjectDiagramCreator diagramCreator = new ObjectDiagramCreator(model, session);
 		try {
 			diagramCreator.create(relationTuples);
-			// only retry another solution if the current one contains structural errors
-			return (diagramCreator.hasDiagramErrors() == ErrorType.STRUCTURE);
+			return diagramCreator.hasDiagramErrors() != ErrorType.NONE;
 		} catch (UseApiException ex) {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.objDiagramCreationError, ex);
