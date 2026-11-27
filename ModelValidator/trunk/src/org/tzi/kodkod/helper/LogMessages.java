@@ -384,11 +384,12 @@ public final class LogMessages {
 	public static String unexpectedInvariantResult(IInvariant invariant) {
 		String message;
 		if(invariant.isNegated()){
-			message = "Negated invariant %s is not fulfilled in generated system state.";
+			message = "USE finds the negated invariant %s true in the object diagram of the solution.";
 		}
 		else {
-			message = "Invariant %s is not fulfilled in generated system state.";
+			message = "USE finds the invariant %s false in the object diagram of the solution.";
 		}
+		message += " The translation and USE disagree here, so the solution is not valid.";
 		return String.format(message, inQuotes(invariant.qualifiedName()));
 	}
 
