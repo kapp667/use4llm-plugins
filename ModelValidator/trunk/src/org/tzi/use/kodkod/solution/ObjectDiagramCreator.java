@@ -112,7 +112,7 @@ public class ObjectDiagramCreator {
 				BooleanValue result = (BooleanValue) evaluator.eval(mModel.getClassInvariant(invariant.qualifiedName()).expandedExpression(),
 						mSystem.state());
 				if ((invariant.isNegated() && result.isTrue()) || (!invariant.isNegated() && result.isFalse())) {
-					LOG.info(LogMessages.unexpectedInvariantResult(invariant));
+					LOG.error(LogMessages.unexpectedInvariantResult(invariant));
 					invariantError = true;
 				}
 			}
