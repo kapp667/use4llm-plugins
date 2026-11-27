@@ -191,6 +191,11 @@ public final class LogMessages {
 				+ ": sortedBy returns an ordered collection, whose order the translation does not keep.";
 	}
 
+	public static String collectionTypeTestError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": a type test whose source or target type is a collection depends"
+				+ " on the runtime type USE computes for a collection from its elements, which the translation does not reproduce.";
+	}
+
 	public static String objectReferenceError(String expression, String objectName) {
 		return "Cannot transform " + inQuotes(expression) + ": write it as the variable " + objectName + ", which is translated.";
 	}

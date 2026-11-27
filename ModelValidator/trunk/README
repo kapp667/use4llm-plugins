@@ -48,3 +48,10 @@ does not keep the order of a collection. Where only the elements matter, for
 example in ->size() or ->forAll(...), use the source collection instead.
 byUseId() and object references such as @ada are refused as well; write the
 object as the variable ada instead.
+
+oclIsKindOf(), oclIsTypeOf() and oclAsType() are refused when the source or the
+target type is a collection, as in Set{1, 2}->oclIsKindOf(Set(Integer)) or
+1.oclIsKindOf(Set(Integer)). USE answers them with the runtime type of the
+value, which it computes for a collection from its elements. The plugin does not
+compute that type. A test on each element, such as
+Set{1, 2}->forAll(x | x.oclIsKindOf(Integer)), is translated.
