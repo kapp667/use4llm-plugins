@@ -69,6 +69,13 @@ public class IntegerType extends ConfigurableType {
 	}
 
 	@Override
+	public void removeTypeLiteral(String literalName) {
+		if (typeLiterals().remove(literalName) != null) {
+			literalValues.remove(Integer.valueOf(literalName.substring(name().length() + 1)));
+		}
+	}
+
+	@Override
 	protected void createTypeLiterals() {
 		typeLiterals = new HashMap<String, Expression>();
 	}
