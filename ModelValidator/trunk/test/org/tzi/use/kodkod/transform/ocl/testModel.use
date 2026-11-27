@@ -14,6 +14,7 @@ attributes
   employerName:String derived = (if self.employerAC.isDefined() then self.employerAC else self.employerA endif).name
   employers:Set(Company) derived = self.employerAC->asSet()
   employerCount:Integer derived = self.employerAC->asSet()->size()
+  hasEmployer:Boolean derived = self.employerAC.isDefined()
 operations
   coworkers():Set(Person) = Person.allInstances()->select(p | p.employerAC = self.employerAC)
   currentEmployer():Company = self.employerAC
