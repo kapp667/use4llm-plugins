@@ -43,6 +43,16 @@ public class DefaultConfiguration_Test {
 		assertEquals(1, objectsOfTheDefaultSolution(spec));
 	}
 
+	@Test
+	public void classWithAnOclVoidAttributeGetsAnObject() throws Exception {
+		String spec = "model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  v : OclVoid\n"
+				+ "end\n";
+		assertEquals(1, objectsOfTheDefaultSolution(spec));
+	}
+
 	private int objectsOfTheDefaultSolution(String spec) throws Exception {
 		KodkodModelValidatorConfiguration.getInstance().setSatFactory(KodkodModelValidatorConfiguration.DEFAULT_SATFACTORY);
 		MModel mModel = TestSpecifications.compile(spec);
