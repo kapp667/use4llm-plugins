@@ -3,28 +3,37 @@ package org.tzi.use.kodkod.plugin;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import kodkod.ast.Formula;
-import kodkod.ast.IntExpression;
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
 import kodkod.engine.Evaluator;
+import kodkod.engine.fol2sat.UnboundLeafException;
 
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IClass;
+import org.tzi.use.kodkod.solution.SolutionValueReader;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Unreadable;
 import org.tzi.use.kodkod.transform.ocl.DefaultExpressionVisitor;
 import org.tzi.use.main.shell.runtime.IPluginShellCmd;
 import org.tzi.use.parser.ocl.OCLCompiler;
 import org.tzi.use.runtime.shell.IPluginShellCmdDelegate;
 import org.tzi.use.uml.ocl.expr.Expression;
+import org.tzi.use.uml.ocl.expr.MultiplicityViolationException;
+import org.tzi.use.uml.ocl.value.ObjectValue;
+import org.tzi.use.uml.ocl.value.Value;
+import org.tzi.use.uml.ocl.value.VarBindings;
 
 /**
- * Cmd-Class for queries on a existing solution.
+ * Prints the value of an OCL expression in the object diagram, as USE computes
+ * it, and compares it with the value of its translation in the solution that
+ * the diagram shows.
  * 
  * @author Hendrik Reitmann
  * 
@@ -44,7 +53,7 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 		String arguments = pluginCommand.getCmdArguments().trim();
 
 		if (arguments.isEmpty()) {
-			LOG.error("Usage: kodkod ? [enable|disable|ocl-expression]");
+			LOG.error("Usage: mv ? [enable|disable|enabled|ocl-expression]");
 		} else if (arguments.toLowerCase().equals("enable")) {
 			KodkodQueryCache.INSTANCE.setQueryEnabled(true);
 		} else if (arguments.toLowerCase().equals("disable")) {
@@ -52,69 +61,98 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 		} else if (arguments.toLowerCase().equals("enabled")) {
 			LOG.info(KodkodQueryCache.INSTANCE.isQueryEnabled());
 		} else {
-			Expression expr = createExpression(arguments);
+			Expression expr = createExpression(arguments, mSystem.varBindings(), new PrintWriter(System.err));
 
 			if (expr == null)
 				return;
 
-			evaluateQuery(transformExpression(expr));
+			query(arguments, expr);
 		}
 	}
 
-	private Object transformExpression(Expression expr) {
+	private void query(String ocl, Expression expr) {
+		Value useValue;
+		try {
+			useValue = new org.tzi.use.uml.ocl.expr.Evaluator().eval(expr, mSystem.state(), mSystem.varBindings());
+		} catch (MultiplicityViolationException e) {
+			LOG.error("Could not evaluate. " + e.getMessage());
+			return;
+		}
+		LOG.info(useValue.toStringWithType());
+
+		compareWithSolution(ocl, expr, useValue);
+	}
+
+	private Node transformExpression(Expression expr) {
 		Map<String, Node> variables = new TreeMap<String, Node>();
 		Map<String, IClass> variableClasses = new TreeMap<String, IClass>();
 
-		Object object = null;
-		try {
-
-			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, variableClasses, new HashMap<String, Variable>(),
-					new ArrayList<String>());
-			expr.processWithVisitor(visitor);
-
-			object = visitor.getObject();
-		} catch (Exception e) {
-			LOG.error("Cannot transform query. " + " " + e.getMessage());
-		}
-		return object;
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, variableClasses, new HashMap<String, Variable>(),
+				new ArrayList<String>());
+		expr.processWithVisitor(visitor);
+		return visitor.getObject();
 	}
 
-	private void evaluateQuery(Object object) {
-		if (object != null) {
-			Evaluator evaluator = null;
-			
-			// get evaluator of last result
-			try {
-				evaluator = KodkodQueryCache.INSTANCE.getEvaluator();
-			}
-			catch(Exception e){
-				LOG.error(LogMessages.queryEvaluatorNotFound);
-				LOG.error(e.getMessage());
+	private void compareWithSolution(String ocl, Expression expr, Value useValue) {
+		Evaluator evaluator = KodkodQueryCache.INSTANCE.evaluatorFor(mSystem.state());
+		if (evaluator == null) {
+			notCompared(KodkodQueryCache.INSTANCE.isQueryEnabled()
+					? "the state shown is not a solution found since mv ? enable, or it changed since"
+					: "solutions are kept for comparison only after mv ? enable");
+			return;
+		}
+		for (VarBindings.Entry variable : mSystem.varBindings()) {
+			String name = variable.getVarName();
+			if (!isObjectNamed(variable.getValue(), name) && !compilesWithout(ocl, name)) {
+				notCompared("the variable " + name + " is bound to " + variable.getValue() + ", not to the object named " + name);
 				return;
 			}
-			
-			// evaluate query
-			try {
-				if(object instanceof kodkod.ast.Expression){
-					LOG.info(evaluator.evaluate((kodkod.ast.Expression) object));
-				} else if(object instanceof Formula){
-					LOG.info(evaluator.evaluate((Formula) object));
-				} else if(object instanceof IntExpression){
-					LOG.info(evaluator.evaluate((IntExpression) object));
-				} else {
-					LOG.error(LogMessages.unsupportedQueryType);
-				}
-			} catch (Exception e) {
-				LOG.error(LogMessages.queryEvaluationError);
-				e.printStackTrace();
-			}
+		}
+
+		Node translation;
+		try {
+			translation = transformExpression(expr);
+		} catch (RuntimeException e) {
+			notCompared(LogMessages.exceptionReason(e));
+			return;
+		}
+
+		Reading reading;
+		try {
+			reading = new SolutionValueReader(mSystem.state()).read(evaluator, translation, expr.type());
+		} catch (UnboundLeafException e) {
+			notCompared("the solution has no atom for " + e.leaf());
+			return;
+		}
+
+		if (reading instanceof Unreadable unreadable) {
+			notCompared(unreadable.reason());
+		} else if (reading.disagreesWith(useValue)) {
+			LOG.error("The translation evaluates " + ocl + " differently from USE. USE: " + useValue + "; Kodkod: " + reading + ".");
 		}
 	}
 
-	private Expression createExpression(String arguments) {
+	private static boolean isObjectNamed(Value value, String name) {
+		return value instanceof ObjectValue object && object.value().name().equals(name);
+	}
+
+	private boolean compilesWithout(String ocl, String variable) {
+		VarBindings others = new VarBindings();
+		for (VarBindings.Entry binding : mSystem.varBindings()) {
+			if (!binding.getVarName().equals(variable)) {
+				others.push(binding.getVarName(), binding.getValue());
+			}
+		}
+		return createExpression(ocl, others, new PrintWriter(new StringWriter())) != null;
+	}
+
+	private void notCompared(String reason) {
+		LOG.info("Not compared with a solution: " + reason);
+	}
+
+	private Expression createExpression(String arguments, VarBindings bindings, PrintWriter err) {
 		InputStream stream = new ByteArrayInputStream(arguments.getBytes());
-		Expression expr = OCLCompiler.compileExpression(mSystem.model(), mSystem.state(), stream, "<input>", new PrintWriter(System.err),
-				mSystem.varBindings());
+		Expression expr = OCLCompiler.compileExpression(mSystem.model(), mSystem.state(), stream, "<input>", err, bindings);
 		return expr;
 	}
 

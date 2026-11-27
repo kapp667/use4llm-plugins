@@ -27,7 +27,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = createObjectDiagram(solution.instance().relationTuples());
+		boolean errors = showDiagramAndCacheEvaluator();
 		if (!errors) {
 			solutions.add(solution.instance().relationTuples());
 			LOG.info(LogMessages.pagingNext);
@@ -64,7 +64,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 		if (solutionIndex == solutions.size()) {
 			newSolution(solutions.get(solutionIndex-1));
 		} else {
-			createObjectDiagram(solutions.get(solutionIndex));
+			showDiagram(solutions.get(solutionIndex));
 		}
 	}
 
@@ -74,7 +74,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 	public void previousSolution() {
 		if (solutionIndex > 0) {
 			solutionIndex--;
-			createObjectDiagram(solutions.get(solutionIndex));
+			showDiagram(solutions.get(solutionIndex));
 		} else {
 			LOG.info(LogMessages.pagingFirst);
 		}
@@ -91,6 +91,6 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 		
 		LOG.info(LogMessages.showSolution(index));
 		solutionIndex = index-1;
-		createObjectDiagram(solutions.get(solutionIndex));
+		showDiagram(solutions.get(solutionIndex));
 	}
 }

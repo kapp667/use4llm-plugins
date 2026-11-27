@@ -7,6 +7,7 @@ import kodkod.instance.TupleSet;
 
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.KodkodModelValidator;
+import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.helper.ProofHelper;
 import org.tzi.kodkod.model.config.impl.ModelConfigurator;
@@ -48,7 +49,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * Handles a satisfiable solution.
 	 */
 	protected void handleSolution() {
-		if(createObjectDiagram(solution.instance().relationTuples())){
+		if(showDiagramAndCacheEvaluator()){
 			LOG.info("USE found errors in the solution. Trying to find a new solution!");
 			
 			session.reset();
@@ -75,26 +76,48 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	}
 	
 	/**
-	 * Creates the object diagram of the solution in USE. Returns true when USE
+	 * Creates the object diagram of the solution just found, as showDiagram
+	 * does. Once USE accepts the diagram, queries compare their value in it
+	 * with the solution.
+	 */
+	protected boolean showDiagramAndCacheEvaluator() {
+		Diagram diagram = showInUse(solution.instance().relationTuples());
+		if (diagram == Diagram.ACCEPTED) {
+			KodkodQueryCache.INSTANCE.cache(evaluator, session.system().state());
+		}
+		return diagram == Diagram.REFUSED;
+	}
+
+	/**
+	 * Creates the object diagram of a solution in USE. Returns true when USE
 	 * finds an error in it, a structure error or an invariant that USE finds
 	 * false, so that the caller looks for another solution.
 	 */
-	protected boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples) {
+	protected boolean showDiagram(Map<Relation, TupleSet> relationTuples) {
+		return showInUse(relationTuples) == Diagram.REFUSED;
+	}
+
+	private enum Diagram {
+		NOT_CREATED, REFUSED, ACCEPTED
+	}
+
+	private Diagram showInUse(Map<Relation, TupleSet> relationTuples) {
 		LOG.info(LogMessages.objDiagramCreation);
 
+		KodkodQueryCache.INSTANCE.clear();
 		session.reset();
 		ObjectDiagramCreator diagramCreator = new ObjectDiagramCreator(model, session);
 		try {
 			diagramCreator.create(relationTuples);
-			return diagramCreator.hasDiagramErrors() != ErrorType.NONE;
 		} catch (UseApiException ex) {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.objDiagramCreationError, ex);
 			} else {
 				LOG.error(LogMessages.objDiagramCreationError + " Reason: " + ex.getMessage());
 			}
-			return false;
+			return Diagram.NOT_CREATED;
 		}
+		return diagramCreator.hasDiagramErrors() == ErrorType.NONE ? Diagram.ACCEPTED : Diagram.REFUSED;
 	}
 
 	/**

@@ -10,20 +10,16 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import kodkod.ast.Expression;
-import kodkod.ast.Formula;
-import kodkod.ast.IntExpression;
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
 import kodkod.engine.Evaluator;
 import kodkod.engine.Solution;
 import kodkod.instance.Tuple;
-import kodkod.instance.TupleSet;
 
 import org.apache.commons.configuration.MapConfiguration;
 import org.junit.BeforeClass;
@@ -48,6 +44,9 @@ import org.tzi.kodkod.ocl.operation.VariableOperationGroup;
 import org.tzi.use.config.Options;
 import org.tzi.use.config.Options.WarningType;
 import org.tzi.use.kodkod.plugin.PluginModelFactory;
+import org.tzi.use.kodkod.solution.SolutionValueReader;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Read;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
 import org.tzi.use.kodkod.transform.enrich.ObjectDiagramModelEnricher;
 import org.tzi.use.main.Session;
 import org.tzi.use.main.shell.Shell;
@@ -58,16 +57,11 @@ import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.ocl.type.CollectionType;
-import org.tzi.use.uml.ocl.type.EnumType;
+import org.tzi.use.uml.ocl.type.Type;
 import org.tzi.use.uml.ocl.type.Type.VoidHandling;
-import org.tzi.use.uml.ocl.value.BooleanValue;
+import org.tzi.use.uml.ocl.type.TypeFactory;
 import org.tzi.use.uml.ocl.value.CollectionValue;
-import org.tzi.use.uml.ocl.value.EnumValue;
-import org.tzi.use.uml.ocl.value.IntegerValue;
-import org.tzi.use.uml.ocl.value.ObjectValue;
 import org.tzi.use.uml.ocl.value.SetValue;
-import org.tzi.use.uml.ocl.value.StringValue;
-import org.tzi.use.uml.ocl.value.UndefinedValue;
 import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
@@ -444,72 +438,18 @@ public class OCLTest {
 
 	/**
 	 * Evaluates the translated expression on the Kodkod instance of the object
-	 * diagram and converts the result to a USE value.
+	 * diagram and converts the result to a USE value, a collection to a set.
 	 */
 	protected Value evaluateKodkod(Object transform, org.tzi.use.uml.ocl.expr.Expression expression) {
-		if (transform instanceof Formula) {
-			return BooleanValue.get(kodkodEvaluator.evaluate((Formula) transform));
+		Type type = expression.type();
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
+			type = TypeFactory.mkSet(((CollectionType) type).elemType());
 		}
-		if (transform instanceof IntExpression) {
-			return IntegerValue.valueOf(kodkodEvaluator.evaluate((IntExpression) transform));
+		Reading reading = new SolutionValueReader(mSystem.state()).read(kodkodEvaluator, (Node) transform, type);
+		if (!(reading instanceof Read read)) {
+			throw new AssertionError("The harness cannot convert the Kodkod result to a USE value: " + reading);
 		}
-		if (!(transform instanceof Expression)) {
-			throw new AssertionError("Unexpected result of the translation: " + transform.getClass());
-		}
-
-		TupleSet tuples = kodkodEvaluator.evaluate((Expression) transform);
-		if (tuples.arity() != 1) {
-			throw new AssertionError("Unexpected arity " + tuples.arity() + " of the Kodkod result " + tuples);
-		}
-		if (expression.type().isKindOfCollection(VoidHandling.INCLUDE_VOID) && !expression.type().isTypeOfVoidType()) {
-			// Kodkod collections are sets, whatever the OCL collection kind is (see test)
-			if (tuples.size() == 1 && tuples.iterator().next().atom(0).equals(TypeConstants.UNDEFINED_SET)) {
-				return UndefinedValue.instance;
-			}
-			List<Value> elements = new ArrayList<Value>();
-			for (Tuple tuple : tuples) {
-				elements.add(toUseValue(tuple.atom(0)));
-			}
-			return new SetValue(((CollectionType) expression.type()).elemType(), elements);
-		}
-		if (tuples.size() != 1) {
-			throw new AssertionError("Expected one atom as Kodkod result of the non-collection expression, found " + tuples);
-		}
-		return toUseValue(tuples.iterator().next().atom(0));
-	}
-
-	/**
-	 * Converts an atom of the Kodkod universe to the USE value it represents.
-	 */
-	private Value toUseValue(Object atom) {
-		if (atom instanceof Integer) {
-			return IntegerValue.valueOf((Integer) atom);
-		}
-		String name = atom.toString();
-		if (name.equals(TypeConstants.UNDEFINED)) {
-			return UndefinedValue.instance;
-		}
-		if (name.equals(TypeConstants.BOOLEAN_TRUE) || name.equals(TypeConstants.TRUE)) {
-			return BooleanValue.TRUE;
-		}
-		if (name.equals(TypeConstants.BOOLEAN_FALSE) || name.equals(TypeConstants.FALSE)) {
-			return BooleanValue.FALSE;
-		}
-		if (name.startsWith(TypeConstants.STRING + "_")) {
-			return new StringValue(name.substring(TypeConstants.STRING.length() + 1));
-		}
-		for (EnumType enumType : mSystem.model().enumTypes()) {
-			String prefix = enumType.name() + "_";
-			if (name.startsWith(prefix) && enumType.contains(name.substring(prefix.length()))) {
-				return new EnumValue(enumType, name.substring(prefix.length()));
-			}
-		}
-		for (MObject object : mSystem.state().allObjects()) {
-			if (name.equals(object.cls().name() + "_" + object.name())) {
-				return new ObjectValue(object.cls(), object);
-			}
-		}
-		throw new AssertionError("The harness cannot convert the Kodkod atom " + name + " to a USE value");
+		return read.value();
 	}
 
 	public static void main(String[] args) {
