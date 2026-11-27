@@ -65,9 +65,12 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	public Expression closure(Expression src, Expression src_type, Expression body, Variable var) {
 		final Variable y = Variable.unary("y");
+		// USE applies the body to null as well, and a body that is undefined adds null
+		final Expression elements = src_type.union(undefined);
+		final Expression step = body.eq(undefined_Set).thenElse(undefined, body);
 
-		final Expression generalClosure = y.in(body)
-				.comprehension(var.oneOf(src_type).and(y.oneOf(src_type)))
+		final Expression generalClosure = y.in(step)
+				.comprehension(var.oneOf(elements).and(y.oneOf(elements)))
 				.closure();
 		// closure in OCL 2.4 is defined as the reflexive transitive closure,
 		// therefore we add the src manually
