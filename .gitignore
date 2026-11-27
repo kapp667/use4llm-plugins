@@ -26,3 +26,4 @@ Thumbs.db
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/privacy-guard/
+!.claude/skills/verify-modelvalidator/

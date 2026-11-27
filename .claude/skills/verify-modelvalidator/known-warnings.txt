@@ -1,0 +1,2 @@
+# WARN lines that the plugin prints on every run in this environment and that judge.sh counts but does not fail on.
+# One extended regex per line. Add a line only after showing the message is independent of the change under test.

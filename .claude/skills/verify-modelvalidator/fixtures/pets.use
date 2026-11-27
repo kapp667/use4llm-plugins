@@ -1,0 +1,21 @@
+model Pets
+
+class Person
+attributes
+  name : String
+  age : Integer
+end
+
+class Pet
+attributes
+  nick : String
+end
+
+association Owns between
+  Person[1] role owner
+  Pet[0..*] role pets
+end
+
+constraints
+context Person inv adult: self.age >= 18
+context Pet inv hasNick: self.nick <> ''
