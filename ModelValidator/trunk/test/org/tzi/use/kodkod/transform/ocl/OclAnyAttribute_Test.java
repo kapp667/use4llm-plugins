@@ -25,6 +25,7 @@ import org.tzi.kodkod.KodkodModelValidator;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.plugin.KodkodValidateCmd;
+import org.tzi.use.main.shell.Shell;
 
 public class OclAnyAttribute_Test {
 
@@ -55,18 +56,68 @@ public class OclAnyAttribute_Test {
 
 	@Test
 	public void refusalNamesTheOclAnyAttributeAndItsType() {
-		IModel model = oneObjectOfA(ONE_X);
-		StringWriter log = new StringWriter();
-		Logger logger = Logger.getLogger(KodkodModelValidator.class);
-		WriterAppender appender = new WriterAppender(new PatternLayout("%m%n"), log);
-		logger.addAppender(appender);
-		try {
-			validator.validate(model);
-		} finally {
-			logger.removeAppender(appender);
-		}
-		assertTrue(log.toString(), log.toString().contains("A::x"));
-		assertTrue(log.toString(), log.toString().contains("OclAny"));
+		String log = refusalOf(ONE_X);
+		assertTrue(log, log.contains("A::x"));
+		assertTrue(log, log.contains("OclAny"));
+	}
+
+	@Test
+	public void readFromAnInvariantOfASubclassIsRefused() {
+		String log = refusalOf("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
+				+ "end\n"
+				+ "class B < A\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context B inv one: self.x = 1\n");
+		assertTrue(log, log.contains("A::x"));
+	}
+
+	@Test
+	public void readThroughANavigationIsRefused() {
+		String log = refusalOf("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
+				+ "end\n"
+				+ "class C\n"
+				+ "end\n"
+				+ "association R between\n"
+				+ "  C [*] role c\n"
+				+ "  A [*] role a\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context C inv allOne: self.a->forAll(o | o.x = 1)\n");
+		assertTrue(log, log.contains("A::x"));
+	}
+
+	@Test
+	public void readFromTheDeriveExpressionOfAnAttributeThatAnInvariantReadsIsRefused() {
+		String log = refusalOf("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
+				+ "  isOne : Boolean derive: self.x = 1\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context A inv derived: self.isOne\n");
+		assertTrue(log, log.contains("A::x"));
+	}
+
+	@Test
+	public void readFromAnOperationBodyThatAnInvariantCallsIsRefused() {
+		String log = refusalOf("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
+				+ "operations\n"
+				+ "  isOne() : Boolean = self.x = 1\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context A inv called: self.isOne()\n");
+		assertTrue(log, log.contains("A::x"));
 	}
 
 	@Test
@@ -115,10 +166,26 @@ public class OclAnyAttribute_Test {
 			String output = shell.run(new KodkodValidateCmd(), properties.getPath());
 			assertTrue(output, output.matches("(?s).*INFO (TRIVIALLY_)?SATISFIABLE.*"));
 			assertFalse(output, output.contains("ERROR"));
+			shell.type("check");
+			assertTrue(Shell.getInstance().lastCheckResult());
 		} finally {
 			shell.close();
 			configuration.setAutomaticDiagramExtraction(extraction);
 		}
+	}
+
+	private String refusalOf(String spec) {
+		StringWriter log = new StringWriter();
+		Logger logger = Logger.getLogger(KodkodModelValidator.class);
+		WriterAppender appender = new WriterAppender(new PatternLayout("%m%n"), log);
+		logger.addAppender(appender);
+		try {
+			validator.validate(oneObjectOfA(spec));
+		} finally {
+			logger.removeAppender(appender);
+		}
+		assertNull(log.toString(), validator.outcome);
+		return log.toString();
 	}
 
 	private static IModel oneObjectOfA(String spec) {
