@@ -91,3 +91,13 @@ association Unemployment between
   Person[*] role unemployed
   Company[0] role noEmployer
 end
+
+association DerivedFriendship between
+  Person[0..1] role befriender
+  Person[0..1] role derivedFriend derived = self.bestFriend
+end
+
+associationclass Idle_AC between
+  Person[*] role idler
+  Company[0] role idleEmployer
+end

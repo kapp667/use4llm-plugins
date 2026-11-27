@@ -6,8 +6,7 @@ import org.junit.Test;
  * In USE, a navigation from an undefined object is undefined, also when it goes
  * to a derived association end or comes from one. USE does not evaluate the
  * derive expression then. A forward navigation goes to the derived end, a
- * backward navigation to the other end. The derived end derivedEmployer is an
- * object, the derived end staff is a set.
+ * backward navigation to the other end.
  */
 public class DerivedEndNavigation_Test extends OCLTest {
 
@@ -39,5 +38,10 @@ public class DerivedEndNavigation_Test extends OCLTest {
 	@Test
 	public void forwardToAnObjectFromAnUndefinedObject() {
 		test("forwardToAnObjectFromAnUndefinedObject", "uf.person.derivedEmployer");
+	}
+
+	@Test
+	public void backwardToAnObjectFromAnUndefinedObjectWhenEveryDerivedValueIsUndefined() {
+		test("backwardToAnObjectFromAnUndefinedObjectWhenEveryDerivedValueIsUndefined", "uf.person.befriender");
 	}
 }
