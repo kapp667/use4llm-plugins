@@ -78,16 +78,17 @@ public final class Multiplicity {
 	}
 
 	/**
-	 * Return true if this multiplicity represents an object type end.
+	 * Return true if no range of this multiplicity goes above 1, as USE types the
+	 * navigation to such an end as an object, not as a collection.
 	 * 
 	 * @return
 	 */
 	public boolean isObjectTypeEnd() {
-		boolean equal = false;
-		if (ranges.size() > 0) {
-			Range range = ranges.get(0);
-			equal = ranges.size() == 1 && range.getLower() == 1 && range.getUpper() == 1;
+		for (Range range : ranges) {
+			if (range.getUpper() == MANY || range.getUpper() > 1) {
+				return false;
+			}
 		}
-		return equal || isZeroOne();
+		return true;
 	}
 }
