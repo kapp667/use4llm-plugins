@@ -33,6 +33,7 @@ import org.tzi.kodkod.model.iface.IAttribute;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.impl.DerivedAssociation;
+import org.tzi.kodkod.model.impl.DerivedAttribute;
 import org.tzi.kodkod.model.type.TypeConstants;
 import org.tzi.kodkod.ocl.OCLGroupRegistry;
 import org.tzi.kodkod.ocl.operation.AnyOperationGroup;
@@ -222,6 +223,9 @@ public class OCLTest {
 		for (MObject object : state.allObjects()) {
 			IClass clazz = model.getClass(object.cls().name());
 			for (MAttribute mAttribute : object.cls().allAttributes()) {
+				if (mAttribute.isDerived()) {
+					continue;
+				}
 				IAttribute attribute = clazz.getAttribute(mAttribute.name());
 				Value value = object.state(state).attributeValue(mAttribute);
 				int tuples = 1;
@@ -246,6 +250,9 @@ public class OCLTest {
 		for (IClass clazz : model.classes()) {
 			checkTupleNumber(evaluator, clazz.relation(), expectedTuples.get(clazz.name()));
 			for (IAttribute attribute : clazz.attributes()) {
+				if (attribute instanceof DerivedAttribute) {
+					continue;
+				}
 				checkTupleNumber(evaluator, attribute.relation(), attributeTuples.get(attribute));
 			}
 		}
@@ -301,7 +308,7 @@ public class OCLTest {
 	}
 
 	protected Object toKodkod(org.tzi.use.uml.ocl.expr.Expression expression) {
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, new HashMap<String, Node>(), new HashMap<String, IClass>(), new HashMap<String, Variable>(), new ArrayList<String>());
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, new HashMap<String, Node>(), new HashMap<String, Variable>(), new ArrayList<String>());
 		expression.processWithVisitor(visitor);
 		return visitor.getObject();
 	}

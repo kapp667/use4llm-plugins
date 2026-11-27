@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.tzi.kodkod.helper.LogMessages;
-import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.use.kodkod.UseCTScrollingKodkodModelValidator;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.kodkod.transform.ocl.DefaultExpressionVisitor;
@@ -237,8 +236,7 @@ public class KodkodCTScrollingValidateCmd extends KodkodScrollingValidateCmd {
 			Node obsTermKodkod;
 			try {
 				DefaultExpressionVisitor ev = new DefaultExpressionVisitor(model(),
-						new HashMap<String, Node>(), new HashMap<String, IClass>(),
-						new HashMap<String, Variable>(), new ArrayList<String>());
+						new HashMap<String, Node>(), new HashMap<String, Variable>(), new ArrayList<String>());
 				result.processWithVisitor(ev);
 				obsTermKodkod = ev.getObject();
 			}
