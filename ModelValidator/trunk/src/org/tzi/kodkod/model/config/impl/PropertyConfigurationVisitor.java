@@ -159,8 +159,13 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 			typeConfigurators.put(realType, new RealConfigurator());
 		}
 
-		double step = config.getDouble(realType.name() + PropertyEntry.realStep, 0.5);
-		((RealConfigurator) typeConfigurators.get(realType)).setStep(step);
+		String stepName = realType.name() + PropertyEntry.realStep;
+		double step = config.getDouble(stepName, DefaultConfigurationValues.realStep);
+		if (step >= DefaultConfigurationValues.realStepMinimum) {
+			((RealConfigurator) typeConfigurators.get(realType)).setStep(step);
+		} else {
+			error(stepName + ": " + LogMessages.realStepConfigError(step));
+		}
 
 		super.visitRealType(realType);
 	}

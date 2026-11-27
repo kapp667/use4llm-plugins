@@ -33,6 +33,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		RealValue_Test.class,
 		DefaultConfiguration_Test.class,
 		RealAtom_Test.class,
+		RealStep_Test.class,
 		AttributeValueBounds_Test.class,
 		AssociationClassMultiplicity_Test.class,
 		IntegerArithmetic_Test.class,
