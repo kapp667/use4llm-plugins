@@ -137,56 +137,43 @@ public class ValueCreator {
 		return BooleanValue.get(new Boolean((String) atom));
 	}
 
-	private Value createSetValue(Object atom, CollectionType attributeType) {
-		SetValue setValue;
-		if (mObjectState.attributeValue(mAttribute).isUndefined()) {
-			setValue = new SetValue(attributeType.elemType());
-		} else {
-			setValue = (SetValue) mObjectState.attributeValue(mAttribute);
+	/**
+	 * Returns the empty collection of the attribute type, of the kind that
+	 * the elements of the solution are added to.
+	 */
+	static Value emptyCollection(CollectionType attributeType) {
+		Type elemType = attributeType.elemType();
+		if (attributeType.isTypeOfBag()) {
+			return new BagValue(elemType);
+		} else if (attributeType.isTypeOfSequence()) {
+			return new SequenceValue(elemType);
+		} else if (attributeType.isTypeOfOrderedSet()) {
+			return new OrderedSetValue(elemType);
 		}
+		return new SetValue(elemType);
+	}
 
+	private Value createSetValue(Object atom, CollectionType attributeType) {
+		SetValue setValue = (SetValue) mObjectState.attributeValue(mAttribute);
 		Value val = createValue(attributeType.elemType(), atom);
-		setValue = setValue.including(attributeType, val);
-
-		return setValue;
+		return setValue.including(attributeType, val);
 	}
 
 	private Value createSequenceValue(Object atom, SequenceType attributeType) {
-		SequenceValue sequenceValue;
-		if (mObjectState.attributeValue(mAttribute).isUndefined()) {
-			sequenceValue = new SequenceValue(attributeType.elemType());
-		} else {
-			sequenceValue = (SequenceValue) mObjectState.attributeValue(mAttribute);
-		}
+		SequenceValue sequenceValue = (SequenceValue) mObjectState.attributeValue(mAttribute);
 		Value val = createValue(attributeType.elemType(), atom);
-		sequenceValue = sequenceValue.append(attributeType, val);
-
-		return sequenceValue;
+		return sequenceValue.append(attributeType, val);
 	}
 
 	private Value createOrderedSetValue(Object atom, OrderedSetType attributeType) {
-		OrderedSetValue orderedSetValue;
-		if (mObjectState.attributeValue(mAttribute).isUndefined()) {
-			orderedSetValue = new OrderedSetValue(attributeType.elemType());
-		} else {
-			orderedSetValue = (OrderedSetValue) mObjectState.attributeValue(mAttribute);
-		}
+		OrderedSetValue orderedSetValue = (OrderedSetValue) mObjectState.attributeValue(mAttribute);
 		Value val = createValue(attributeType.elemType(), atom);
-		orderedSetValue = orderedSetValue.append(attributeType, val);
-
-		return orderedSetValue;
+		return orderedSetValue.append(attributeType, val);
 	}
 
 	private Value createBagValue(Object atom, BagType attributeType) {
-		BagValue bagValue;
-		if (mObjectState.attributeValue(mAttribute).isUndefined()) {
-			bagValue = new BagValue(attributeType.elemType());
-		} else {
-			bagValue = (BagValue) mObjectState.attributeValue(mAttribute);
-		}
+		BagValue bagValue = (BagValue) mObjectState.attributeValue(mAttribute);
 		Value val = createValue(attributeType.elemType(), atom);
-		bagValue = bagValue.including(attributeType, val);
-
-		return bagValue;
+		return bagValue.including(attributeType, val);
 	}
 }
