@@ -1,5 +1,8 @@
 package org.tzi.use.kodkod.transform.ocl.setOperation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.kodkod.transform.ocl.OCLTest;
@@ -95,6 +98,14 @@ public class Flatten_Test extends OCLTest {
 				"Sequence{1,2}->collectNested(i | if i = 1 then oclUndefined(Set(Integer)) else Set{i} endif)->flatten()");
 	}
 
+	@Test
+	public void collectNestedOnACollectionIsRefused() {
+		assertRefused("(if true then Sequence{1,2} else Set{1,2} endif)->collectNested(i | if i = 1 then oclUndefined(Set(Integer)) else Set{i} endif)->flatten()",
+				"Cannot transform `if true then Sequence {1,2} else Set {1,2} endif->collectNested(i : Integer | if (i = 1) then null else Set {i} endif)':"
+						+ " its source has the type Collection, and USE's flatten() keeps an undefined collection of its result"
+						+ " for a Set or a Bag source but skips it for a Sequence or an OrderedSet source.");
+	}
+
 	@Test(expected = TransformationException.class)
 	public void orderedSetWithAnUndefinedElementIsRefused() {
 		toKodkod(toOCLExpression("OrderedSet{OrderedSet{1}, null}->flatten()"));
@@ -103,6 +114,15 @@ public class Flatten_Test extends OCLTest {
 	@Test
 	public void orderedSetOfLiteralsIsFlattened() {
 		test("orderedSetOfLiteralsIsFlattened", "OrderedSet{OrderedSet{1}, OrderedSet{2}}->flatten()");
+	}
+
+	private void assertRefused(String ocl, String message) {
+		try {
+			toKodkod(toOCLExpression(ocl));
+			fail("The expression was translated: " + ocl);
+		} catch (TransformationException e) {
+			assertEquals(message, e.getMessage());
+		}
 	}
 
 }
