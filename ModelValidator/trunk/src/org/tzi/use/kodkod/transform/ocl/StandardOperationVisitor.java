@@ -37,12 +37,12 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 	public void visitStdOp(ExpStdOp exp) {
 		arguments = new ArrayList<Object>();
 
-		for (org.tzi.use.uml.ocl.expr.Expression expArg : exp.args()) {
+		for (int i = 0; i < exp.args().length; i++) {
 			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 			if (exp.opname().equals("flatten")) {
 				visitor.acceptCollectionOfCollections();
 			}
-			expArg.processWithVisitor(visitor);
+			visitor.processAs(exp.args()[i], argumentType(exp, i));
 			arguments.add(visitor.getObject());
 			set = set || visitor.isSet();
 		}
@@ -55,6 +55,19 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 		} else {
 			invokeMethod(exp.opname(), arguments, set);
 		}
+	}
+
+	private static final Set<String> EQUALITY = Set.of("=", "<>");
+
+	/**
+	 * The type USE takes an argument of the operation as. An operand of = or <> is
+	 * taken as a value of the type of the other operand.
+	 */
+	private static Type argumentType(ExpStdOp exp, int index) {
+		if (EQUALITY.contains(exp.opname())) {
+			return exp.args()[1 - index].type();
+		}
+		return exp.args()[index].type();
 	}
 
 	private static final Set<String> STRING_ORDER_AND_CONCATENATION = Set.of("<", "<=", ">", ">=", "+");
@@ -74,7 +87,7 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 		if ((opname.equals("size") || opname.equals("count") || opname.equals("sum")) && canHoldDuplicates(exp.args()[0].type())) {
 			throw new TransformationException(LogMessages.collectionDuplicatesError(exp.toString()));
 		}
-		if ((opname.equals("=") || opname.equals("<>")) && (isCollectionButNotSet(exp.args()[0].type()) || isCollectionButNotSet(exp.args()[1].type()))) {
+		if (EQUALITY.contains(opname) && (isCollectionButNotSet(exp.args()[0].type()) || isCollectionButNotSet(exp.args()[1].type()))) {
 			throw new TransformationException(LogMessages.collectionComparisonError(exp.toString()));
 		}
 	}
