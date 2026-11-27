@@ -264,6 +264,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitIf(ExpIf exp) {
 		super.visitIf(exp);
 		refuseCollectionOfCollections(exp);
+		boolean collection = exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
 
 		List<Object> arguments = new ArrayList<Object>();
 
@@ -271,15 +272,19 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.getCondition().processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 
-		visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-		exp.getThenExpression().processWithVisitor(visitor);
-		arguments.add(visitor.getObject());
+		arguments.add(branch(exp.getThenExpression(), collection));
+		arguments.add(branch(exp.getElseExpression(), collection));
 
-		visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-		exp.getElseExpression().processWithVisitor(visitor);
-		arguments.add(visitor.getObject());
+		invokeMethod("if_then_else", arguments, collection);
+	}
 
-		invokeMethod("if_then_else", arguments, false);
+	private Object branch(org.tzi.use.uml.ocl.expr.Expression branch, boolean collection) {
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
+		branch.processWithVisitor(visitor);
+		if (collection && branch.type().isTypeOfVoidType()) {
+			return undefined_Set;
+		}
+		return visitor.getObject();
 	}
 
 	@Override
