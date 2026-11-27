@@ -368,4 +368,29 @@ public class Equality_Test extends OCLTest {
 		test("test52", ocl, expected);
 	}
 
+	@Test
+	public void anUndefinedSetEqualsNull() {
+		test("anUndefinedSetEqualsNull", "ada.luckyNumbers = null");
+	}
+
+	@Test
+	public void nullEqualsAnUndefinedSet() {
+		test("nullEqualsAnUndefinedSet", "null = ada.luckyNumbers");
+	}
+
+	@Test
+	public void aDefinedSetDoesNotEqualNull() {
+		test("aDefinedSetDoesNotEqualNull", "bob.luckyNumbers = null");
+	}
+
+	@Test
+	public void anUndefinedSetOfATypeEqualsNull() {
+		test("anUndefinedSetOfATypeEqualsNull", "oclUndefined(Set(Integer)) = null");
+	}
+
+	@Test
+	public void selectsThePeopleWhoseSetEqualsNull() {
+		test("selectsThePeopleWhoseSetEqualsNull", "Person.allInstances()->select(p | p.luckyNumbers = null)->size()");
+	}
+
 }
