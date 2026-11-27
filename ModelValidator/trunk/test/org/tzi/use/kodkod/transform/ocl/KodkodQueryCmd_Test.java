@@ -105,7 +105,7 @@ public class KodkodQueryCmd_Test {
 		solve();
 		String output = query("3 * 3 * 3");
 		assertTrue(output, output.contains("INFO 27 : Integer"));
-		String error = errorLine(output);
+		String error = lineStartingWith(output, "ERROR");
 		assertTrue(output, error.contains("USE: 27") && error.contains("Kodkod: []"));
 	}
 
@@ -164,15 +164,30 @@ public class KodkodQueryCmd_Test {
 		assertNotComparedWithoutError(output);
 	}
 
+	@Test
+	public void doesNotCompareAVariableBoundToAnotherValue() throws Exception {
+		solve();
+		shell.type("!person2 := person1");
+		String output = query("person2 = person1");
+		assertTrue(output, output.contains("INFO true : Boolean"));
+		assertNotComparedWithoutError(output);
+		assertTrue(output, lineStartingWith(output, "INFO " + NOT_COMPARED).contains("person2"));
+		shell.type("!five := 5");
+		output = query("five + 1");
+		assertTrue(output, output.contains("INFO 6 : Integer"));
+		assertNotComparedWithoutError(output);
+		assertTrue(output, lineStartingWith(output, "INFO " + NOT_COMPARED).contains("five"));
+	}
+
 	private static void assertNotComparedWithoutError(String output) {
 		assertTrue(output, output.contains(NOT_COMPARED));
 		assertFalse(output, output.contains("ERROR"));
 		assertFalse(output, output.contains("Exception"));
 	}
 
-	private static String errorLine(String output) {
+	private static String lineStartingWith(String output, String start) {
 		for (String line : output.split("\n")) {
-			if (line.startsWith("ERROR")) {
+			if (line.startsWith(start)) {
 				return line;
 			}
 		}
