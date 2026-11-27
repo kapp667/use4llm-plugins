@@ -1,5 +1,6 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -156,6 +157,17 @@ public class KodkodQueryCmd_Test {
 	}
 
 	@Test
+	public void aQueryDoesNotChangeTheUniverseOfTheNextSolve() throws Exception {
+		String properties = properties();
+		String first = shell.run(new KodkodValidateCmd(), properties);
+		assertTrue(first, first.contains("Universe:"));
+		query("4 > 5");
+		query("'zzz' = 'zzz'");
+		String second = shell.run(new KodkodValidateCmd(), properties);
+		assertEquals(lineContaining(first, "Universe:"), lineContaining(second, "Universe:"));
+	}
+
+	@Test
 	public void doesNotCompareBeforeASolve() {
 		String output = query("1 + 2");
 		assertTrue(output, output.contains("INFO 3 : Integer"));
@@ -234,6 +246,15 @@ public class KodkodQueryCmd_Test {
 		for (String line : output.split("\n")) {
 			if (line.startsWith(start)) {
 				return line;
+			}
+		}
+		return "";
+	}
+
+	private static String lineContaining(String output, String part) {
+		for (String line : output.split("\n")) {
+			if (line.contains(part)) {
+				return line.substring(line.indexOf(part));
 			}
 		}
 		return "";
