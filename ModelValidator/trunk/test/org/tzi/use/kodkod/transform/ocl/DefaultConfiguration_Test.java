@@ -20,7 +20,8 @@ import org.tzi.use.uml.sys.MSystem;
 
 /**
  * Checks that the default configuration, the one the validator writes when it
- * is given no properties file, leaves room for the values of a Real attribute.
+ * is given no properties file, gives an object to a class with a Real
+ * attribute or an OclAny attribute.
  */
 public class DefaultConfiguration_Test {
 
@@ -33,6 +34,16 @@ public class DefaultConfiguration_Test {
 				+ "class A\n"
 				+ "attributes\n"
 				+ "  salary : Real\n"
+				+ "end\n";
+		assertEquals(1, objectsOfTheDefaultSolution(spec));
+	}
+
+	@Test
+	public void classWithAnOclAnyAttributeGetsAnObject() throws Exception {
+		String spec = "model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
 				+ "end\n";
 		assertEquals(1, objectsOfTheDefaultSolution(spec));
 	}
