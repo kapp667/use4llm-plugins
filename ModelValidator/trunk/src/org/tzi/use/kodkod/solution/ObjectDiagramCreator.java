@@ -25,8 +25,10 @@ import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.main.Session;
 import org.tzi.use.uml.mm.MAssociationClass;
+import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.ocl.expr.Evaluator;
+import org.tzi.use.uml.ocl.type.CollectionType;
 import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.sys.MObjectState;
 import org.tzi.use.uml.sys.MSystem;
@@ -73,7 +75,24 @@ public class ObjectDiagramCreator {
 
 		createAssociationClasses(relations);
 
+		emptyCollectionAttributes();
+
 		createElements(withoutClasses);
+	}
+
+	private void emptyCollectionAttributes() throws UseApiException {
+		MModel mModel = systemApi.getSystem().model();
+		for (IAttribute attribute : attributes.values()) {
+			MAttribute mAttribute = mModel.getClass(attribute.owner().name()).attribute(attribute.name(), false);
+			if (attribute.type().isSet() && !mAttribute.isDerived()) {
+				for (MObjectState objectState : objectStates.values()) {
+					if (objectState.attributeValueMap().containsKey(mAttribute)) {
+						systemApi.setAttributeValueEx(objectState.object(), mAttribute,
+								ValueCreator.emptyCollection((CollectionType) mAttribute.type()));
+					}
+				}
+			}
+		}
 	}
 
 	public ErrorType hasDiagramErrors() {
