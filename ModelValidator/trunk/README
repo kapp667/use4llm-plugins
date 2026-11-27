@@ -42,3 +42,9 @@ Metamodels/UML23/UML2MM.use and Others/Sudoku/Sudoku.use use any(). Where only
 the existence of a match or a property of all matches matters,
 select(...)->notEmpty() or select(...)->forAll(...) expresses it and is
 translated.
+
+sortedBy() is refused: it returns an OrderedSet or a Sequence, and the plugin
+does not keep the order of a collection. Where only the elements matter, for
+example in ->size() or ->forAll(...), use the source collection instead.
+byUseId() and object references such as @ada are refused as well; write the
+object as the variable ada instead.
