@@ -60,4 +60,9 @@ public class AsSet_Test extends OCLTest {
 		test("test8", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeAsASetIsUndefined() {
+		test("undefinedSetOfATypeAsASetIsUndefined", "oclUndefined(Set(Integer))->asSet()");
+	}
+
 }

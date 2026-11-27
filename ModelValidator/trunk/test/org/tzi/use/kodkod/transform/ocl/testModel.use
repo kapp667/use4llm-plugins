@@ -17,6 +17,8 @@ operations
   currentEmployer():Company = self.employerAC
   numbersIfAlive():Set(Integer) = if self.alive then Set{1} else Set{2} endif
   named():Boolean = self.name.isDefined()
+  sizeOf(numbers:Set(Integer)):Integer = numbers->size()
+  noNumbers():Set(Integer) = null
 end
 
 class Company
@@ -42,6 +44,7 @@ attributes
   parent:Parent_AC
   buy:Buy_AC
   exam:Exam_AC
+  numbers:Set(Integer) derived = null
 end
 
 association Job_A between
@@ -116,6 +119,16 @@ end
 association NamedJob between
   Person[*] role namedEmployee
   Company[0..1] role namedEmployer derived = if self.name.isDefined() then self.employerAC else null endif
+end
+
+association NullStaff between
+  Company[*] role nullEmployer
+  Person[*] role nullStaff derived = null
+end
+
+association StaffFriendship between
+  Company[*] role staffFriendEmployer
+  Person[*] role staffFriend derived = self.employeeAC->collect(p | p.bestFriend)->asSet()
 end
 
 associationclass Idle_AC between

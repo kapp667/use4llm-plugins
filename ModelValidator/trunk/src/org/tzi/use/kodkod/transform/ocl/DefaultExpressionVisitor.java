@@ -123,6 +123,20 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		collectionOfCollectionsAccepted = true;
 	}
 
+	/** An OclVoid expression such as null, where a collection is expected, is the undefined set. */
+	protected void processAs(org.tzi.use.uml.ocl.expr.Expression exp, Type type) {
+		if (exp.type().isTypeOfVoidType() && type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
+			translateToUndefinedSet();
+		} else {
+			exp.processWithVisitor(this);
+		}
+	}
+
+	private void translateToUndefinedSet() {
+		object = undefined_Set;
+		set = true;
+	}
+
 	@Override
 	public void visitAllInstances(ExpAllInstances exp) {
 		super.visitAllInstances(exp);
@@ -243,7 +257,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		super.visitLet(exp);
 		refuseCollectionOfCollections(exp);
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-		exp.getVarExpression().processWithVisitor(visitor);
+		visitor.processAs(exp.getVarExpression(), exp.getVarType());
 		Node varExpression = visitor.getObject();
 
 		variables.put(exp.getVarname(), varExpression);
@@ -272,19 +286,16 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		exp.getCondition().processWithVisitor(visitor);
 		arguments.add(visitor.getObject());
 
-		arguments.add(branch(exp.getThenExpression(), collection));
-		arguments.add(branch(exp.getElseExpression(), collection));
+		arguments.add(branch(exp.getThenExpression(), exp.type()));
+		arguments.add(branch(exp.getElseExpression(), exp.type()));
 
 		invokeMethod("if_then_else", arguments, collection);
 	}
 
-	private Object branch(org.tzi.use.uml.ocl.expr.Expression branch, boolean collection) {
-		if (collection && branch.type().isTypeOfVoidType()) {
-			return undefined_Set;
-		}
+	private Object branch(org.tzi.use.uml.ocl.expr.Expression branch, Type type) {
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-		branch.processWithVisitor(visitor);
-		if (collection && !visitor.isSet() && visitor.getObject() != undefined_Set) {
+		visitor.processAs(branch, type);
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !visitor.isSet()) {
 			throw new TransformationException("Cannot transform " + StringUtil.inQuotes(branch.toString())
 					+ ": it is a branch of a collection-valued if but is not translated to a set.");
 		}
@@ -405,7 +416,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		refuseCollectionOfCollections(exp);
 		refuseReal(exp);
 		if (exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
-			object = undefined_Set;
+			translateToUndefinedSet();
 		} else {
 			object = undefined;
 		}

@@ -350,4 +350,14 @@ public class AttributeAccess_Test extends OCLTest {
 		test("selectByAttributeOfAnIfInADerivedAttribute", "Person.allInstances()->select(p | p.employerName = 'IBM')->size()");
 	}
 
+	@Test
+	public void derivedSetAttributeOfNullHasNoSize() {
+		test("derivedSetAttributeOfNullHasNoSize", "uf.numbers->size()");
+	}
+
+	@Test
+	public void derivedSetAttributeOfNullEqualsAnUndefinedSet() {
+		test("derivedSetAttributeOfNullEqualsAnUndefinedSet", "uf.numbers = ada.luckyNumbers");
+	}
+
 }
