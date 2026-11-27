@@ -383,7 +383,8 @@ public enum ValidityRule {
 
 	/**
 	 * Returns the rules that mv -validate checks before it searches: a bound out of
-	 * range, a min above its max, or a String attribute with no String settings, which the loader does not report. The other
+	 * range, a min above its max, or a String attribute with no String settings,
+	 * which the loader does not report. The other
 	 * rules are reported by mv -vc only, because some of them reject settings the
 	 * loader reads soundly.
 	 * 
