@@ -2,6 +2,7 @@ package org.tzi.kodkod.model.config.impl;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -10,7 +11,6 @@ import java.util.Set;
 import kodkod.instance.TupleFactory;
 import kodkod.instance.TupleSet;
 
-import org.tzi.kodkod.model.impl.Range;
 import org.tzi.kodkod.model.type.ConfigurableType;
 
 /**
@@ -23,6 +23,9 @@ public class RealConfigurator extends TypeConfigurator{
 
 	private double step = 0.5;
 	private final DecimalFormat decimalFormat;
+	private boolean rangeSet = false;
+	private double realLower;
+	private double realUpper;
 	
 	public RealConfigurator(){
 		decimalFormat = new DecimalFormat("#0.00", DecimalFormatSymbols.getInstance(Locale.ROOT));
@@ -36,10 +39,8 @@ public class RealConfigurator extends TypeConfigurator{
 			lower.add(tupleFactory.tuple(type.name() + "_" + decimalFormat.format(Double.parseDouble(specific[0]))));
 		}
 
-		for(Range range : ranges){
-			for (double i = range.getLower(); i <= range.getUpper(); i+=step) {
-				lower.add(tupleFactory.tuple(type.name() + "_" + decimalFormat.format(i)));
-			}
+		for (double value : rangeValues()) {
+			lower.add(tupleFactory.tuple(type.name() + "_" + decimalFormat.format(value)));
 		}
 		
 		return lower;
@@ -55,10 +56,8 @@ public class RealConfigurator extends TypeConfigurator{
 		Set<Object >atoms = new LinkedHashSet<Object>();
 		atoms.addAll(literals);		
 
-		for(Range range : ranges){
-			for (double i = range.getLower(); i <= range.getUpper(); i+=step) {
-				atoms.add(type.name() + "_" + decimalFormat.format(i));
-			}
+		for (double value : rangeValues()) {
+			atoms.add(type.name() + "_" + decimalFormat.format(value));
 		}
 
 		for (String[] specific : allValues()) {
@@ -70,6 +69,29 @@ public class RealConfigurator extends TypeConfigurator{
 
 	public void setStep(double step) {
 		this.step = step;
+	}
+
+	/**
+	 * Sets the bounds of the range. The bounds keep the values the file gives.
+	 */
+	public void setRealRange(double lower, double upper) {
+		this.realLower = lower;
+		this.realUpper = upper;
+		this.rangeSet = true;
+	}
+
+	/**
+	 * Returns the values lower + k * step that are at most the upper bound.
+	 * Each value comes from k, so no rounding error builds up over the steps.
+	 */
+	private List<Double> rangeValues() {
+		List<Double> values = new ArrayList<Double>();
+		if (rangeSet) {
+			for (int k = 0; realLower + k * step <= realUpper; k++) {
+				values.add(realLower + k * step);
+			}
+		}
+		return values;
 	}
 
 }
