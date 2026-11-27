@@ -137,10 +137,6 @@ public class ValueCreator {
 		return BooleanValue.get(new Boolean((String) atom));
 	}
 
-	/**
-	 * Returns the empty collection of the attribute type, of the kind that
-	 * the elements of the solution are added to.
-	 */
 	static Value emptyCollection(CollectionType attributeType) {
 		Type elemType = attributeType.elemType();
 		if (attributeType.isTypeOfBag()) {
