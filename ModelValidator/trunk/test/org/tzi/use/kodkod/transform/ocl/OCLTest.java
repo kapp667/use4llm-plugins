@@ -31,6 +31,7 @@ import org.tzi.kodkod.model.iface.IAssociation;
 import org.tzi.kodkod.model.iface.IAttribute;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
+import org.tzi.kodkod.model.impl.DerivedAssociation;
 import org.tzi.kodkod.model.type.TypeConstants;
 import org.tzi.kodkod.ocl.OCLGroupRegistry;
 import org.tzi.kodkod.ocl.operation.AnyOperationGroup;
@@ -247,6 +248,9 @@ public class OCLTest {
 			}
 		}
 		for (IAssociation association : model.associations()) {
+			if (association instanceof DerivedAssociation) {
+				continue;
+			}
 			int linkTuples = 0;
 			for (Tuple tuple : evaluator.evaluate(association.relation())) {
 				if (!containsAtom(tuple, TypeConstants.UNDEFINED)) {

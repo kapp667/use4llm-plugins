@@ -76,3 +76,13 @@ associationclass Exam_AC between
   Person[0..*] role examinerAC
   Person[0..1] role recorderAC
 end
+
+association DerivedJob between
+  Person[*] role derivedEmployee
+  Company[0..1] role derivedEmployer derived = self.employerAC
+end
+
+association DerivedStaff between
+  Company[0..1] role staffEmployer
+  Person[*] role staff derived = Person.allInstances()->select(employee | employee.employerAC = self)
+end
