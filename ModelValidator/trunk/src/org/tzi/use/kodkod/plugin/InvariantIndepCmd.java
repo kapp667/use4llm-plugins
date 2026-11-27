@@ -27,7 +27,9 @@ public class InvariantIndepCmd extends ConfigurablePlugin implements IPluginShel
 		}
 		
 		initialize(pluginCommand.getSession());
-		enrichModel();
+		if (!enrichModel()) {
+			return;
+		}
 
 		InvariantIndepChecker indepChecker = new InvariantIndepChecker(session);
 
