@@ -153,6 +153,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	public void visitAsType(ExpAsType exp) {
 		super.visitAsType(exp);
 		refuseCollectionOfCollections(exp);
+		refuseTypeTestWithCollection(exp, exp.getSourceExpr(), exp.getTargetType());
 		refuseReal(exp);
 		try {
 			visitTypeOperation("oclAsType", exp.getSourceExpr(), exp.getTargetType(), true);
@@ -292,12 +293,14 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitIsKindOf(ExpIsKindOf exp) {
 		super.visitIsKindOf(exp);
+		refuseTypeTestWithCollection(exp, exp.getSourceExpr(), exp.getTargetType());
 		visitTypeOperation("oclIsKindOf", exp.getSourceExpr(), exp.getTargetType(), true);
 	}
 
 	@Override
 	public void visitIsTypeOf(ExpIsTypeOf exp) {
 		super.visitIsTypeOf(exp);
+		refuseTypeTestWithCollection(exp, exp.getSourceExpr(), exp.getTargetType());
 		visitTypeOperation("oclIsTypeOf", exp.getSourceExpr(), exp.getTargetType(), false);
 	}
 
@@ -482,9 +485,19 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		sourceType = visitor.getSourceType();
 	}
 
+	private void refuseTypeTestWithCollection(org.tzi.use.uml.ocl.expr.Expression typeTest, org.tzi.use.uml.ocl.expr.Expression source, Type targetType) {
+		if (isCollectionOfCollections(targetType)) {
+			throw new TransformationException(LogMessages.collectionOfCollectionsError(targetType.toString()));
+		}
+		refuseCollectionOfCollections(source);
+		if (source.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID) || targetType.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
+			throw new TransformationException(LogMessages.collectionTypeTestError(typeTest.toString()));
+		}
+	}
+
 	/**
 	 * Visit every kind of type operation.
-	 * 
+	 *
 	 * @param opName
 	 * @param sourceExpression
 	 * @param targetType
