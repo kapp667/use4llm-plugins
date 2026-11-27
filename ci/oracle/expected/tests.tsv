@@ -137,7 +137,7 @@ use-gui/src/it/resources/testfiles/shell/relativepath/library.use	default	UNSAT	
 use-gui/src/it/resources/testfiles/shell/relativepath/library.use	wide	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t001.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t001.use	wide	SAT	ok
-use-gui/src/it/resources/testfiles/shell/t002.use	default	UNSAT	n/a
+use-gui/src/it/resources/testfiles/shell/t002.use	default	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t002.use	wide	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t002.use	witness	SAT	ok
 use-gui/src/it/resources/testfiles/shell/t003.use	default	UNSAT	n/a

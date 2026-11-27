@@ -18,10 +18,6 @@ import org.tzi.use.main.Session;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.sys.MSystem;
 
-/**
- * Checks that the default configuration, the one the validator writes when it
- * is given no properties file, leaves room for the values of a Real attribute.
- */
 public class DefaultConfiguration_Test {
 
 	@Rule
@@ -33,6 +29,26 @@ public class DefaultConfiguration_Test {
 				+ "class A\n"
 				+ "attributes\n"
 				+ "  salary : Real\n"
+				+ "end\n";
+		assertEquals(1, objectsOfTheDefaultSolution(spec));
+	}
+
+	@Test
+	public void classWithAnOclAnyAttributeGetsAnObject() throws Exception {
+		String spec = "model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  x : OclAny\n"
+				+ "end\n";
+		assertEquals(1, objectsOfTheDefaultSolution(spec));
+	}
+
+	@Test
+	public void classWithAnOclVoidAttributeGetsAnObject() throws Exception {
+		String spec = "model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  v : OclVoid\n"
 				+ "end\n";
 		assertEquals(1, objectsOfTheDefaultSolution(spec));
 	}

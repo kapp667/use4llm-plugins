@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.tzi.kodkod.helper.ExpressionHelper;
+import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IAssociation;
 import org.tzi.kodkod.model.iface.IAssociationEnd;
 import org.tzi.kodkod.model.iface.IAttribute;
@@ -53,7 +54,8 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		IClass owner = model.getClass(exp.attr().owner().name());
 		IAttribute attribute = owner == null ? null : owner.getAttribute(exp.attr().name());
 		if (attribute == null) {
-			throw new TransformationException("Cannot find attribute " + exp.attr().name() + ".");
+			throw new TransformationException(LogMessages.untransformedAttributeError(exp.toString(),
+					exp.attr().owner().name() + "::" + exp.attr().name(), exp.attr().type().toString()));
 		}
 		if (attribute instanceof DerivedAttribute) {
 			handleDerivedAttribute(exp, (DerivedAttribute) attribute);

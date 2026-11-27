@@ -117,10 +117,10 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 		IAttribute attribute;
 		
 		for (MAttribute mAttribute : mObject.cls().allAttributes()) {
-			if(mAttribute.isDerived()){
+			attribute = clazz.getAttribute(mAttribute.name());
+			if(mAttribute.isDerived() || attribute == null){
 				continue;
 			}
-			attribute = clazz.getAttribute(mAttribute.name());
 			Value value = objectState.attributeValue(mAttribute);
 			if (!value.isUndefined()) {
 
