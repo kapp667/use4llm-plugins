@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.tzi.kodkod.helper.ExpressionHelper;
 import org.tzi.kodkod.model.iface.IAssociation;
 import org.tzi.kodkod.model.iface.IAssociationEnd;
 import org.tzi.kodkod.model.iface.IAttribute;
@@ -28,6 +29,7 @@ import org.tzi.use.uml.ocl.type.Type.VoidHandling;
 import org.tzi.use.util.StringUtil;
 
 import kodkod.ast.Expression;
+import kodkod.ast.Formula;
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
 
@@ -82,9 +84,8 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		}
 
 		set = exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
-		if (object instanceof Expression) {
-			object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, (Expression) object);
-		}
+		Expression value = object instanceof Formula ? ExpressionHelper.boolean_formula2expr((Formula) object, model.typeFactory()) : (Expression) object;
+		object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, value);
 	}
 
 	private void handleRegularAttribute(ExpAttrOp exp, IAttribute attribute) {
