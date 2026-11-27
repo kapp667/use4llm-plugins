@@ -1,5 +1,8 @@
 package org.tzi.use.kodkod.transform.ocl;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,20 +29,39 @@ public class CollectionAttributeDiagram_Test {
 			+ "  b : Bag(Integer)\n"
 			+ "  q : Sequence(Integer)\n"
 			+ "  o : OrderedSet(Integer)\n"
+			+ "  c : Collection(Integer)\n"
 			+ "  u : Set(Integer)\n"
 			+ "  emptied : Set(Integer) init: Set{1}\n"
 			+ "  replaced : Set(Integer) init: Set{1}\n"
+			+ "  filledBag : Bag(Integer)\n"
+			+ "  filledSequence : Sequence(Integer)\n"
+			+ "  filledOrderedSet : OrderedSet(Integer)\n"
+			+ "  filledCollection : Collection(Integer)\n"
 			+ "end\n"
 			+ "class B < A\n"
+			+ "end\n"
+			+ "class C\n"
+			+ "end\n"
+			+ "associationclass AC between\n"
+			+ "  A[*] role owner\n"
+			+ "  C[*] role item\n"
+			+ "attributes\n"
+			+ "  tags : Set(Integer)\n"
 			+ "end\n"
 			+ "constraints\n"
 			+ "context A inv emptySet: self.s->isEmpty()\n"
 			+ "context A inv emptyBag: self.b->isEmpty()\n"
 			+ "context A inv emptySequence: self.q->isEmpty()\n"
 			+ "context A inv emptyOrderedSet: self.o->isEmpty()\n"
+			+ "context A inv emptyCollection: self.c->isEmpty()\n"
 			+ "context A inv undefinedSet: self.u->isUndefined()\n"
 			+ "context A inv emptiedInit: self.emptied->isEmpty()\n"
-			+ "context A inv replacedInit: self.replaced = Set{2}\n";
+			+ "context A inv replacedInit: self.replaced = Set{2}\n"
+			+ "context A inv bagElements: self.filledBag->asSet() = Set{1,2}\n"
+			+ "context A inv sequenceElements: self.filledSequence->asSet() = Set{1,2}\n"
+			+ "context A inv orderedSetElements: self.filledOrderedSet->asSet() = Set{1,2}\n"
+			+ "context A inv collectionElements: self.filledCollection->asSet() = Set{1,2}\n"
+			+ "context AC inv emptyLinkObjectSet: self.tags->isEmpty()\n";
 
 	private Session session;
 	private ObjectDiagramCreator creator;
@@ -53,7 +75,7 @@ public class CollectionAttributeDiagram_Test {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("Integer_min", 0);
 		properties.put("Integer_max", 3);
-		for (String className : new String[] { "A", "B" }) {
+		for (String className : new String[] { "A", "B", "C", "AC" }) {
 			properties.put(className + "_min", 1);
 			properties.put(className + "_max", 1);
 		}
@@ -87,8 +109,18 @@ public class CollectionAttributeDiagram_Test {
 	}
 
 	@Test
+	public void emptyCollectionAttributeIsTheEmptySet() {
+		assertEquals("Set{}", attributeValue("A", "c").toString());
+	}
+
+	@Test
 	public void emptySetAttributeOfASubclassObjectIsTheEmptySet() {
 		assertEquals("Set{}", attributeValue("B", "s").toString());
+	}
+
+	@Test
+	public void emptySetAttributeOfALinkObjectIsTheEmptySet() {
+		assertEquals("Set{}", attributeValue("AC", "tags").toString());
 	}
 
 	@Test
@@ -104,6 +136,28 @@ public class CollectionAttributeDiagram_Test {
 	@Test
 	public void setAttributeHoldsOnlyTheElementsOfTheSolutionAfterAnInitValue() {
 		assertEquals("Set{2}", attributeValue("A", "replaced").toString());
+	}
+
+	@Test
+	public void bagAttributeHoldsTheElementsOfTheSolution() {
+		assertEquals("Bag{1,2}", attributeValue("A", "filledBag").toString());
+	}
+
+	@Test
+	public void sequenceAttributeHoldsTheElementsOfTheSolution() {
+		assertThat(attributeValue("A", "filledSequence").toString(),
+				anyOf(equalTo("Sequence{1,2}"), equalTo("Sequence{2,1}")));
+	}
+
+	@Test
+	public void orderedSetAttributeHoldsTheElementsOfTheSolution() {
+		assertThat(attributeValue("A", "filledOrderedSet").toString(),
+				anyOf(equalTo("OrderedSet{1,2}"), equalTo("OrderedSet{2,1}")));
+	}
+
+	@Test
+	public void collectionAttributeHoldsTheElementsOfTheSolutionInASet() {
+		assertEquals("Set{1,2}", attributeValue("A", "filledCollection").toString());
 	}
 
 	@Test
