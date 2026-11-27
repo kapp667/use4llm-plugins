@@ -425,4 +425,19 @@ public class Select_Test extends OCLTest {
 		test("test59", ocl, expected);
 	}
 
+	@Test
+	public void selectionByKindFromAnUndefinedSetIsUndefined() {
+		test("selectionByKindFromAnUndefinedSetIsUndefined", "ada.luckyNumbers->selectByKind(Integer)");
+	}
+
+	@Test
+	public void selectionByTypeFromAnUndefinedSetIsUndefined() {
+		test("selectionByTypeFromAnUndefinedSetIsUndefined", "ada.luckyNumbers->selectByType(Integer)");
+	}
+
+	@Test
+	public void selectionByKindFromADefinedSetKeepsItsElements() {
+		test("selectionByKindFromADefinedSetKeepsItsElements", "bob.luckyNumbers->selectByKind(Integer)");
+	}
+
 }
