@@ -295,7 +295,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	private Object branch(org.tzi.use.uml.ocl.expr.Expression branch, Type type) {
 		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		visitor.processAs(branch, type);
-		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !visitor.isSet() && visitor.getObject() != undefined_Set) {
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !visitor.isSet()) {
 			throw new TransformationException("Cannot transform " + StringUtil.inQuotes(branch.toString())
 					+ ": it is a branch of a collection-valued if but is not translated to a set.");
 		}
