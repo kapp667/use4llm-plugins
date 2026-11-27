@@ -186,6 +186,19 @@ public final class LogMessages {
 				+ ": its result depends on the order of a collection that is not a set, which the transformation does not keep.";
 	}
 
+	public static String sortedByError(String expression) {
+		return "Cannot transform " + inQuotes(expression)
+				+ ": sortedBy returns an ordered collection, whose order the translation does not keep.";
+	}
+
+	public static String objectReferenceError(String expression, String objectName) {
+		return "Cannot transform " + inQuotes(expression) + ": write it as the variable " + objectName + ", which is translated.";
+	}
+
+	public static String unsupportedExpressionError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": the translation does not handle this kind of expression.";
+	}
+
 	public static String collectionComparisonError(String expression) {
 		return "Cannot transform " + inQuotes(expression) + ": only two sets can be compared.";
 	}
