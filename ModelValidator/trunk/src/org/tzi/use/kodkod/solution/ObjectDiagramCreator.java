@@ -80,12 +80,6 @@ public class ObjectDiagramCreator {
 		createElements(withoutClasses);
 	}
 
-	/**
-	 * Gives each collection attribute of each object the empty collection, the
-	 * value of a collection attribute that has no tuple in the solution. A new
-	 * object of USE has an undefined value or its init value instead. The
-	 * tuples of the attribute then add its elements, or make it undefined.
-	 */
 	private void emptyCollectionAttributes() throws UseApiException {
 		MModel mModel = systemApi.getSystem().model();
 		for (IAttribute attribute : attributes.values()) {

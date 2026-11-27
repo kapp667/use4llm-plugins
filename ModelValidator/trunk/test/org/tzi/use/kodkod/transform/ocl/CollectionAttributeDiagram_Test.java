@@ -17,12 +17,6 @@ import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystem;
 
-/**
- * Checks that the object diagram built from a solution gives each collection
- * attribute the value the solution gives it, whatever value USE gives a new
- * object. A solution holds no tuple for an empty collection and the atom
- * Undefined_Set for an undefined one.
- */
 public class CollectionAttributeDiagram_Test {
 
 	private static final String SPEC = "model M\n"
@@ -63,8 +57,7 @@ public class CollectionAttributeDiagram_Test {
 			properties.put(className + "_min", 1);
 			properties.put(className + "_max", 1);
 		}
-		// by default, every attribute value is defined
-		properties.put("A_u_min", 0);
+		letAttributeBeUndefined(properties, "A", "u");
 		IModel model = TestSpecifications.configure(TestSpecifications.transform(mModel), properties);
 		OutcomeRecorder validator = new OutcomeRecorder();
 		validator.validate(model);
@@ -116,6 +109,10 @@ public class CollectionAttributeDiagram_Test {
 	@Test
 	public void useFindsNoInvariantFalseInTheDiagram() {
 		assertEquals(ObjectDiagramCreator.ErrorType.NONE, creator.hasDiagramErrors());
+	}
+
+	private static void letAttributeBeUndefined(Map<String, Object> properties, String className, String attributeName) {
+		properties.put(className + "_" + attributeName + "_min", 0);
 	}
 
 	private Value attributeValue(String className, String attributeName) {
