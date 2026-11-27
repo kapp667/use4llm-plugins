@@ -133,6 +133,31 @@ public class OclAnyAttribute_Test {
 	}
 
 	@Test
+	public void invariantOnAnOclVoidAttributeIsRefused() {
+		String log = refusalOf("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  v : OclVoid\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context A inv undefined: self.v.isUndefined()\n");
+		assertTrue(log, log.contains("A::v"));
+		assertTrue(log, log.contains("OclVoid"));
+	}
+
+	@Test
+	public void invariantOnASetOfOclVoidAttributeIsSolved() {
+		validator.validate(oneObjectOfA("model M\n"
+				+ "class A\n"
+				+ "attributes\n"
+				+ "  s : Set(OclVoid)\n"
+				+ "end\n"
+				+ "constraints\n"
+				+ "context A inv holdsNull: self.s->size() = 1\n"));
+		assertThat(validator.outcome, anyOf(equalTo("SATISFIABLE"), equalTo("TRIVIALLY_SATISFIABLE")));
+	}
+
+	@Test
 	public void invariantOnADerivedOclAnyAttributeIsSolved() {
 		validator.validate(oneObjectOfA("model M\n"
 				+ "class A\n"
