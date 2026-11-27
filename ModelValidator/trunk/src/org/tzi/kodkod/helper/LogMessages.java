@@ -176,6 +176,11 @@ public final class LogMessages {
 				+ ": its result depends on the duplicates of a collection that is not a set, which the transformation does not keep.";
 	}
 
+	public static String anyError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": when several elements satisfy its body, USE returns"
+				+ " the first one its hash-based collection iterates, which the translation does not reproduce.";
+	}
+
 	public static String collectionOrderError(String expression) {
 		return "Cannot transform " + inQuotes(expression)
 				+ ": its result depends on the order of a collection that is not a set, which the transformation does not keep.";

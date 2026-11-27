@@ -26,6 +26,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		CollectionKind_Test.class,
 		StringOperation_Test.class,
 		SolutionRecheck_Test.class,
+		SetAny_Test.class,
 		RealValue_Test.class,
 		DefaultConfiguration_Test.class,
 		RealAtom_Test.class,
