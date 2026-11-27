@@ -314,7 +314,7 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 		}
 
 		Formula maxFormula = Formula.TRUE;
-		if (!unboundedDefinedValues && !allValuesDefined) {
+		if (!unboundedDefinedValues) {
 			maxFormula = numberOfDefinedObjects.lte(IntConstant.constant(max));
 		}
 
