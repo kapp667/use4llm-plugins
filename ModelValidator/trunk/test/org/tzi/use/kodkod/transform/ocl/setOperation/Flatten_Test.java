@@ -120,7 +120,8 @@ public class Flatten_Test extends OCLTest {
 	@Test
 	public void orderedSetWithAnUndefinedElementIsRefused() {
 		assertRefused("OrderedSet{OrderedSet{1}, null}->flatten()",
-				"Cannot transform `OrderedSet {OrderedSet {1},null}': USE fails to flatten an ordered set that holds an undefined collection.");
+				"Cannot transform `OrderedSet {OrderedSet {1},null}': USE fails to flatten an ordered set when one of its element collections is undefined,"
+						+ " and an element of this ordered set may be undefined.");
 	}
 
 	@Test
