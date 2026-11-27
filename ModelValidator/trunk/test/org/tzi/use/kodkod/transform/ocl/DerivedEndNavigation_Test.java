@@ -6,8 +6,7 @@ import org.junit.Test;
  * In USE, a navigation from an undefined object is undefined, also when it goes
  * to a derived association end or comes from one. USE does not evaluate the
  * derive expression then. A forward navigation goes to the derived end, a
- * backward navigation to the other end. An attribute after the navigation is
- * an attribute of the class of the end it goes to.
+ * backward navigation to the other end.
  */
 public class DerivedEndNavigation_Test extends OCLTest {
 
