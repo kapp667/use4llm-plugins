@@ -16,8 +16,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import kodkod.ast.Relation;
-import kodkod.instance.TupleSet;
 import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.kodkod.model.iface.IModel;
@@ -117,9 +115,9 @@ public class SolutionRecheck_Test {
 		final List<Boolean> retries = new ArrayList<Boolean>();
 		new UseKodkodModelValidator(session) {
 			@Override
-			protected boolean createObjectDiagram(Map<Relation, TupleSet> relationTuples) {
+			protected boolean showDiagramAndCacheEvaluator() {
 				five.activate();
-				boolean retry = super.createObjectDiagram(relationTuples);
+				boolean retry = super.showDiagramAndCacheEvaluator();
 				five.deactivate();
 				retries.add(retry);
 				return retry;

@@ -80,7 +80,7 @@
 		</command>
 		<command id="org.tzi.use.kodkod.plugin.KodkodQueryCmd"
 			class="org.tzi.use.kodkod.plugin.KodkodQueryCmd"
-			help="internal (OCL expressions are evaluated in the context of the relational solution.)"
+			help="Prints the value of an OCL expression in the current object diagram, as USE computes it, and compares it with the value of its translation in the solution that the diagram shows. An error names both values when they differ. Only a solution found after 'enable' is compared, and only until the diagram changes; 'disable' stops keeping solutions; 'enabled' tells whether they are kept."
 			label="KodkodQueryCmd"
 			shellcmd="modelvalidator ?"
 			alias="mv ?">

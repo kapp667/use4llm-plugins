@@ -70,10 +70,6 @@ public abstract class KodkodModelValidator {
 		default:
 			throw new IllegalStateException("Kodkod returned unknown solution outcome.");
 		}
-
-		if(KodkodQueryCache.INSTANCE.isQueryEnabled()){
-			KodkodQueryCache.INSTANCE.setEvaluator(evaluator);
-		}
 	}
 
 	/**
