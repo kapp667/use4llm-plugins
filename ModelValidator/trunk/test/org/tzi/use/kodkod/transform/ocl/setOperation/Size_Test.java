@@ -74,4 +74,9 @@ public class Size_Test extends OCLTest {
 		test("test10", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeHasNoSize() {
+		test("undefinedSetOfATypeHasNoSize", "oclUndefined(Set(Integer))->size()");
+	}
+
 }

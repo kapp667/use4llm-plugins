@@ -74,4 +74,24 @@ public class DerivedEndNavigation_Test extends OCLTest {
 	public void forwardInAnOperationOfTheOtherClass() {
 		test("forwardInAnOperationOfTheOtherClass", "ibm.namedStaffBySelect()");
 	}
+
+	@Test
+	public void forwardToASetWhenTheDeriveExpressionIsNull() {
+		test("forwardToASetWhenTheDeriveExpressionIsNull", "ibm.nullStaff");
+	}
+
+	@Test
+	public void forwardToASetHasNoElementWhenTheDeriveExpressionIsNull() {
+		test("forwardToASetHasNoElementWhenTheDeriveExpressionIsNull", "ibm.nullStaff->size()");
+	}
+
+	@Test
+	public void backwardToASetWhenTheDeriveExpressionIsNull() {
+		test("backwardToASetWhenTheDeriveExpressionIsNull", "ada.nullEmployer");
+	}
+
+	@Test
+	public void forwardToASetLeavesOutTheUndefinedElementsOfTheDerivedValue() {
+		test("forwardToASetLeavesOutTheUndefinedElementsOfTheDerivedValue", "ibm.staffFriend");
+	}
 }

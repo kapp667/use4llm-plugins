@@ -229,4 +229,9 @@ public class Min_Test extends OCLTest {
 		test("test32", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeHasNoMinimum() {
+		test("undefinedSetOfATypeHasNoMinimum", "oclUndefined(Set(Integer))->min()");
+	}
+
 }

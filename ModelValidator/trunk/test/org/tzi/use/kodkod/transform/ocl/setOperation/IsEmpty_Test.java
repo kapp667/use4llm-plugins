@@ -74,4 +74,9 @@ public class IsEmpty_Test extends OCLTest {
 		test("test10", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeIsNotKnownToBeEmpty() {
+		test("undefinedSetOfATypeIsNotKnownToBeEmpty", "oclUndefined(Set(Integer))->isEmpty()");
+	}
+
 }

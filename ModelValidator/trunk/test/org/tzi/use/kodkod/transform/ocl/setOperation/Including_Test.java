@@ -153,4 +153,9 @@ public class Including_Test extends OCLTest {
 		test("test21", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeIncludingAnElementIsUndefined() {
+		test("undefinedSetOfATypeIncludingAnElementIsUndefined", "oclUndefined(Set(Integer))->including(1)");
+	}
+
 }

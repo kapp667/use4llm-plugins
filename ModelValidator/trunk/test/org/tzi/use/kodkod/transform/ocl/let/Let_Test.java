@@ -249,4 +249,34 @@ public class Let_Test extends OCLTest {
 		test("test35", ocl, expected);
 	}
 
+	@Test
+	public void setVariableBoundToNullIsUndefined() {
+		test("setVariableBoundToNullIsUndefined", "let s : Set(Integer) = null in s");
+	}
+
+	@Test
+	public void setVariableBoundToNullHasNoSize() {
+		test("setVariableBoundToNullHasNoSize", "let s : Set(Integer) = null in s->size()");
+	}
+
+	@Test
+	public void setVariableBoundToNullEqualsAnUndefinedSet() {
+		test("setVariableBoundToNullEqualsAnUndefinedSet", "let s : Set(Integer) = null in s = ada.luckyNumbers");
+	}
+
+	@Test
+	public void variableBoundToAnUndefinedSetOfATypeHasNoSize() {
+		test("variableBoundToAnUndefinedSetOfATypeHasNoSize", "let s = oclUndefined(Set(Integer)) in s->size()");
+	}
+
+	@Test
+	public void bagVariableBoundToNullIsNotKnownToBeEmpty() {
+		test("bagVariableBoundToNullIsNotKnownToBeEmpty", "let b : Bag(Integer) = null in b->isEmpty()");
+	}
+
+	@Test
+	public void orderedSetVariableBoundToNullIsNotKnownToBeEmpty() {
+		test("orderedSetVariableBoundToNullIsNotKnownToBeEmpty", "let o : OrderedSet(Integer) = null in o->isEmpty()");
+	}
+
 }

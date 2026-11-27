@@ -69,8 +69,8 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		if(set){
 			collectionVariables.add("self");
 		}
-		attribute.derivedExpression().processWithVisitor(this);
-		
+		processAs(attribute.derivedExpression(), exp.type());
+
 		if(oldSelf != null){
 			variables.put("self", oldSelf);
 		} else {
@@ -80,8 +80,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 			collectionVariables.remove("self");
 		}
 
-		//FIXME correct?
-		set = attribute.derivedExpression().type().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
+		set = exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
 	}
 
 	private void handleRegularAttribute(ExpAttrOp exp, IAttribute attribute) {
@@ -165,8 +164,11 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				if(set){
 					collectionVariables.add(p.getName());
 				}
-				derEnd.derivedExpression().processWithVisitor(this);
+				processAs(derEnd.derivedExpression(), exp.type());
 				set = !to.multiplicity().isObjectTypeEnd();
+				if(set){
+					object = ((Expression) object).eq(undefined_Set).thenElse(Expression.NONE, ((Expression) object).difference(undefined));
+				}
 				
 				if(oldSelf != null){
 					variables.put(p.getName(), oldSelf);
