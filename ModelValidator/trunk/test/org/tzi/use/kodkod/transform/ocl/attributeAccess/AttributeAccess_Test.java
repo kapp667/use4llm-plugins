@@ -410,4 +410,49 @@ public class AttributeAccess_Test extends OCLTest {
 		test("selectByADerivedBooleanAttribute", "Person.allInstances()->select(p | p.hasEmployer)->size()");
 	}
 
+	@Test
+	public void existsByADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("existsByADerivedBooleanAttributeOfAnUndefinedObject", "Person.allInstances()->exists(p | p.bestFriend.hasEmployer)");
+	}
+
+	@Test
+	public void existsByAnUndefinedDerivedBooleanAttribute() {
+		test("existsByAnUndefinedDerivedBooleanAttribute", "Person.allInstances()->exists(p | p.bestFriend.hasEmployer.isUndefined())");
+	}
+
+	@Test
+	public void forAllByADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("forAllByADerivedBooleanAttributeOfAnUndefinedObject", "Person.allInstances()->forAll(p | p.bestFriend.hasEmployer)");
+	}
+
+	@Test
+	public void forAllByNotADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("forAllByNotADerivedBooleanAttributeOfAnUndefinedObject", "Person.allInstances()->forAll(p | not p.bestFriend.hasEmployer)");
+	}
+
+	@Test
+	public void selectByADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("selectByADerivedBooleanAttributeOfAnUndefinedObject", "Person.allInstances()->select(p | p.bestFriend.hasEmployer)->size()");
+	}
+
+	@Test
+	public void selectByAnUndefinedDerivedBooleanAttribute() {
+		test("selectByAnUndefinedDerivedBooleanAttribute", "Person.allInstances()->select(p | p.bestFriend.hasEmployer.isUndefined())->size()");
+	}
+
+	@Test
+	public void selectBySomeUndefinedDerivedBooleanAttributes() {
+		test("selectBySomeUndefinedDerivedBooleanAttributes", "Person.allInstances()->select(p | (if p.hasEmployer then p.bestFriend else p endif).hasEmployer.isUndefined())->size()");
+	}
+
+	@Test
+	public void rejectByADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("rejectByADerivedBooleanAttributeOfAnUndefinedObject", "Person.allInstances()->reject(p | p.bestFriend.hasEmployer)->size()");
+	}
+
+	@Test
+	public void rejectByAnUndefinedDerivedBooleanAttribute() {
+		test("rejectByAnUndefinedDerivedBooleanAttribute", "Person.allInstances()->reject(p | p.bestFriend.hasEmployer.isUndefined())->size()");
+	}
+
 }
