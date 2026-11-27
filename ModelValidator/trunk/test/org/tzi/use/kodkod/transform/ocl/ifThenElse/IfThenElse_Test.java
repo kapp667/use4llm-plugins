@@ -287,4 +287,14 @@ public class IfThenElse_Test extends OCLTest {
 		test("setWithAnUndefinedConditionHasNoSize", "(if ada.alive then Set{1} else Set{2} endif)->size()");
 	}
 
+	@Test
+	public void setFromANullBranchIsUndefined() {
+		test("setFromANullBranchIsUndefined", "if ada.alive.isUndefined() then null else Set{1} endif");
+	}
+
+	@Test
+	public void setFromANullBranchHasNoSize() {
+		test("setFromANullBranchHasNoSize", "(if ada.alive.isUndefined() then null else Set{1} endif)->size()");
+	}
+
 }
