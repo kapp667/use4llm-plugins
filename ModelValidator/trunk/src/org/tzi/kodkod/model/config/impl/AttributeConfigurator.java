@@ -1,5 +1,6 @@
 package org.tzi.kodkod.model.config.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -94,7 +95,11 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 	protected String getValue(Type type, String value) {
 		if (type instanceof TypeAtoms && !type.isBoolean()) {
 			if (!(value.equals(TypeConstants.UNDEFINED) || value.equals(TypeConstants.UNDEFINED_SET))) {
-				value = ((TypeAtoms) type).name() + "_" + value;
+				if (type.isReal()) {
+					value = RealConfigurator.atomName(((TypeAtoms) type).name(), BigDecimal.valueOf(Double.parseDouble(value)));
+				} else {
+					value = ((TypeAtoms) type).name() + "_" + value;
+				}
 			}
 		}
 		return value;
