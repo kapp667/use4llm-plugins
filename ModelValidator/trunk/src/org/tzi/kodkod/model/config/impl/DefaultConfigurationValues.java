@@ -31,6 +31,7 @@ public class DefaultConfigurationValues {
 	public static final double realMin = -2d;
 	public static final double realMax = 2d;
 	public static final double realStep = 0.5d;
+	public static final double realStepMinimum = 0.01d;
 	public static final boolean realEnabled = false;
 	
 	public static final boolean AGGREGATIONCYCLEFREENESS = true;
