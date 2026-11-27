@@ -123,18 +123,18 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		collectionOfCollectionsAccepted = true;
 	}
 
-	/**
-	 * Transforms an expression that USE takes as a value of the given type. An
-	 * expression of type OclVoid, such as null, has the value null, which is the
-	 * undefined set if the type is a collection.
-	 */
-	public void processAs(org.tzi.use.uml.ocl.expr.Expression exp, Type type) {
+	/** An OclVoid expression such as null, where a collection is expected, is the undefined set. */
+	protected void processAs(org.tzi.use.uml.ocl.expr.Expression exp, Type type) {
 		if (exp.type().isTypeOfVoidType() && type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
-			object = undefined_Set;
-			set = true;
+			translateToUndefinedSet();
 		} else {
 			exp.processWithVisitor(this);
 		}
+	}
+
+	private void translateToUndefinedSet() {
+		object = undefined_Set;
+		set = true;
 	}
 
 	@Override
@@ -416,8 +416,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		refuseCollectionOfCollections(exp);
 		refuseReal(exp);
 		if (exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
-			object = undefined_Set;
-			set = true;
+			translateToUndefinedSet();
 		} else {
 			object = undefined;
 		}
