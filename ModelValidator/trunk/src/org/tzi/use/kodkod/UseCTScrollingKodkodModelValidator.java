@@ -11,6 +11,7 @@ import org.tzi.kodkod.model.config.impl.ModelConfigurator;
 import org.tzi.kodkod.model.type.TypeAtoms;
 import org.tzi.kodkod.model.type.TypeConstants;
 import org.tzi.use.kodkod.solution.SolutionValueReader;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.main.Session;
 import org.tzi.use.uml.ocl.expr.Evaluator;
@@ -70,7 +71,7 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = createSolutionDiagram();
+		boolean errors = showDiagramAndCacheEvaluator();
 		if (!errors) {
 			readSolutionTerms(session.system().state());
 			
@@ -152,12 +153,11 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 		Map<ClassifyingTerm, Value> solutionMap = new LinkedHashMap<>();
 		
 		for (ClassifyingTerm ct : classifyingTerms) {
-			Object kodkodResult = SolutionValueReader.evaluate(evaluator, ct.kodkodExpr);
-			Value kodkodEval = reader.read(kodkodResult, ct.oclExpr.type());
+			Reading kodkodEval = reader.read(evaluator, ct.kodkodExpr, ct.oclExpr.type());
 			Value useEval = eval.eval(ct.oclExpr, state);
 			
-			if(!useEval.equals(kodkodEval)){
-				LOG.error("Kodkod and USE evaluate classifying term " + StringUtil.inQuotes(ct.name) + " differently. Kodkod: " + (kodkodEval == null ? kodkodResult : kodkodEval) + "; USE: " + useEval);
+			if(kodkodEval.disagreesWith(useEval)){
+				LOG.error("Kodkod and USE evaluate classifying term " + StringUtil.inQuotes(ct.name) + " differently. Kodkod: " + kodkodEval + "; USE: " + useEval);
 				LOG.info("Using evaluated value of USE for further steps.");
 			}
 			solutionMap.put(ct, useEval);

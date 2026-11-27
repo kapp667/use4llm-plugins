@@ -13,11 +13,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.tzi.use.kodkod.plugin.KodkodCTScrollingValidateCmd;
 
-/**
- * Tests mv -scrollingCT. The search for the next solution goes on with USE's value
- * of each classifying term, so a term that the translation evaluates differently
- * is reported, and the solution is still kept.
- */
 public class KodkodCTScrollingValidateCmd_Test {
 
 	@Rule

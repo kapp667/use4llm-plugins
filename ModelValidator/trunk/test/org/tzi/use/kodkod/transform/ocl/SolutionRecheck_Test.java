@@ -115,9 +115,9 @@ public class SolutionRecheck_Test {
 		final List<Boolean> retries = new ArrayList<Boolean>();
 		new UseKodkodModelValidator(session) {
 			@Override
-			protected boolean createSolutionDiagram() {
+			protected boolean showDiagramAndCacheEvaluator() {
 				five.activate();
-				boolean retry = super.createSolutionDiagram();
+				boolean retry = super.showDiagramAndCacheEvaluator();
 				five.deactivate();
 				retries.add(retry);
 				return retry;

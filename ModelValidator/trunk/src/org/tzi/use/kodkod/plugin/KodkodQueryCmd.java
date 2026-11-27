@@ -3,6 +3,7 @@ package org.tzi.use.kodkod.plugin;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,20 +18,22 @@ import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.use.kodkod.solution.SolutionValueReader;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Reading;
+import org.tzi.use.kodkod.solution.SolutionValueReader.Unreadable;
 import org.tzi.use.kodkod.transform.ocl.DefaultExpressionVisitor;
 import org.tzi.use.main.shell.runtime.IPluginShellCmd;
 import org.tzi.use.parser.ocl.OCLCompiler;
 import org.tzi.use.runtime.shell.IPluginShellCmdDelegate;
 import org.tzi.use.uml.ocl.expr.Expression;
 import org.tzi.use.uml.ocl.expr.MultiplicityViolationException;
-import org.tzi.use.uml.ocl.type.Type;
-import org.tzi.use.uml.ocl.type.Type.VoidHandling;
+import org.tzi.use.uml.ocl.value.ObjectValue;
 import org.tzi.use.uml.ocl.value.Value;
+import org.tzi.use.uml.ocl.value.VarBindings;
 
 /**
- * Cmd-Class for queries. Prints the value of an OCL expression in the object
- * diagram, as USE computes it, and compares it with the value of its
- * translation in the solution that the diagram shows.
+ * Prints the value of an OCL expression in the object diagram, as USE computes
+ * it, and compares it with the value of its translation in the solution that
+ * the diagram shows.
  * 
  * @author Hendrik Reitmann
  * 
@@ -58,7 +61,7 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 		} else if (arguments.toLowerCase().equals("enabled")) {
 			LOG.info(KodkodQueryCache.INSTANCE.isQueryEnabled());
 		} else {
-			Expression expr = createExpression(arguments);
+			Expression expr = createExpression(arguments, mSystem.varBindings(), new PrintWriter(System.err));
 
 			if (expr == null)
 				return;
@@ -93,14 +96,17 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 	private void compareWithSolution(String ocl, Expression expr, Value useValue) {
 		Evaluator evaluator = KodkodQueryCache.INSTANCE.evaluatorFor(mSystem.state());
 		if (evaluator == null) {
-			notCompared(KodkodQueryCache.INSTANCE.isQueryEnabled() ? "no solution for this state"
+			notCompared(KodkodQueryCache.INSTANCE.isQueryEnabled()
+					? "the state shown is not a solution found since mv ? enable, or it changed since"
 					: "solutions are kept for comparison only after mv ? enable");
 			return;
 		}
-		Type type = expr.type();
-		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !type.isTypeOfSet()) {
-			notCompared("the translation represents a " + type + " by a set");
-			return;
+		for (VarBindings.Entry variable : mSystem.varBindings()) {
+			String name = variable.getVarName();
+			if (!isObjectNamed(variable.getValue(), name) && !compilesWithout(ocl, name)) {
+				notCompared("the variable " + name + " is bound to " + variable.getValue() + ", not to the object named " + name);
+				return;
+			}
 		}
 
 		Node translation;
@@ -111,29 +117,42 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 			return;
 		}
 
-		Object result;
+		Reading reading;
 		try {
-			result = SolutionValueReader.evaluate(evaluator, translation);
+			reading = new SolutionValueReader(mSystem.state()).read(evaluator, translation, expr.type());
 		} catch (UnboundLeafException e) {
 			notCompared("the solution has no atom for " + e.leaf());
 			return;
 		}
 
-		Value kodkodValue = new SolutionValueReader(mSystem.state()).read(result, type);
-		if (!useValue.equals(kodkodValue)) {
-			LOG.error("The translation evaluates " + ocl + " differently from USE. USE: " + useValue + "; Kodkod: "
-					+ (kodkodValue == null ? result : kodkodValue) + ".");
+		if (reading instanceof Unreadable unreadable) {
+			notCompared(unreadable.reason());
+		} else if (reading.disagreesWith(useValue)) {
+			LOG.error("The translation evaluates " + ocl + " differently from USE. USE: " + useValue + "; Kodkod: " + reading + ".");
 		}
+	}
+
+	private static boolean isObjectNamed(Value value, String name) {
+		return value instanceof ObjectValue object && object.value().name().equals(name);
+	}
+
+	private boolean compilesWithout(String ocl, String variable) {
+		VarBindings others = new VarBindings();
+		for (VarBindings.Entry binding : mSystem.varBindings()) {
+			if (!binding.getVarName().equals(variable)) {
+				others.push(binding.getVarName(), binding.getValue());
+			}
+		}
+		return createExpression(ocl, others, new PrintWriter(new StringWriter())) != null;
 	}
 
 	private void notCompared(String reason) {
 		LOG.info("Not compared with a solution: " + reason);
 	}
 
-	private Expression createExpression(String arguments) {
+	private Expression createExpression(String arguments, VarBindings bindings, PrintWriter err) {
 		InputStream stream = new ByteArrayInputStream(arguments.getBytes());
-		Expression expr = OCLCompiler.compileExpression(mSystem.model(), mSystem.state(), stream, "<input>", new PrintWriter(System.err),
-				mSystem.varBindings());
+		Expression expr = OCLCompiler.compileExpression(mSystem.model(), mSystem.state(), stream, "<input>", err, bindings);
 		return expr;
 	}
 
