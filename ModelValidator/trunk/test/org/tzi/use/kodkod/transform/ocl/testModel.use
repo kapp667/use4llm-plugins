@@ -11,6 +11,9 @@ attributes
   alive:Boolean
   luckyNumbers:Set(Integer)
   favoriteColor:Color
+operations
+  coworkers():Set(Person) = Person.allInstances()->select(p | p.employerAC = self.employerAC)
+  currentEmployer():Company = self.employerAC
 end
 
 class Company
