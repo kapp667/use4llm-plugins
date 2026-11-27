@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -136,6 +137,7 @@ public class OCLTest {
 		shell.processLineSafely("!set bob.age := 3");
 		shell.processLineSafely("!set bob.name := 'Bob'");
 		shell.processLineSafely("!set bob.luckyNumbers := Set{7, 8}");
+		shell.processLineSafely("!set ibm.name := 'IBM'");
 
 		model = PluginModelFactory.INSTANCE.getModel(mModel);
 
@@ -211,7 +213,7 @@ public class OCLTest {
 
 		// Attributes: the enricher extracts the defined values only. The undefined ones are added here, because
 		// the attribute bounds are exact only if every object is specified.
-		Map<IAttribute, Integer> attributeTuples = new HashMap<IAttribute, Integer>();
+		Map<IAttribute, Integer> attributeTuples = new IdentityHashMap<IAttribute, Integer>();
 		for (IClass clazz : model.classes()) {
 			for (IAttribute attribute : clazz.attributes()) {
 				attributeTuples.put(attribute, 0);
