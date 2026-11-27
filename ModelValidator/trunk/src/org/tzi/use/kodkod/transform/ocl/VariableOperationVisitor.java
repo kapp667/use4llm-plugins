@@ -164,8 +164,11 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				if(set){
 					collectionVariables.add(p.getName());
 				}
-				derEnd.derivedExpression().processWithVisitor(this);
+				processAs(derEnd.derivedExpression(), exp.type());
 				set = !to.multiplicity().isObjectTypeEnd();
+				if(set){
+					object = ((Expression) object).eq(undefined_Set).thenElse(Expression.NONE, ((Expression) object).difference(undefined));
+				}
 				
 				if(oldSelf != null){
 					variables.put(p.getName(), oldSelf);
