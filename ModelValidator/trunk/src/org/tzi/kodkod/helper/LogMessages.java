@@ -395,6 +395,11 @@ public final class LogMessages {
 		return "The value for " + name + " is not a number! The default value will be used.";
 	}
 
+	public static String realStepConfigError(double step) {
+		return "The step " + step + " is not at least " + DefaultConfigurationValues.realStepMinimum
+				+ ", the precision of the Real values of the search space.";
+	}
+
 	public static String setSyntaxConfigError(String syntax) {
 		return "Not the correct syntax. Use the syntax " + syntax + ".";
 	}
