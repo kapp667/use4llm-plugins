@@ -74,6 +74,10 @@ class PluginShell {
 		return log.getBuffer().substring(start) + written;
 	}
 
+	MSystem system() {
+		return session.system();
+	}
+
 	void type(String line) {
 		Shell.getInstance().processLineSafely(line);
 	}
