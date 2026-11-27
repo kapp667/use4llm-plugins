@@ -380,4 +380,34 @@ public class AttributeAccess_Test extends OCLTest {
 		test("derivedSetAttributeOfDefinedObjects", "Person.allInstances()->select(p | p.employers->includes(ibm))->size()");
 	}
 
+	@Test
+	public void derivedBooleanAttributeOfAnUndefinedObjectIsUndefined() {
+		test("derivedBooleanAttributeOfAnUndefinedObjectIsUndefined", "uf.person.hasEmployer");
+	}
+
+	@Test
+	public void isUndefinedOfADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("isUndefinedOfADerivedBooleanAttributeOfAnUndefinedObject", "uf.person.hasEmployer.isUndefined()");
+	}
+
+	@Test
+	public void notOfADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("notOfADerivedBooleanAttributeOfAnUndefinedObject", "not uf.person.hasEmployer");
+	}
+
+	@Test
+	public void conditionOnADerivedBooleanAttributeOfAnUndefinedObject() {
+		test("conditionOnADerivedBooleanAttributeOfAnUndefinedObject", "if uf.person.hasEmployer then 1 else 2 endif");
+	}
+
+	@Test
+	public void derivedBooleanAttributeOfAnUndefinedObjectOrTrue() {
+		test("derivedBooleanAttributeOfAnUndefinedObjectOrTrue", "uf.person.hasEmployer or true");
+	}
+
+	@Test
+	public void selectByADerivedBooleanAttribute() {
+		test("selectByADerivedBooleanAttribute", "Person.allInstances()->select(p | p.hasEmployer)->size()");
+	}
+
 }
