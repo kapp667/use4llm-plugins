@@ -417,6 +417,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		refuseReal(exp);
 		if (exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
 			object = undefined_Set;
+			set = true;
 		} else {
 			object = undefined;
 		}
