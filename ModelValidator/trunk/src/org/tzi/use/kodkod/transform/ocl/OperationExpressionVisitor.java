@@ -86,7 +86,7 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 			
 			set = exp.getOperation().resultType().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
 			
-			object = expression.in(undefined).thenElse(undefined, getAsExpression(object));
+			object = expression.in(undefined).thenElse(set ? undefined_Set : undefined, getAsExpression(object));
 			
 			opVariables.remove("self");
 			opVariableClasses.remove("self");
