@@ -180,6 +180,22 @@ public class KodkodValidateCmd_Test {
 		assertTrue(output, output.contains("SATISFIABLE"));
 	}
 
+	@Test
+	public void keepsTheAttributeMaxWhenEveryObjectHasAValue() throws Exception {
+		open("model D\nclass C\nattributes\n  x : Integer\nend\n");
+		String output = check(file("alldefined.properties", "[alldefined]\nInteger_min = 1\nInteger_max = 1\nC_min = 2\nC_max = 2\nC_x_min = -1\nC_x_max = 1\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO UNSATISFIABLE"));
+	}
+
+	@Test
+	public void solvesWhenTheAttributeMaxAllowsEveryObjectAValue() throws Exception {
+		open("model D\nclass C\nattributes\n  x : Integer\nend\n");
+		String output = check(file("alldefined.properties", "[alldefined]\nInteger_min = 1\nInteger_max = 1\nC_min = 2\nC_max = 2\nC_x_min = -1\nC_x_max = 2\n"));
+		assertFalse(output, output.contains("ERROR"));
+		assertTrue(output, output.contains("INFO SATISFIABLE"));
+	}
+
 	private String file(String name, String content) throws Exception {
 		File file = folder.newFile(name);
 		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
