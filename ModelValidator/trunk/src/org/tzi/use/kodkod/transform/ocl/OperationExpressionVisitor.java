@@ -203,9 +203,6 @@ public class OperationExpressionVisitor extends DefaultExpressionVisitor {
 		
 		opVariables.put("self", variableVisitor.getObject());
 
-		IClass clazz = variableVisitor.getAttributeClass();
-
-		opVariableClasses.put("self", clazz);
 		if (variableVisitor.isSet()) {
 			opCollectionVariables.add("self");
 		}
