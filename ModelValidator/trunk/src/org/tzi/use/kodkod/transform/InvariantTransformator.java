@@ -53,19 +53,16 @@ public class InvariantTransformator {
 		IClass invariantClass = model.getClass(mClassInvariant.cls().name());
 
 		Map<String, Node> variables = new TreeMap<String, Node>();
-		Map<String, IClass> variableClasses = new TreeMap<String, IClass>();
 		Map<String, Node> contextVariables = new TreeMap<String, Node>();
 
 		String[] singleVars = mClassInvariant.var().split(",");
 		for (String var : singleVars) {
 			variables.put(var.trim(), Variable.unary(var.trim()));
-			variableClasses.put(var.trim(), invariantClass);
 			contextVariables.put(var.trim(), variables.get(var.trim()));
 		}
 
 		//TODO maybe give expr. visitor invariant name for better error messages (collect -> bag)
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, new HashMap<String, Variable>(),
-				new ArrayList<String>());
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, new HashMap<String, Variable>(), new ArrayList<String>());
 		mClassInvariant.bodyExpression().processWithVisitor(visitor);
 
 		IInvariant invariant = createInvariant(mClassInvariant.name(), invariantClass, contextVariables.values(), visitor.getObject());

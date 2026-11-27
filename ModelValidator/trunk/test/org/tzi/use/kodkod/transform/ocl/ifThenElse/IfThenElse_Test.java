@@ -277,4 +277,69 @@ public class IfThenElse_Test extends OCLTest {
 		test("test39", ocl, expected);
 	}
 
+	@Test
+	public void setWithAnUndefinedConditionIsUndefined() {
+		test("setWithAnUndefinedConditionIsUndefined", "if ada.alive then Set{1} else Set{2} endif");
+	}
+
+	@Test
+	public void setWithAnUndefinedConditionHasNoSize() {
+		test("setWithAnUndefinedConditionHasNoSize", "(if ada.alive then Set{1} else Set{2} endif)->size()");
+	}
+
+	@Test
+	public void setFromANullBranchIsUndefined() {
+		test("setFromANullBranchIsUndefined", "if ada.alive.isUndefined() then null else Set{1} endif");
+	}
+
+	@Test
+	public void setFromANullBranchHasNoSize() {
+		test("setFromANullBranchHasNoSize", "(if ada.alive.isUndefined() then null else Set{1} endif)->size()");
+	}
+
+	@Test
+	public void setWithATrueConditionHasTheSizeOfTheThenBranch() {
+		test("setWithATrueConditionHasTheSizeOfTheThenBranch", "(if true then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithAFalseConditionHasTheSizeOfTheElseBranch() {
+		test("setWithAFalseConditionHasTheSizeOfTheElseBranch", "(if false then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithATrueConditionIncludesTheElementOfTheThenBranch() {
+		test("setWithATrueConditionIncludesTheElementOfTheThenBranch", "(if true then Set{1} else Set{2} endif)->includes(1)");
+	}
+
+	@Test
+	public void setWithATrueOperationResultHasTheSizeOfTheThenBranch() {
+		test("setWithATrueOperationResultHasTheSizeOfTheThenBranch", "(if bob.named() then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithAFalseOperationResultHasTheSizeOfTheElseBranch() {
+		test("setWithAFalseOperationResultHasTheSizeOfTheElseBranch", "(if ada.named() then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithADefinednessTestThatHoldsHasTheSizeOfTheThenBranch() {
+		test("setWithADefinednessTestThatHoldsHasTheSizeOfTheThenBranch", "(if ada.alive.isUndefined() then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithADefinednessTestThatFailsHasTheSizeOfTheElseBranch() {
+		test("setWithADefinednessTestThatFailsHasTheSizeOfTheElseBranch", "(if ada.alive.isDefined() then Set{1} else Set{2,3} endif)->size()");
+	}
+
+	@Test
+	public void setWithAFalseConditionIsTheElseBranchBesideANullBranch() {
+		test("setWithAFalseConditionIsTheElseBranchBesideANullBranch", "if ada.alive.isDefined() then null else Set{1} endif");
+	}
+
+	@Test
+	public void setFromAnUndefinedSetBranchIsUndefined() {
+		test("setFromAnUndefinedSetBranchIsUndefined", "if true then oclUndefined(Set(Integer)) else Set{1} endif");
+	}
+
 }

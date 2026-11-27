@@ -11,14 +11,20 @@ attributes
   alive:Boolean
   luckyNumbers:Set(Integer)
   favoriteColor:Color
+  employerName:String derived = (if self.employerAC.isDefined() then self.employerAC else self.employerA endif).name
 operations
   coworkers():Set(Person) = Person.allInstances()->select(p | p.employerAC = self.employerAC)
   currentEmployer():Company = self.employerAC
+  numbersIfAlive():Set(Integer) = if self.alive then Set{1} else Set{2} endif
+  named():Boolean = self.name.isDefined()
 end
 
 class Company
 attributes
   name:String
+operations
+  namedStaff():Set(Person) = self.namedEmployee
+  namedStaffBySelect():Set(Person) = Person.allInstances()->select(p | p.namedEmployer = self)
 end
 
 class Car
@@ -105,6 +111,11 @@ end
 association CheckedJob between
   Person[*] role checkedEmployee
   Company[0..1] role checkedEmployer derived = if self.employerAC.isDefined() then self.employerAC else null endif
+end
+
+association NamedJob between
+  Person[*] role namedEmployee
+  Company[0..1] role namedEmployer derived = if self.name.isDefined() then self.employerAC else null endif
 end
 
 associationclass Idle_AC between

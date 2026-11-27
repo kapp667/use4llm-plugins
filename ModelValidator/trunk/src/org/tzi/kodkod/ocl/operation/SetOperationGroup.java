@@ -32,6 +32,7 @@ public class SetOperationGroup extends OCLOperationGroup {
 		operationsReturningSet.add("collectNested");
 		operationsReturningSet.add("minus");
 		operationsReturningSet.add("flatten");
+		operationsReturningSet.add("if_then_else");
 		operationsReturningSet.add("excluding");
 		operationsReturningSet.add("including");
 		operationsReturningSet.add("intersection");
@@ -176,6 +177,14 @@ public class SetOperationGroup extends OCLOperationGroup {
 
 	public Expression forAll(Expression src, Expression body, Variable... vars) {
 		return forAll(src, body.eq(booleanTrue), vars);
+	}
+
+	public final Expression if_then_else(Expression cond, Expression l, Expression r) {
+		return cond.eq(undefined).thenElse(undefined_Set, cond.eq(booleanTrue).thenElse(l, r));
+	}
+
+	public final Expression if_then_else(Formula cond, Expression l, Expression r) {
+		return cond.thenElse(l, r);
 	}
 
 	// OCL: srcExpr->includes(argExpr)
