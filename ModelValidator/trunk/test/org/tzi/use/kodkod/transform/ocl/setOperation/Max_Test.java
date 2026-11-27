@@ -228,4 +228,9 @@ public class Max_Test extends OCLTest {
 		test("test32", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeHasNoMaximum() {
+		test("undefinedSetOfATypeHasNoMaximum", "oclUndefined(Set(Integer))->max()");
+	}
+
 }

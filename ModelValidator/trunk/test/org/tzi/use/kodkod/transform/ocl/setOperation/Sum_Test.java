@@ -228,4 +228,9 @@ public class Sum_Test extends OCLTest {
 		test("test32", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeHasNoSum() {
+		test("undefinedSetOfATypeHasNoSum", "oclUndefined(Set(Integer))->sum()");
+	}
+
 }

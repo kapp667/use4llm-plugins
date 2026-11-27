@@ -151,4 +151,9 @@ public class Excludes_Test extends OCLTest {
 		test("test21", ocl, expected);
 	}
 
+	@Test
+	public void undefinedSetOfATypeExcludesNothing() {
+		test("undefinedSetOfATypeExcludesNothing", "oclUndefined(Set(Integer))->excludes(1)");
+	}
+
 }
