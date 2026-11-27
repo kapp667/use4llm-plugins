@@ -370,7 +370,8 @@ public enum ValidityRule {
 	 * The rules that mv -validate checks before it searches.
 	 */
 	private static final Set<ValidityRule> STOPPING_THE_SEARCH = Collections.unmodifiableSet(EnumSet.of(
-			INTEGER_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, STRING_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
+			INTEGER_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, STRING_SETTINGS_NESSESSARY,
+			STRING_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
 			STRING_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, CLASS_SETTINGS_MIN_MAX_GREATER_THAN_OR_EQUAL_ZERO,
 			CLASS_SETTINGS_MIN_LESS_THAN_OR_EQUAL_MAX, ASSOCIATION_SETTINGS_MAX_STAR_OR_GREATER_THAN_OR_EQUAL_ZERO,
 			ASSOCIATION_SETTINGS_MIN_GREATER_THAN_OR_EQUAL_ZERO,
@@ -382,7 +383,7 @@ public enum ValidityRule {
 
 	/**
 	 * Returns the rules that mv -validate checks before it searches: a bound out of
-	 * range, or a min above its max, which the loader does not report. The other
+	 * range, a min above its max, or a String attribute with no String settings, which the loader does not report. The other
 	 * rules are reported by mv -vc only, because some of them reject settings the
 	 * loader reads soundly.
 	 * 
