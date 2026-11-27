@@ -44,4 +44,24 @@ public class DerivedEndNavigation_Test extends OCLTest {
 	public void backwardToAnObjectFromAnUndefinedObjectWhenEveryDerivedValueIsUndefined() {
 		test("backwardToAnObjectFromAnUndefinedObjectWhenEveryDerivedValueIsUndefined", "uf.person.befriender");
 	}
+
+	@Test
+	public void attributeAfterBackwardToAnObject() {
+		test("attributeAfterBackwardToAnObject", "ada.staffEmployer.name");
+	}
+
+	@Test
+	public void selectByAttributeAfterBackwardToAnObject() {
+		test("selectByAttributeAfterBackwardToAnObject", "Person.allInstances()->select(p | p.staffEmployer.name = 'IBM')->size()");
+	}
+
+	@Test
+	public void attributeAfterForwardToAnObject() {
+		test("attributeAfterForwardToAnObject", "ada.checkedEmployer.name");
+	}
+
+	@Test
+	public void selectByAttributeAfterForwardToAnObject() {
+		test("selectByAttributeAfterForwardToAnObject", "Person.allInstances()->select(p | p.checkedEmployer.name = 'IBM')->size()");
+	}
 }

@@ -251,6 +251,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 				}
 			}
 			object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, (Expression) object);
+			attributeClass = to.associatedClass();
 		} else {
 			// n-Ary assoc
 			// TODO implement derived associations
