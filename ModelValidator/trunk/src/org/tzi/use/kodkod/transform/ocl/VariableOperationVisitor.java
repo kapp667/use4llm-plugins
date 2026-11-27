@@ -62,6 +62,7 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 
 	private void handleDerivedAttribute(ExpAttrOp exp, DerivedAttribute attribute) {
 		//TODO recursion detector
+		Expression source = (Expression) object;
 		Node oldSelf = variables.get("self");
 		boolean oldSet = collectionVariables.contains("self");
 		
@@ -81,6 +82,9 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		}
 
 		set = exp.type().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
+		if (object instanceof Expression) {
+			object = source.eq(undefined).thenElse(set ? undefined_Set : undefined, (Expression) object);
+		}
 	}
 
 	private void handleRegularAttribute(ExpAttrOp exp, IAttribute attribute) {
