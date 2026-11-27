@@ -101,12 +101,6 @@ public final class LogMessages {
 
 	public static final String showSolutionIndexToSmall = "Please enter an index greater 0.";
 
-	public static final String queryEvaluatorNotFound = "No evaluator found. Make sure the evaluator feature is enabled and run a validation first.";
-	
-	public static final String queryEvaluationError = "The query can not be evaluated.";
-	
-	public static final String unsupportedQueryType = "The type of the transformed query is not supported.";
-
 	public static final String closureObjectMessage = "Closure is only available for collections with objects.";
 
 	public static final String closureCollectionMessage = "Source type is not a collection.";

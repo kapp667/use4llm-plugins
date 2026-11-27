@@ -27,7 +27,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = createObjectDiagram(solution.instance().relationTuples());
+		boolean errors = createSolutionDiagram();
 		if (!errors) {
 			solutions.add(solution.instance().relationTuples());
 			LOG.info(LogMessages.pagingNext);

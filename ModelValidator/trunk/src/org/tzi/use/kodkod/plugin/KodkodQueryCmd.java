@@ -8,23 +8,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import kodkod.ast.Formula;
-import kodkod.ast.IntExpression;
 import kodkod.ast.Node;
 import kodkod.ast.Variable;
 import kodkod.engine.Evaluator;
+import kodkod.engine.fol2sat.UnboundLeafException;
 
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.iface.IClass;
+import org.tzi.use.kodkod.solution.SolutionValueReader;
 import org.tzi.use.kodkod.transform.ocl.DefaultExpressionVisitor;
 import org.tzi.use.main.shell.runtime.IPluginShellCmd;
 import org.tzi.use.parser.ocl.OCLCompiler;
 import org.tzi.use.runtime.shell.IPluginShellCmdDelegate;
 import org.tzi.use.uml.ocl.expr.Expression;
+import org.tzi.use.uml.ocl.expr.MultiplicityViolationException;
+import org.tzi.use.uml.ocl.type.Type;
+import org.tzi.use.uml.ocl.type.Type.VoidHandling;
+import org.tzi.use.uml.ocl.value.Value;
 
 /**
- * Cmd-Class for queries on a existing solution.
+ * Cmd-Class for queries. Prints the value of an OCL expression in the object
+ * diagram, as USE computes it, and compares it with the value of its
+ * translation in the solution that the diagram shows.
  * 
  * @author Hendrik Reitmann
  * 
@@ -44,7 +50,7 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 		String arguments = pluginCommand.getCmdArguments().trim();
 
 		if (arguments.isEmpty()) {
-			LOG.error("Usage: kodkod ? [enable|disable|ocl-expression]");
+			LOG.error("Usage: mv ? [enable|disable|enabled|ocl-expression]");
 		} else if (arguments.toLowerCase().equals("enable")) {
 			KodkodQueryCache.INSTANCE.setQueryEnabled(true);
 		} else if (arguments.toLowerCase().equals("disable")) {
@@ -57,58 +63,71 @@ public class KodkodQueryCmd extends AbstractPlugin implements IPluginShellCmdDel
 			if (expr == null)
 				return;
 
-			evaluateQuery(transformExpression(expr));
+			query(arguments, expr);
 		}
 	}
 
-	private Object transformExpression(Expression expr) {
+	private void query(String ocl, Expression expr) {
+		Value useValue;
+		try {
+			useValue = new org.tzi.use.uml.ocl.expr.Evaluator().eval(expr, mSystem.state(), mSystem.varBindings());
+		} catch (MultiplicityViolationException e) {
+			LOG.error("Could not evaluate. " + e.getMessage());
+			return;
+		}
+		LOG.info(useValue.toStringWithType());
+
+		compareWithSolution(ocl, expr, useValue);
+	}
+
+	private Node transformExpression(Expression expr) {
 		Map<String, Node> variables = new TreeMap<String, Node>();
 		Map<String, IClass> variableClasses = new TreeMap<String, IClass>();
 
-		Object object = null;
-		try {
-
-			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, variableClasses, new HashMap<String, Variable>(),
-					new ArrayList<String>());
-			expr.processWithVisitor(visitor);
-
-			object = visitor.getObject();
-		} catch (Exception e) {
-			LOG.error("Cannot transform query. " + " " + e.getMessage());
-		}
-		return object;
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model(), variables, variableClasses, new HashMap<String, Variable>(),
+				new ArrayList<String>());
+		expr.processWithVisitor(visitor);
+		return visitor.getObject();
 	}
 
-	private void evaluateQuery(Object object) {
-		if (object != null) {
-			Evaluator evaluator = null;
-			
-			// get evaluator of last result
-			try {
-				evaluator = KodkodQueryCache.INSTANCE.getEvaluator();
-			}
-			catch(Exception e){
-				LOG.error(LogMessages.queryEvaluatorNotFound);
-				LOG.error(e.getMessage());
-				return;
-			}
-			
-			// evaluate query
-			try {
-				if(object instanceof kodkod.ast.Expression){
-					LOG.info(evaluator.evaluate((kodkod.ast.Expression) object));
-				} else if(object instanceof Formula){
-					LOG.info(evaluator.evaluate((Formula) object));
-				} else if(object instanceof IntExpression){
-					LOG.info(evaluator.evaluate((IntExpression) object));
-				} else {
-					LOG.error(LogMessages.unsupportedQueryType);
-				}
-			} catch (Exception e) {
-				LOG.error(LogMessages.queryEvaluationError);
-				e.printStackTrace();
-			}
+	private void compareWithSolution(String ocl, Expression expr, Value useValue) {
+		Evaluator evaluator = KodkodQueryCache.INSTANCE.evaluatorFor(mSystem.state());
+		if (evaluator == null) {
+			notCompared(KodkodQueryCache.INSTANCE.isQueryEnabled() ? "no solution for this state"
+					: "solutions are kept for comparison only after mv ? enable");
+			return;
 		}
+		Type type = expr.type();
+		if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID) && !type.isTypeOfSet()) {
+			notCompared("the translation represents a " + type + " by a set");
+			return;
+		}
+
+		Node translation;
+		try {
+			translation = transformExpression(expr);
+		} catch (RuntimeException e) {
+			notCompared(LogMessages.exceptionReason(e));
+			return;
+		}
+
+		Object result;
+		try {
+			result = SolutionValueReader.evaluate(evaluator, translation);
+		} catch (UnboundLeafException e) {
+			notCompared("the solution has no atom for " + e.leaf());
+			return;
+		}
+
+		Value kodkodValue = new SolutionValueReader(mSystem.state()).read(result, type);
+		if (!useValue.equals(kodkodValue)) {
+			LOG.error("The translation evaluates " + ocl + " differently from USE. USE: " + useValue + "; Kodkod: "
+					+ (kodkodValue == null ? result : kodkodValue) + ".");
+		}
+	}
+
+	private void notCompared(String reason) {
+		LOG.info("Not compared with a solution: " + reason);
 	}
 
 	private Expression createExpression(String arguments) {
