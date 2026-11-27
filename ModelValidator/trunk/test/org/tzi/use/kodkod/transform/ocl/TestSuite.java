@@ -53,6 +53,8 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		ScrollingNext_Test.class,
 		StructureCheck_Test.class,
 		ObjectDiagramExtraction_Test.class,
-		CollectDuplicates_Test.class })
+		CollectDuplicates_Test.class,
+		SubclassSetAttributeBounds_Test.class,
+		SubclassAttributeMaxValidation_Test.class })
 public class TestSuite {
 }

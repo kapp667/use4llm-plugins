@@ -299,7 +299,7 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 		Formula formula = null;
 		IntExpression numberOfDefinedObjects;
 		if (attribute.type().isSet()) {
-			numberOfDefinedObjects = attribute.owner().relation().count().minus(relation.join(undefinedSet).count());
+			numberOfDefinedObjects = attribute.owner().inheritanceOrRegularRelation().count().minus(relation.join(undefinedSet).count());
 		} else {
 			numberOfDefinedObjects = relation.join(Expression.UNIV.difference(undefined)).count();
 		}
@@ -372,6 +372,6 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 			constraints.add(numberOfValues.lte(IntConstant.constant(maxCollectionSize)));
 		}
 
-		return Formula.and(constraints).forAll(variable.oneOf(attribute.owner().relation()));
+		return Formula.and(constraints).forAll(variable.oneOf(attribute.owner().inheritanceOrRegularRelation()));
 	}
 }
