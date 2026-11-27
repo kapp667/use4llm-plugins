@@ -13,8 +13,8 @@ Judge the meaning, not the shape of a string. A word that looks like a path or a
 
 - **Personal identity.** Real names, email addresses, phone numbers and street addresses of people. The GitHub login of the repository owner and the GitHub handles of upstream authors are public and may appear.
 - **The author's machine.** Absolute paths outside the repository, such as a home folder, a temporary folder of a tool or a session's scratch folder. Host names, user names and IP addresses of private machines.
-- **Working sessions.** Links to chat or agent sessions, and session or conversation identifiers. The two attribution trailers below are the only exception.
-- **How the work was produced.** Which AI model or agent wrote, reviewed or fixed something; budgets or costs of a session; handoff notes, prompts, worktrees, pauses, "overnight" runs and review passes done by agents. A pull request explains the change, its reasons and its verification. It never explains the process that produced it.
+- **Working sessions.** Links to chat or agent sessions, and session or conversation identifiers, with no exception. A session link points into the owner's private account, so it is a security risk even when the session itself is access-controlled. This covers a commit trailer such as `Claude-Session:` and a link at the end of a pull request.
+- **How the work was produced.** Which agent reviewed or fixed something in which pass; budgets or costs of a session; handoff notes, prompts, worktrees, pauses, "overnight" runs and review passes done by agents. A pull request explains the change, its reasons and its verification. It never explains the process that produced it.
 - **Secrets.** Tokens, keys, passwords and private URLs that grant access.
 - **Details that help an attacker.** A step-by-step account of how to exploit a vulnerability that is not fixed yet.
 
@@ -24,7 +24,7 @@ Judge the meaning, not the shape of a string. A word that looks like a path or a
 - Technical content about USE, OCL, Kodkod, the plugins and their bugs, including exact error messages.
 - Issue and pull request numbers, commit hashes and public URLs of this project and its upstream projects.
 - Mentions of tools as tools, such as Claude Code as the editor used, a CI job or a SAT solver.
-- These attribution lines, exactly as written, and only these: a `Co-Authored-By: Claude ... <noreply@anthropic.com>` commit trailer, a `Claude-Session: https://claude.ai/code/session_...` commit trailer, and the pull request footer `🤖 Generated with [Claude Code](https://claude.com/claude-code)` followed by one session link.
+- Statements that the work was written with an AI tool, model name included: a `Co-Authored-By: Claude ... <noreply@anthropic.com>` commit trailer, or a footer such as `Generated with Claude Code` that links to the product page. Being open about how the code was written is legitimate. Only a link to a session is private.
 - This file and other documentation that describe these categories in general terms.
 
 ## Verdict
