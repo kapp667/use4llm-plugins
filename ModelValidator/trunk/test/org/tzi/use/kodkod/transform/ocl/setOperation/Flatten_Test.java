@@ -1,6 +1,7 @@
 package org.tzi.use.kodkod.transform.ocl.setOperation;
 
 import org.junit.Test;
+import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.kodkod.transform.ocl.OCLTest;
 
 public class Flatten_Test extends OCLTest {
@@ -56,6 +57,52 @@ public class Flatten_Test extends OCLTest {
 	@Test
 	public void undefinedSetOfATypeFlattenedIsUndefined() {
 		test("undefinedSetOfATypeFlattenedIsUndefined", "oclUndefined(Set(Integer))->flatten()");
+	}
+
+	@Test
+	public void nullElementOfASetIsSkipped() {
+		test("nullElementOfASetIsSkipped", "Set{Set{1}, null}->flatten()");
+	}
+
+	@Test
+	public void undefinedElementOfASetIsSkipped() {
+		test("undefinedElementOfASetIsSkipped", "Set{Set{1}, ada.luckyNumbers}->flatten()");
+	}
+
+	@Test
+	public void undefinedElementIsSkippedForEachObject() {
+		test("undefinedElementIsSkippedForEachObject", "Person.allInstances()->select(p | Set{p.luckyNumbers, Set{1}}->flatten()->includes(1))");
+	}
+
+	@Test
+	public void setOfUndefinedCollectionsFlattensToTheEmptySet() {
+		test("setOfUndefinedCollectionsFlattensToTheEmptySet", "Set{ada.luckyNumbers, oclUndefined(Set(Integer))}->flatten()");
+	}
+
+	@Test
+	public void nullElementOfASequenceIsSkipped() {
+		test("nullElementOfASequenceIsSkipped", "Sequence{Sequence{1}, null}->flatten()");
+	}
+
+	@Test
+	public void undefinedElementOfABagIsKeptAsAnUndefinedElement() {
+		test("undefinedElementOfABagIsKeptAsAnUndefinedElement", "Bag{Set{1}, ada.luckyNumbers}->flatten()");
+	}
+
+	@Test
+	public void undefinedResultOfCollectNestedOnASequenceIsSkipped() {
+		test("undefinedResultOfCollectNestedOnASequenceIsSkipped",
+				"Sequence{1,2}->collectNested(i | if i = 1 then oclUndefined(Set(Integer)) else Set{i} endif)->flatten()");
+	}
+
+	@Test(expected = TransformationException.class)
+	public void orderedSetWithAnUndefinedElementIsRefused() {
+		toKodkod(toOCLExpression("OrderedSet{OrderedSet{1}, null}->flatten()"));
+	}
+
+	@Test
+	public void orderedSetOfLiteralsIsFlattened() {
+		test("orderedSetOfLiteralsIsFlattened", "OrderedSet{OrderedSet{1}, OrderedSet{2}}->flatten()");
 	}
 
 }
