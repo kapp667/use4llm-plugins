@@ -43,6 +43,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		IntegerArithmetic_Test.class,
 		IntegerCollectionBounds_Test.class,
 		OclAnyAttribute_Test.class,
+		EmptyDomainAttribute_Test.class,
 		PluginCommands_Test.class,
 		ConfigurationValidationCmd_Test.class,
 		KodkodValidateCmd_Test.class,
