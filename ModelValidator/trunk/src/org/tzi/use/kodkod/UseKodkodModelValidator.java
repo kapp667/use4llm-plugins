@@ -53,8 +53,9 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 			
 			session.reset();
 			newSolution(solution.instance().relationTuples());
+		} else {
+			evaluateInactiveInvariants();
 		}
-		evaluateInactiveInvariants();
 	}
 
 	@Override
