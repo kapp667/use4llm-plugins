@@ -92,8 +92,15 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 
 	@Override
 	public void visitCollectNested(ExpCollectNested exp) {
+		if (isCollectionOfCollections(exp.type()) && exp.getRangeExpression().type().isTypeOfCollection()) {
+			throw new TransformationException(LogMessages.flattenCollectNestedOnCollectionError(exp.toString()));
+		}
 		collectTypeCheck(exp);
-		visitQueryAndInvoke(exp);
+		visitQuery(exp);
+		if (isCollectionOfCollections(exp.type())) {
+			arguments.set(1, flattenedElement((Expression) arguments.get(1), exp));
+		}
+		invokeMethod(exp.name(), arguments, true);
 	}
 
 	@Override

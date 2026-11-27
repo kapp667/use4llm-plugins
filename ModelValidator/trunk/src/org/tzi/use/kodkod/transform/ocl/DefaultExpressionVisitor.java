@@ -477,11 +477,32 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		DefaultExpressionVisitor visitor;
 		for (org.tzi.use.uml.ocl.expr.Expression expression : exp.getElemExpr()) {
 			visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
-			expression.processWithVisitor(visitor);
-			arguments.add(visitor.getObject());
+			visitor.processAs(expression, ((CollectionType) exp.type()).elemType());
+			if (isCollectionOfCollections(exp.type()) && canBeUndefined(expression)) {
+				arguments.add(flattenedElement((Expression) visitor.getObject(), exp));
+			} else {
+				arguments.add(visitor.getObject());
+			}
 		}
 
 		invokeMethod(literal, arguments, false);
+	}
+
+	/**
+	 * USE's flatten() skips an undefined element of a Set or a Sequence, keeps it
+	 * as an undefined element of a Bag, and fails on one of an OrderedSet.
+	 */
+	protected Expression flattenedElement(Expression element, org.tzi.use.uml.ocl.expr.Expression flattenSource) {
+		Type type = flattenSource.type();
+		if (type.isTypeOfOrderedSet()) {
+			throw new TransformationException(LogMessages.flattenOrderedSetError(flattenSource.toString()));
+		}
+		Expression undefinedElement = type.isTypeOfBag() ? undefined : Expression.NONE;
+		return element.eq(undefined_Set).thenElse(undefinedElement, element);
+	}
+
+	private static boolean canBeUndefined(org.tzi.use.uml.ocl.expr.Expression expression) {
+		return !(expression instanceof ExpCollectionLiteral || expression instanceof ExpEmptyCollection);
 	}
 
 	/**
@@ -576,7 +597,7 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 		return type.isTypeOfReal();
 	}
 
-	private static boolean isCollectionOfCollections(Type type) {
+	protected static boolean isCollectionOfCollections(Type type) {
 		return type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)
 				&& ((CollectionType) type).elemType().isKindOfCollection(VoidHandling.EXCLUDE_VOID);
 	}

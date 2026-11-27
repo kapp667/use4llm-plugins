@@ -165,6 +165,16 @@ public final class LogMessages {
 		return "Cannot transform " + inQuotes(expression) + ": collections of collections are not supported.";
 	}
 
+	public static String flattenOrderedSetError(String expression) {
+		return "Cannot transform " + inQuotes(expression)
+				+ ": USE fails to flatten an ordered set when one of its element collections is undefined, and an element of this ordered set may be undefined.";
+	}
+
+	public static String flattenCollectNestedOnCollectionError(String expression) {
+		return "Cannot transform " + inQuotes(expression) + ": its source has the type Collection, and USE's flatten() keeps an undefined collection of its result"
+				+ " for a Set or a Bag source but skips it for a Sequence or an OrderedSet source.";
+	}
+
 	public static String collectionDuplicatesError(String expression) {
 		return "Cannot transform " + inQuotes(expression)
 				+ ": its result depends on the duplicates of a collection that is not a set, which the transformation does not keep.";
