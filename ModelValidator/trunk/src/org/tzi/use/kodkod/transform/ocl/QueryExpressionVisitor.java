@@ -40,9 +40,9 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 
 	private List<Object> arguments;
 
-	public QueryExpressionVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
-			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
-		super(model, variables, variableClasses, replaceVariables, collectionVariables);
+	public QueryExpressionVisitor(IModel model, Map<String, Node> variables, Map<String, Variable> replaceVariables,
+			List<String> collectionVariables) {
+		super(model, variables, replaceVariables, collectionVariables);
 		arguments = new ArrayList<Object>();
 	}
 
@@ -109,19 +109,19 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 	@Override
 	public void visitIsUnique(ExpIsUnique exp) {
 		refuseDuplicatesOfRange(exp);
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getRangeExpression().processWithVisitor(visitor);
 		arguments.add(0, visitor.getObject());
 
 		List<String> replacedVariables = createVariables(exp.getVariableDeclarations(), ((Expression) visitor.getObject()).arity());
 
-		DefaultExpressionVisitor visitor2 = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor2 = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getQueryExpression().processWithVisitor(visitor2);
 		arguments.add(1, visitor2.getObject());
 
 		replacedVariables.addAll(createVariables(exp.getVariableDeclarations(), ((Expression) visitor.getObject()).arity()));
 
-		visitor2 = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		visitor2 = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getQueryExpression().processWithVisitor(visitor2);
 		arguments.add(2, visitor2.getObject());
 
@@ -153,14 +153,14 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 	}
 	
 	public void visitQuery(ExpQuery exp) {
-		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getRangeExpression().processWithVisitor(visitor);
 		sourceType = exp.getRangeExpression().type();
 		arguments.add(0, visitor.getObject());
 
 		List<String> replacedVariables = createVariables(exp.getVariableDeclarations(), ((Expression) visitor.getObject()).arity());
 
-		DefaultExpressionVisitor visitor2 = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+		DefaultExpressionVisitor visitor2 = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 		exp.getQueryExpression().processWithVisitor(visitor2);
 		arguments.add(1, visitor2.getObject());
 		
@@ -212,21 +212,8 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 				varName = varDecl.name();
 				variables.put(varName, createKodkodVariable(varName, arity));
 			}
-
-			objectVariable(varDecl, varName);
 		}
 		return replaced;
-	}
-
-	/**
-	 * Stores the class of an object variable for further use.
-	 * 
-	 * @param varDecl
-	 */
-	private void objectVariable(VarDecl varDecl, String name) {
-		if (varDecl.type().isTypeOfClass()) {
-			variableClasses.put(name, model.getClass(varDecl.type().shortName()));
-		}
 	}
 
 	private Variable createKodkodVariable(String name, int arity) {

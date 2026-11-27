@@ -39,9 +39,9 @@ import kodkod.ast.Variable;
  */
 public class VariableOperationVisitor extends DefaultExpressionVisitor {
 
-	public VariableOperationVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
-			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
-		super(model, variables, variableClasses, replaceVariables, collectionVariables);
+	public VariableOperationVisitor(IModel model, Map<String, Node> variables, Map<String, Variable> replaceVariables,
+			List<String> collectionVariables) {
+		super(model, variables, replaceVariables, collectionVariables);
 	}
 
 	@Override

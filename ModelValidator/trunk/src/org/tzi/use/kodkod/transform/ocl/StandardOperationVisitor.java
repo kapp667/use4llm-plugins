@@ -11,7 +11,6 @@ import kodkod.ast.Node;
 import kodkod.ast.Variable;
 
 import org.tzi.kodkod.helper.LogMessages;
-import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.uml.ocl.expr.ExpStdOp;
@@ -29,9 +28,9 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 
 	private List<Object> arguments;
 
-	public StandardOperationVisitor(IModel model, Map<String, Node> variables, Map<String, IClass> variableClasses,
-			Map<String, Variable> replaceVariables, List<String> collectionVariables) {
-		super(model, variables, variableClasses, replaceVariables, collectionVariables);
+	public StandardOperationVisitor(IModel model, Map<String, Node> variables, Map<String, Variable> replaceVariables,
+			List<String> collectionVariables) {
+		super(model, variables, replaceVariables, collectionVariables);
 	}
 
 	@Override
@@ -39,7 +38,7 @@ public class StandardOperationVisitor extends DefaultExpressionVisitor {
 		arguments = new ArrayList<Object>();
 
 		for (org.tzi.use.uml.ocl.expr.Expression expArg : exp.args()) {
-			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, variableClasses, replaceVariables, collectionVariables);
+			DefaultExpressionVisitor visitor = new DefaultExpressionVisitor(model, variables, replaceVariables, collectionVariables);
 			if (exp.opname().equals("flatten")) {
 				visitor.acceptCollectionOfCollections();
 			}
