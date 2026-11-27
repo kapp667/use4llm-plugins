@@ -788,4 +788,9 @@ public class Exists_Test extends OCLTest {
 		test("test112", ocl, expected);
 	}
 
+	@Test
+	public void existenceInAnUndefinedSetOfATypeIsUndefined() {
+		test("existenceInAnUndefinedSetOfATypeIsUndefined", "oclUndefined(Set(Integer))->exists(i | i > 0)");
+	}
+
 }
