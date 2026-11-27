@@ -51,7 +51,7 @@ public class QueryExpressionVisitor extends DefaultExpressionVisitor {
 		if (canBeOrdered(exp.getRangeExpression().type())) {
 			throw new TransformationException(LogMessages.collectionOrderError(exp.toString()));
 		}
-		visitQueryAndInvoke(exp);
+		throw new TransformationException(LogMessages.anyError(exp.toString()));
 	}
 
 	@Override

@@ -23,7 +23,6 @@ import org.tzi.use.uml.mm.MAssociationEnd;
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MNavigableElement;
 import org.tzi.use.uml.mm.MOperation;
-import org.tzi.use.uml.ocl.expr.ExpAny;
 import org.tzi.use.uml.ocl.expr.ExpAttrOp;
 import org.tzi.use.uml.ocl.expr.ExpNavigation;
 import org.tzi.use.uml.ocl.expr.ExpNavigationClassifierSource;
@@ -52,15 +51,6 @@ public class VariableOperationVisitor extends DefaultExpressionVisitor {
 		super(model, variables, variableClasses, replaceVariables, collectionVariables);
 	}
 
-	@Override
-	public void visitAny(ExpAny exp) {
-		super.visitAny(exp);
-		Type type = exp.getVariableDeclarations().varDecl(0).type();
-		if(type.isTypeOfClass()){
-			attributeClass = model.getClass(((MClass)type).name());
-		}
-	}
-	
 	@Override
 	public void visitAttrOp(ExpAttrOp exp) {
 		exp.objExp().processWithVisitor(this);
