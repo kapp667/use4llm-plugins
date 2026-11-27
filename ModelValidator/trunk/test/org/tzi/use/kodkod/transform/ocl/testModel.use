@@ -11,6 +11,7 @@ attributes
   alive:Boolean
   luckyNumbers:Set(Integer)
   favoriteColor:Color
+  employerName:String derived = (if self.employerAC.isDefined() then self.employerAC else self.employerA endif).name
 operations
   coworkers():Set(Person) = Person.allInstances()->select(p | p.employerAC = self.employerAC)
   currentEmployer():Company = self.employerAC
