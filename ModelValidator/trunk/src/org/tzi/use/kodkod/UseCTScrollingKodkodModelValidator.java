@@ -10,6 +10,7 @@ import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.config.impl.ModelConfigurator;
 import org.tzi.kodkod.model.type.TypeAtoms;
 import org.tzi.kodkod.model.type.TypeConstants;
+import org.tzi.use.kodkod.solution.SolutionValueReader;
 import org.tzi.use.kodkod.transform.TransformationException;
 import org.tzi.use.main.Session;
 import org.tzi.use.uml.ocl.expr.Evaluator;
@@ -69,7 +70,7 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = createObjectDiagram(solution.instance().relationTuples());
+		boolean errors = createSolutionDiagram();
 		if (!errors) {
 			readSolutionTerms(session.system().state());
 			
@@ -147,14 +148,16 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 
 	protected void readSolutionTerms(MSystemState state) {
 		Evaluator eval = new Evaluator();
+		SolutionValueReader reader = new SolutionValueReader(state);
 		Map<ClassifyingTerm, Value> solutionMap = new LinkedHashMap<>();
 		
 		for (ClassifyingTerm ct : classifyingTerms) {
-			Value kodkodEval = evaluateKodkod(ct, evaluator);
+			Object kodkodResult = SolutionValueReader.evaluate(evaluator, ct.kodkodExpr);
+			Value kodkodEval = reader.read(kodkodResult, ct.oclExpr.type());
 			Value useEval = eval.eval(ct.oclExpr, state);
 			
-			if(kodkodEval != null && !kodkodEval.equals(useEval)){
-				LOG.error("Kodkod and USE evaluate classifying term " + StringUtil.inQuotes(ct.name) + " differently. Kodkod: " + kodkodEval + "; USE: " + useEval);
+			if(!useEval.equals(kodkodEval)){
+				LOG.error("Kodkod and USE evaluate classifying term " + StringUtil.inQuotes(ct.name) + " differently. Kodkod: " + (kodkodEval == null ? kodkodResult : kodkodEval) + "; USE: " + useEval);
 				LOG.info("Using evaluated value of USE for further steps.");
 			}
 			solutionMap.put(ct, useEval);
@@ -174,61 +177,6 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 		LOG.info("Term values for this solution:" + StringUtil.NEWLINE + StringUtil.fmtSeq(solutionPrints, StringUtil.NEWLINE));
 	}
 
-	protected Value evaluateKodkod(ClassifyingTerm ct, kodkod.engine.Evaluator evaluatorEnginge) {
-		Value kodkodEval = null;
-		if(evaluatorEnginge != null){
-			if(ct.kodkodExpr instanceof kodkod.ast.Expression){
-				TupleSet res = evaluatorEnginge.evaluate((kodkod.ast.Expression) ct.kodkodExpr);
-				// result should always be a single value of Integer, Undefined, Undefined_Set, Boolean_True or Boolean_False
-				if(res.arity() == 1){
-					//TODO might cause an exception if result is not in universe (for integers, see lolis mail)
-					Object intermRes;
-					try {
-						intermRes = res.iterator().next().atom(0);
-					}
-					catch(IndexOutOfBoundsException ex){
-						LOG.warn("Could not compare evaluation results of USE and Kodkod.");
-						return null;
-					}
-					
-					if(intermRes instanceof Integer){
-						kodkodEval = IntegerValue.valueOf((int) intermRes);
-					} else if(intermRes instanceof String){
-						switch((String) intermRes){
-						case TypeConstants.UNDEFINED:
-						case TypeConstants.UNDEFINED_SET:
-							kodkodEval = UndefinedValue.instance;
-							break;
-						case TypeConstants.BOOLEAN_TRUE:
-						case TypeConstants.TRUE:
-							kodkodEval = BooleanValue.TRUE;
-							break;
-						case TypeConstants.BOOLEAN_FALSE:
-						case TypeConstants.FALSE:
-							kodkodEval = BooleanValue.FALSE;
-							break;
-						default:
-							LOG.error("Unexpected kodkod result when evaluating classifying term." + StringUtil.NEWLINE
-									+ "Classifying term " + StringUtil.inQuotes(ct.name) + " yields: "
-									+ res.toString());
-						}
-					}
-				} else {
-					LOG.error("Arity of kodkod result is not one!" + StringUtil.NEWLINE
-							+ "Classifying term " + StringUtil.inQuotes(ct.name)
-							+ " yields: " + res.toString());
-				}
-			} else if(ct.kodkodExpr instanceof IntExpression){
-				int res  = evaluatorEnginge.evaluate((IntExpression) ct.kodkodExpr);
-				kodkodEval = IntegerValue.valueOf(res);
-			} else if(ct.kodkodExpr instanceof Formula){
-				boolean res = evaluatorEnginge.evaluate((Formula) ct.kodkodExpr);
-				kodkodEval = BooleanValue.get(res);
-			}
-		}
-		return kodkodEval;
-	}
-	
 	public void addClassifyingTerm(String name, Expression term, Node termKodkod){
 		classifyingTerms.add(new ClassifyingTerm(name, term, termKodkod));
 	}

@@ -15,7 +15,7 @@ public class UseCTScrollingAllKodkodModelValidator extends UseCTScrollingKodkodM
 
 	@Override
 	protected void handleSolution() {
-		boolean errors = createObjectDiagram(solution.instance().relationTuples());
+		boolean errors = createSolutionDiagram();
 		if (!errors) {
 			readSolutionTerms(session.system().state());
 			solutions.add(solution.instance().relationTuples());
