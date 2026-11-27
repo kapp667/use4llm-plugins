@@ -10,9 +10,10 @@
 #                    in a shell, e.g. --expect SAT --require 'INFO: true'), plus any properties
 #                    file journey.cmd names
 # Logs stay in <out dir>, one per gate. Exits 0 only when every gate passed.
+# Before a commit, also run ci/hygiene.sh (session links, judge.args quoting, line endings).
 set -uo pipefail
 
-[ "$#" -ge 4 ] || { sed -n '2,11p' "$0" >&2; exit 2; }
+[ "$#" -ge 4 ] || { sed -n '2,13p' "$0" >&2; exit 2; }
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 use="$(cd "$1" && pwd)"; junit="$(cd "$2" && pwd)"; tests="$(cd "$3" && pwd)"
 mkdir -p "$4"; out="$(cd "$4" && pwd)"

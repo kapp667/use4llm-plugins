@@ -25,6 +25,15 @@ jobs:
       JACOCO_CLI_SHA256: 594c01125b84864a7fc5a9efab19b71b7de36b27346863f6d7cd0cd45400ceb0
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Session links in commit messages, judge.args quoting, and line-ending changes.
+      - name: Check commit and file hygiene
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ci/hygiene.sh "origin/${BASE_REF}..HEAD"
 
       - uses: actions/setup-java@v4
         with:
