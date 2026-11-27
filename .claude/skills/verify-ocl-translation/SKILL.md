@@ -100,15 +100,12 @@ A `no-value` row is not by itself a wrong verdict: the validator solves `A.allIn
 
 ## Known findings at the sync commit
 
-All 35 `value` rows of `expected.tsv` have one cause. `closure` drops an undefined value that
-the body returns. `SetOperationGroup.closure` builds `^{x, y | y in body}` with `x` and `y` over
-`src_type`, which holds no undefined value, while USE adds `null` to the result.
+None in `value` or `verdict`. The 155 `no-value` rows are Integers above `Integer_max`, inside
+`+` and `collect`.
 
-- Expression `A.allInstances->closure(x | Set{x.src})->size() = 2`, state: one `a1 : A` with no
-  `src`. USE gives `Set{null,a1}`, so the invariant holds and `check` says OK. The translation
-  gives `Set{a1}`, and `mv -validate` reports TRIVIALLY_UNSATISFIABLE with no ERROR.
-
-The 155 `no-value` rows are Integers above `Integer_max`, inside `+` and `collect`.
+Fixed before this sync commit: `closure` dropped an undefined value that the body returns
+(issue #121). `A.allInstances->closure(x | Set{x.src})->size() = 2` in a state with one
+`a1 : A` and no `src` was TRIVIALLY_UNSATISFIABLE with no ERROR, while USE's `check` says OK.
 
 ## Not covered
 
@@ -133,10 +130,9 @@ attributes, derived attributes, associations, inheritance), `src/org/tzi/use/kod
 `src/org/tzi/kodkod/KodkodQueryCache.java`, `src/org/tzi/use/kodkod/UseScrollingKodkodModelValidator.java`
 and `ModelConfigurator.forbid`.
 
-Sync commit: `22bee41`. At that commit the check exits 0 with 152 states and 11897
-expressions, and the covered code differs from `bf93679` only in `AttributeConfigurator`
-(a class with a maximum of 0 holds no attribute values; no class of `model.use` has one) and a
-new `ValidityRule` for String settings (`mv -vc` only). The findings below hold. Before you move it forward, run the
+Sync commit: `93af50e`. At that commit the check exits 0 with 152 states and 11897
+expressions. The covered code differs from `22bee41` only in `SetOperationGroup.closure`,
+which now keeps the undefined value, and `expected.tsv` lost the 35 closure rows. Before you move it forward, run the
 check at the new commit and confirm that this file still describes the covered code: the
 grammar still reaches the changed operations, and the findings above are still true. To see
 what changed since, run `git diff <sync commit> -- ModelValidator/trunk/src`.
