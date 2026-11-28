@@ -195,15 +195,20 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		private final Map<String, List<String>> unknownKeys = new TreeMap<String, List<String>>();
 
 		/**
+		 * The configuration section of each name, as the file holds it.
+		 */
+		private final Map<String, Configuration> sections = new TreeMap<String, Configuration>();
+
+		/**
 		 * Constructs an object.
-		 * 
+		 *
 		 * @param model
 		 *            The class diagram of the UML/OCL model.
 		 * @param configManager
 		 *            The manager for the configuration file.
 		 */
 		private LoadedConfigFileManager(IModel model, MModel mModel, ConfigurationFileManager configManager) {
-			this.configs = getConfigurations(configManager, model, mModel, unknownKeys);
+			this.configs = getConfigurations(configManager, model, mModel, unknownKeys, sections);
 		}
 
 		/**
@@ -247,12 +252,13 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 */
 		private static Map<String, SettingsConfiguration> getConfigurations(
 				final ConfigurationFileManager configManager, final IModel model, final MModel mModel,
-				final Map<String, List<String>> unknownKeys) {
+				final Map<String, List<String>> unknownKeys, final Map<String, Configuration> sections) {
 			final String[] configNames = configManager.getConfigurationNames();
 			final Map<String, SettingsConfiguration> configurationsForNames = new TreeMap<String, SettingsConfiguration>();
 			for (String configurationName : configNames) {
 				final SettingsConfiguration configuration = new SettingsConfiguration(model);
 				Configuration section = configManager.getConfiguration(configurationName);
+				sections.put(configurationName, section);
 				List<String> unknown = UnknownConfigurationKeys.unknown(mModel, section);
 				if (!unknown.isEmpty()) {
 					unknownKeys.put(configurationName, unknown);
@@ -269,6 +275,10 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 
 		public Map<String, List<String>> getUnknownKeys() {
 			return unknownKeys;
+		}
+
+		public Map<String, Configuration> getSections() {
+			return sections;
 		}
 
 	}
