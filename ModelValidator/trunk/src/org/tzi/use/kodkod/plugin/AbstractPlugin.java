@@ -57,7 +57,10 @@ public abstract class AbstractPlugin {
 			enricher.enrichModel(mSystem, model());
 			return true;
 		} catch (IllegalStateException e) {
-			LOG.error(e.getMessage() + " " + e.getCause());
+			Throwable cause = e.getCause();
+				String detail = cause == null ? ""
+						: " " + (cause.getMessage() != null ? cause.getMessage() : cause.toString());
+				LOG.error(e.getMessage() + detail);
 			return false;
 		}
 	}
