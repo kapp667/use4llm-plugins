@@ -207,7 +207,7 @@ public class ObjectDiagramCreator {
 			IAttribute attribute = attributes.get(relation);
 
 			if (attribute != null) {
-				strategy = new AttributeStrategy(systemApi, objectStates, attribute.name());
+				strategy = new AttributeStrategy(systemApi, objectStates, attribute.owner().name(), attribute.name());
 			} else if (isAssociation(relation)) {
 				strategy = new LinkStrategy(systemApi, objectStates, relation.name());
 			}
