@@ -1,6 +1,5 @@
 package org.tzi.use.kodkod.transform.enrich;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -11,14 +10,12 @@ import org.tzi.kodkod.model.iface.IAttribute;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.model.type.ConfigurableType;
-import org.tzi.kodkod.model.type.EnumType;
 import org.tzi.kodkod.model.type.Type;
-import org.tzi.kodkod.model.type.TypeFactory;
 import org.tzi.kodkod.model.type.TypeLiterals;
+import org.tzi.use.kodkod.transform.TypeConverter;
 import org.tzi.use.kodkod.transform.ValueConverter;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.ocl.value.CollectionValue;
-import org.tzi.use.uml.ocl.value.EnumValue;
 import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MLinkObject;
@@ -113,7 +110,6 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 	 * Extraction of the attribute values.
 	 */
 	private void extractAttributeValues(IModel model, MObjectState objectState, IClass clazz, MObject mObject) {
-		TypeFactory typeFactory = model.typeFactory();
 		IAttribute attribute;
 		
 		for (MAttribute mAttribute : mObject.cls().allAttributes()) {
@@ -126,30 +122,19 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 
 				ValueConverter valueConverter = new ValueConverter();
 				Set<String> values = valueConverter.convert(value);
-				
-				/*if(value.isObject()){
-						
+
+				Type type = getType(value, model);
+				String objectName = mObject.cls().name() + "_" + mObject.name();
+
+				if (values.isEmpty()) {
+					// an empty collection: the attribute of this object is fixed to no element
+					attribute.getConfigurator().addSpecificValue(new String[] { objectName });
 				}
-				else if(value instanceof EnumValue){
-					
-				}*/
-
-				Type type = getType(typeFactory, value, model);
-
 				for (String stringValue : values) {
-					setAttributeValue(mObject.cls().name() + "_" + mObject.name(), attribute, type, stringValue);
+					attribute.getConfigurator().addSpecificValue(new String[] { objectName, stringValue });
 					addValueToType(type, stringValue);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Sets the value for the given attribute.
-	 */
-	private void setAttributeValue(String name, IAttribute attribute, Type type, String value) {
-		if (type != null) {
-			attribute.getConfigurator().addSpecificValue(new String[] { name, value });
 		}
 	}
 
@@ -162,28 +147,20 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 		}
 	}
 
-	private Type getType(TypeFactory typeFactory, Value value, IModel model) {
-		String typeName;
-		Type type;
-		if (value.isCollection()) {
-			typeName = ((CollectionValue) value).elemType().shortName();
-		} else {
-			typeName = value.type().shortName();
-		}
-		//TODO attributes can also reference other classes and enums
-		if(value.isObject()){
-			IClass clazz = model.getClass(typeName);
-			type = typeFactory.objectType(clazz);	
-		}
-		else if(value instanceof EnumValue){
-			List<String> enumTypes = new ArrayList<String>();
-			for( EnumType enumType :model.enumTypes()){
-				enumTypes.add(enumType.toString());
-			}
-			type = typeFactory.enumType(typeName,enumTypes);
-		}
-		else{
-			type = typeFactory.buildInType(typeName);
+	/**
+	 * Returns the type of the given value, or of its elements if it is a
+	 * collection.
+	 *
+	 * @throws IllegalStateException
+	 *             if the model validator has no type for it, so that the value
+	 *             is never dropped from the object diagram in silence
+	 */
+	private Type getType(Value value, IModel model) {
+		org.tzi.use.uml.ocl.type.Type valueType = value.isCollection() ? ((CollectionValue) value).elemType()
+				: value.type();
+		Type type = new TypeConverter(model).convert(valueType);
+		if (type == null) {
+			throw new IllegalStateException(LogMessages.typeConvertError(valueType.shortName()));
 		}
 		return type;
 	}
