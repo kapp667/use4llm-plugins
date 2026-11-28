@@ -3,7 +3,6 @@ package org.tzi.use.kodkod.transform;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.type.TypeConstants;
 import org.tzi.use.uml.ocl.value.CollectionValue;
@@ -22,13 +21,14 @@ import org.tzi.use.uml.sys.MObject;
  */
 public class ValueConverter {
 
-	private static final Logger LOG = Logger.getLogger(ValueConverter.class);
-
 	/**
 	 * Converts the given value.
 	 * 
 	 * @param value
 	 * @return
+	 * @throws IllegalStateException
+	 *             if the value holds a nested collection, which the model
+	 *             validator cannot represent
 	 */
 	public Set<String> convert(Value value) {
 		Set<String> values = new HashSet<String>();
@@ -59,7 +59,7 @@ public class ValueConverter {
 
 		for (Value val : collectionValue.collection()) {
 			if (val.isCollection()) {
-				LOG.error(LogMessages.valueConversionNestedCollections);
+				throw new IllegalStateException(LogMessages.valueConversionNestedCollections);
 			} else {
 				values.addAll(convert(val));
 			}
