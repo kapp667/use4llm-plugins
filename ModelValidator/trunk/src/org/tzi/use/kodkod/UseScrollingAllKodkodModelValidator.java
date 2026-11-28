@@ -14,6 +14,7 @@ public class UseScrollingAllKodkodModelValidator extends UseScrollingKodkodModel
 		if (!errors) {
 			solutions.add(solution.instance().relationTuples());
 		} else {
+			refusedSolutions++;
 			session.reset();
 		}
 		newSolution(solution.instance().relationTuples());

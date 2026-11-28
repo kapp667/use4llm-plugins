@@ -21,6 +21,7 @@ public class UseCTScrollingAllKodkodModelValidator extends UseCTScrollingKodkodM
 			solutions.add(solution.instance().relationTuples());
 			LOG.info("Found solution no. " + solutions.size());
 		} else {
+			refusedSolutions++;
 			session.reset();
 		}
 		newSolution(solution.instance().relationTuples());

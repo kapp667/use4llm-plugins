@@ -113,6 +113,14 @@ public final class LogMessages {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
 	}
 
+	/**
+	 * The error that replaces an unsatisfiable verdict when USE refused solutions of the translation.
+	 */
+	public static String notProvedError(String outcome, int refusals) {
+		return outcome + " is not proved: USE refused " + refusals + " solution" + (refusals == 1 ? "" : "s")
+				+ " of the translation, so the translation and USE disagree on the model and the search cannot prove that no solution exists.";
+	}
+
 	public static String untransformedElementsError(List<String> errors) {
 		return "Cannot validate the model: the following elements cannot be transformed, and a solution would ignore them.\n"
 				+ String.join("\n", errors);

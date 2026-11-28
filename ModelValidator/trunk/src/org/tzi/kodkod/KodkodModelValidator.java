@@ -47,7 +47,7 @@ public abstract class KodkodModelValidator {
 			return;
 		}
 
-		LOG.info(solution.outcome());
+		reportOutcome(solution.outcome());
 
 		Statistics statistics = solution.stats();
 		LOG.info(LogMessages.kodkodStatistics(statistics));
@@ -85,6 +85,15 @@ public abstract class KodkodModelValidator {
 		}
 		LOG.error(LogMessages.untransformedElementsError(model.transformationErrors()));
 		return true;
+	}
+
+	/**
+	 * Reports the outcome of the solver. A subclass may report it in another way.
+	 *
+	 * @param outcome
+	 */
+	protected void reportOutcome(Solution.Outcome outcome) {
+		LOG.info(outcome);
 	}
 
 	private void storeEvaluator(KodkodSolver kodkodSolver) {
