@@ -95,6 +95,15 @@ public class ObjectDiagramCreator {
 		}
 	}
 
+	/**
+	 * Sets the kept values of the attributes that the translation leaves out on the objects of the diagram.
+	 *
+	 * @return false if a value cannot be set, after an error has been logged
+	 */
+	public boolean restoreNonTranslatedValues(NonTranslatedValues values) throws UseApiException {
+		return values.restore(systemApi, systemApi.getSystem().state());
+	}
+
 	public ErrorType hasDiagramErrors() {
 		StringWriter buffer = new StringWriter();
 		PrintWriter out = new PrintWriter(buffer);

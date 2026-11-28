@@ -149,15 +149,21 @@ public class ModelTransformator {
 		TypeConverter typeConverter = new TypeConverter(model);
 
 		for (MAttribute mAttribute : attributes) {
-			Type type = typeConverter.convert(mAttribute.type());
-			if (type != null && (mAttribute.isDerived() || !type.isUndefined() && !holdsOclAny(type))) {
-				IAttribute attr;
-				if(mAttribute.isDerived()){
-					attr = factory.createDerivedAttribute(model, mAttribute.name(), type, clazz, mAttribute.getDeriveExpression());
-				} else {
-					attr = factory.createAttribute(model, mAttribute.name(), type, clazz);
+			if (mAttribute.isDerived()) {
+				Type type = typeConverter.convert(mAttribute.type());
+				if (type != null) {
+					IAttribute attr = factory.createDerivedAttribute(model, mAttribute.name(), type, clazz, mAttribute.getDeriveExpression());
+					clazz.addAttribute(attr);
 				}
+				continue;
+			}
+			// a type the translation does not hold is left out without an error; its value is kept in the object diagram
+			Type type = typeConverter.convertQuietly(mAttribute.type());
+			if (type != null && !type.isUndefined() && !holdsOclAny(type)) {
+				IAttribute attr = factory.createAttribute(model, mAttribute.name(), type, clazz);
 				clazz.addAttribute(attr);
+			} else {
+				LOG.info(LogMessages.nonTranslatedAttributeInfo(clazz.name(), mAttribute.name(), mAttribute.type().shortName()));
 			}
 		}
 	}

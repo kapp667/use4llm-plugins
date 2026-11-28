@@ -61,6 +61,18 @@ public class TypeConverter {
 	 * @return
 	 */
 	public Type convert(org.tzi.use.uml.ocl.type.Type type) {
+		return convert(type, true);
+	}
+
+	/**
+	 * Converts the given type as {@link #convert(org.tzi.use.uml.ocl.type.Type)} does, but returns null for a type
+	 * that cannot be converted without logging an error. The caller decides whether that matters.
+	 */
+	public Type convertQuietly(org.tzi.use.uml.ocl.type.Type type) {
+		return convert(type, false);
+	}
+
+	private Type convert(org.tzi.use.uml.ocl.type.Type type, boolean reportErrors) {
 		if (type.isTypeOfVoidType()) {
 			return typeFactory.undefinedType();
 		} else if (type.isTypeOfString() || type.isTypeOfBoolean() || type.isTypeOfInteger() || type.isTypeOfReal()) {
@@ -72,17 +84,19 @@ public class TypeConverter {
 		} else if (type.isTypeOfOclAny()) {
 			return typeFactory.anyType();
 		} else if (type.isKindOfCollection(VoidHandling.EXCLUDE_VOID)) {
-			return convertCollection(type);
+			return convertCollection(type, reportErrors);
 		}
 
-		LOG.error(LogMessages.typeConvertError(type.shortName()));
+		if (reportErrors) {
+			LOG.error(LogMessages.typeConvertError(type.shortName()));
+		}
 
 		return null;
 	}
 
-	private Type convertCollection(org.tzi.use.uml.ocl.type.Type type) {
+	private Type convertCollection(org.tzi.use.uml.ocl.type.Type type, boolean reportErrors) {
 		CollectionType collectionType = (CollectionType) type;
-		Type elemType = convert(collectionType.elemType());
+		Type elemType = convert(collectionType.elemType(), reportErrors);
 
 		if (elemType != null) {
 			if (type.isTypeOfSet()) {
