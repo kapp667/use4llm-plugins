@@ -32,18 +32,16 @@ abstract class AbstractAttributeSettingsValidityRuleValidator
 		List<ClassSettings> listOfClassSettings = config.getAllClassesSettings(); // never null
 		Map<ClassSettings, Set<AttributeSettings>> attributeSettingsForClassSettings = new HashMap<ClassSettings, Set<AttributeSettings>>();
 		for (ClassSettings classSettings : listOfClassSettings) {
-			if (!classSettings.getCls().isAbstract()) {
-				Map<IAttribute, AttributeSettings> attributeSettingsForAttributes = classSettings
-						.getAttributeSettings();
-				Collection<AttributeSettings> attributeSettings = attributeSettingsForAttributes.values();
-				Set<AttributeSettings> directAttributeSettings = new HashSet<>();
-				for (AttributeSettings potentialDirectAttributeSettings : attributeSettings) {
-					if (potentialDirectAttributeSettings.getAttribute().owner() == classSettings.getCls()) {
-						directAttributeSettings.add(potentialDirectAttributeSettings);
-					}
+			Map<IAttribute, AttributeSettings> attributeSettingsForAttributes = classSettings
+					.getAttributeSettings();
+			Collection<AttributeSettings> attributeSettings = attributeSettingsForAttributes.values();
+			Set<AttributeSettings> directAttributeSettings = new HashSet<>();
+			for (AttributeSettings potentialDirectAttributeSettings : attributeSettings) {
+				if (potentialDirectAttributeSettings.getAttribute().owner() == classSettings.getCls()) {
+					directAttributeSettings.add(potentialDirectAttributeSettings);
 				}
-				attributeSettingsForClassSettings.put(classSettings, directAttributeSettings);
 			}
+			attributeSettingsForClassSettings.put(classSettings, directAttributeSettings);
 		}
 		return this.getViolations(attributeSettingsForClassSettings, model);
 	}
