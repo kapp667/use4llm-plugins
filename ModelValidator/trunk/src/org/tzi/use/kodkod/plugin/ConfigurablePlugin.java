@@ -40,10 +40,10 @@ public abstract class ConfigurablePlugin extends AbstractPlugin {
 	 *             is logged.
 	 */
 	protected void configureModel(Configuration config, PrintWriter warningsOut) throws ConfigurationException {
-		List<String> unknown = UnknownConfigurationKeys.unknown(mModel, config);
-		if (!unknown.isEmpty()) {
-			for (String key : unknown) {
-				LOG.error(UnknownConfigurationKeys.message(key));
+		List<String> refusals = UnknownConfigurationKeys.refusals(mModel, model(), config);
+		if (!refusals.isEmpty()) {
+			for (String refusal : refusals) {
+				LOG.error(refusal);
 			}
 			throw new ConfigurationException(LogMessages.configurationRefused);
 		}

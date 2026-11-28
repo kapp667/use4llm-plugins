@@ -78,8 +78,8 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			List<String> unknown = unknownKeys.get(name);
 			if (unknown != null) {
 				logString += "Config " + name + " is invalid.\n";
-				for (String key : unknown) {
-					logString += "    " + UnknownConfigurationKeys.message(key) + "\n";
+				for (String refusal : unknown) {
+					logString += "    " + refusal + "\n";
 				}
 				logString += "\n";
 				continue;

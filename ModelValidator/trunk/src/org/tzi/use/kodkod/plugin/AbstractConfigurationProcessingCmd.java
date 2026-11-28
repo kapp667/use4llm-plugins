@@ -253,7 +253,7 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 			for (String configurationName : configNames) {
 				final SettingsConfiguration configuration = new SettingsConfiguration(model);
 				Configuration section = configManager.getConfiguration(configurationName);
-				List<String> unknown = UnknownConfigurationKeys.unknown(mModel, section);
+				List<String> unknown = UnknownConfigurationKeys.refusals(mModel, model, section);
 				if (!unknown.isEmpty()) {
 					unknownKeys.put(configurationName, unknown);
 				}
