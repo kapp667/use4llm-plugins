@@ -1,5 +1,9 @@
 package org.tzi.kodkod.model.config.impl;
 
+import java.util.Locale;
+
+import org.apache.commons.configuration.ConversionException;
+
 
 
 /**
@@ -72,4 +76,45 @@ public class PropertyEntry {
 	public static final String INVARIANT_INACTIVE = "inactive";
 	public static final String INVARIANT_NEGATE = "negate";
 	
+
+	/**
+	 * Reads the state of an invariant. The state is active, inactive or negate, in any case.
+	 *
+	 * @param invariantName
+	 *            The name of the invariant as Class::name, for the message.
+	 * @param value
+	 *            The state as the file gives it.
+	 * @return The state in lower case.
+	 * @throws ConversionException
+	 *             If the value is none of the three states.
+	 */
+	public static String readInvariantState(String invariantName, String value) throws ConversionException {
+		String state = value.trim().toLowerCase(Locale.ROOT);
+		if (state.equals(INVARIANT_ACTIVE) || state.equals(INVARIANT_INACTIVE) || state.equals(INVARIANT_NEGATE)) {
+			return state;
+		}
+		throw new ConversionException(invariantName + ": '" + value + "' is not a state of an invariant.");
+	}
+
+	/**
+	 * Reads the value of an on/off option. The value is on or off, in any case.
+	 *
+	 * @param optionName
+	 *            The name of the option, for the message.
+	 * @param value
+	 *            The value as the file gives it.
+	 * @return Whether the option is on.
+	 * @throws ConversionException
+	 *             If the value is neither on nor off.
+	 */
+	public static boolean readOnOff(String optionName, String value) throws ConversionException {
+		String trimmed = value.trim();
+		if (trimmed.equalsIgnoreCase("on")) {
+			return true;
+		}
+		if (trimmed.equalsIgnoreCase("off")) {
+			return false;
+		}
+		throw new ConversionException(optionName + ": '" + value + "' is not a value of " + optionName + ".");
+	}
 }
