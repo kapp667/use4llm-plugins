@@ -33,6 +33,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 			LOG.info(LogMessages.pagingNext);
 			previousLog();
 		} else {
+			refusedSolutions++;
 			session.reset();
 			newSolution(solution.instance().relationTuples());
 		}
