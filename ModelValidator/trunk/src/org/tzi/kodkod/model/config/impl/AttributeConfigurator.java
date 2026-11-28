@@ -369,6 +369,10 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 			constraints.add(numberOfValues.lte(IntConstant.constant(maxCollectionSize)));
 		}
 
-		return Formula.and(constraints).forAll(variable.oneOf(attribute.owner().inheritanceOrRegularRelation()));
+		// An undefined set has no size, so the bounds apply to defined values only.
+		Relation undefinedSet = attribute.model().typeFactory().undefinedSetType().relation();
+		Formula defined = undefinedSet.in(variable.join(attribute.relation())).not();
+
+		return defined.implies(Formula.and(constraints)).forAll(variable.oneOf(attribute.owner().inheritanceOrRegularRelation()));
 	}
 }

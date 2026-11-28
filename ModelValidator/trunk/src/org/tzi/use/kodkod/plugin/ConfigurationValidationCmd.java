@@ -1,12 +1,17 @@
 package org.tzi.use.kodkod.plugin;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
+import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.config.impl.UnknownConfigurationKeys;
 import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.kodkod.validation.ValidityRule;
@@ -56,21 +61,25 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			return;
 		}
 		filterForNameArguments(configurationsForNames, names);
-		processValidation(model, configurationsForNames, loaded.getUnknownKeys(), LOG);
+		processValidation(model, configurationsForNames, loaded.getSections(), loaded.getUnknownKeys(), LOG);
 	}
 
 	/**
-	 * Processes the validation.
-	 * 
+	 * Processes the validation. A configuration is valid when no validity rule is
+	 * violated and the loader of mv -validate accepts it. The loader runs on the
+	 * model without searching.
+	 *
 	 * @param model
 	 *            The class diagram of the UML/OCL model.
 	 * @param configurationsForNames
 	 *            The configurations for their names.
+	 * @param sections
+	 *            The configuration section of each name.
 	 * @param log
 	 *            The logger.
 	 */
 	private void processValidation(final IModel model, final Map<String, SettingsConfiguration> configurationsForNames,
-			final Map<String, List<String>> unknownKeys, final Logger log) {
+			final Map<String, Configuration> sections, final Map<String, List<String>> unknownKeys, final Logger log) {
 		String logString = "Validation results:\n\n";
 		for (Entry<String, SettingsConfiguration> configurationForName : configurationsForNames.entrySet()) {
 			String name = configurationForName.getKey();
@@ -94,14 +103,39 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 				logString += "Config " + name + " could not be validated.\n\n";
 				continue;
 			}
-			if (violationsByValdityRules.size() == 0) {
+			if (violationsByValdityRules.size() != 0) {
+				logString += "Config " + name + " is invalid.\n";
+				logString += describeViolations(violationsByValdityRules) + "\n";
+				continue;
+			}
+			String loadError = loadError(sections.get(name));
+			if (loadError == null) {
 				logString += "Config " + name + " is valid.\n\n";
 			} else {
 				logString += "Config " + name + " is invalid.\n";
-				logString += describeViolations(violationsByValdityRules) + "\n";
+				logString += "    " + loadError + "\n\n";
 			}
 		}
 		log.info(logString);
+	}
+
+	/**
+	 * Loads the configuration on the model as mv -validate does, without searching.
+	 *
+	 * @param config
+	 *            The configuration section.
+	 * @return Null if the loader accepts the configuration, else the message of the
+	 *         error that the loader raised.
+	 */
+	private String loadError(final Configuration config) {
+		try {
+			configureModel(config, new PrintWriter(new StringWriter(), true));
+			return null;
+		} catch (ConfigurationException e) {
+			return e.getMessage() != null ? e.getMessage() : LogMessages.configurationRefused;
+		} catch (RuntimeException e) {
+			return e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+		}
 	}
 
 	/**

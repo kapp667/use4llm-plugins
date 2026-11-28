@@ -61,6 +61,9 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		SubclassAttributeMaxValidation_Test.class,
 		MultipleInheritanceAttribute_Test.class,
 		InvariantIndepRestore_Test.class,
-		QueryLiterals_Test.class })
+		QueryLiterals_Test.class,
+		AbstractOwnerAttributeRules_Test.class,
+		UndefinedSetSize_Test.class,
+		ValidConfigurationLoads_Test.class })
 public class TestSuite {
 }
