@@ -10,7 +10,9 @@ import java.util.TreeMap;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConversionException;
 import org.apache.log4j.Logger;
+import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.model.config.ConfigurationFileManager;
 import org.tzi.kodkod.model.config.impl.UnknownConfigurationKeys;
 import org.tzi.kodkod.model.iface.IModel;
@@ -195,15 +197,25 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		private final Map<String, List<String>> unknownKeys = new TreeMap<String, List<String>>();
 
 		/**
+		 * The configuration section of each name, as the file holds it.
+		 */
+		private final Map<String, Configuration> sections = new TreeMap<String, Configuration>();
+
+		/**
+		 * The message of the value that cannot be read, for each name whose configuration cannot be read.
+		 */
+		private final Map<String, String> readErrors = new TreeMap<String, String>();
+
+		/**
 		 * Constructs an object.
-		 * 
+		 *
 		 * @param model
 		 *            The class diagram of the UML/OCL model.
 		 * @param configManager
 		 *            The manager for the configuration file.
 		 */
 		private LoadedConfigFileManager(IModel model, MModel mModel, ConfigurationFileManager configManager) {
-			this.configs = getConfigurations(configManager, model, mModel, unknownKeys);
+			this.configs = getConfigurations(configManager, model, mModel, unknownKeys, sections, readErrors);
 		}
 
 		/**
@@ -247,17 +259,24 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 		 */
 		private static Map<String, SettingsConfiguration> getConfigurations(
 				final ConfigurationFileManager configManager, final IModel model, final MModel mModel,
-				final Map<String, List<String>> unknownKeys) {
+				final Map<String, List<String>> unknownKeys, final Map<String, Configuration> sections,
+				final Map<String, String> readErrors) {
 			final String[] configNames = configManager.getConfigurationNames();
 			final Map<String, SettingsConfiguration> configurationsForNames = new TreeMap<String, SettingsConfiguration>();
 			for (String configurationName : configNames) {
 				final SettingsConfiguration configuration = new SettingsConfiguration(model);
 				Configuration section = configManager.getConfiguration(configurationName);
-				List<String> unknown = UnknownConfigurationKeys.unknown(mModel, section);
+				sections.put(configurationName, section);
+				List<String> unknown = UnknownConfigurationKeys.refusals(mModel, model, section);
 				if (!unknown.isEmpty()) {
 					unknownKeys.put(configurationName, unknown);
 				}
-				ChangeConfiguration.toSettings(model, section, configuration);
+				try {
+					ChangeConfiguration.toSettings(model, section, configuration);
+				} catch (ConversionException | NumberFormatException e) {
+					LOG.error(LogMessages.configurationValueError + ": " + e.getMessage());
+					readErrors.put(configurationName, e.getMessage());
+				}
 				configurationsForNames.put(configurationName, configuration);
 			}
 			return configurationsForNames;
@@ -269,6 +288,14 @@ abstract class AbstractConfigurationProcessingCmd extends ConfigurablePlugin imp
 
 		public Map<String, List<String>> getUnknownKeys() {
 			return unknownKeys;
+		}
+
+		public Map<String, Configuration> getSections() {
+			return sections;
+		}
+
+		public Map<String, String> getReadErrors() {
+			return readErrors;
 		}
 
 	}

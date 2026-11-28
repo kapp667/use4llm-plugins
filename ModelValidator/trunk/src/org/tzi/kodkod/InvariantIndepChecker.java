@@ -21,17 +21,16 @@ import org.tzi.use.main.Session;
 
 /**
  * Checks the invariant independence.
- * 
+ *
  * @author Hendrik Reitmann
- * 
+ *
  */
 public class InvariantIndepChecker extends KodkodModelValidator {
 
 	private static final Logger LOG = Logger.getLogger(InvariantIndepChecker.class);
 
 	private Session session;
-	
-	private Map<Logger, Level> logLevels;
+
 	private List<IInvariant> inactiveInvariants;
 	private List<IInvariant> negatedInvariants;
 	private IInvariant currentInvariant;
@@ -39,7 +38,7 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 	public InvariantIndepChecker(Session session) {
 		this.session = session;
 	}
-	
+
 	/**
 	 * Validation to check the independence of a single invariant.
 	 */
@@ -47,26 +46,31 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		if (refusesUntransformedElements(model)) {
 			return;
 		}
-		changeLogLevels();
-
-		Collection<IInvariant> invariants = model.classInvariants();
-		activateAllInvariants(invariants);
 
 		IClass clazz = model.getClass(className);
 		if (clazz == null) {
 			LOG.error(LogMessages.noClassError(className));
 			return;
 		}
-		currentInvariant = clazz.getInvariant(invariantName);
-		if (currentInvariant == null) {
+		IInvariant invariant = clazz.getInvariant(invariantName);
+		if (invariant == null) {
 			LOG.error(LogMessages.noClassInvariantError(className, invariantName));
 			return;
 		}
 
-		checkInvariant(model);
+		Collection<IInvariant> invariants = model.classInvariants();
+		saveInvariantStates(invariants);
+		Map<Logger, Level> logLevels = saveLogLevels();
+		try {
+			changeLogLevels(null);
+			activateAllInvariants(invariants);
 
-		resetInvariantStates(invariants);
-		resetLogLevels();
+			currentInvariant = invariant;
+			checkInvariant(model);
+		} finally {
+			resetInvariantStates(invariants);
+			resetLogLevels(logLevels);
+		}
 	}
 
 	@Override
@@ -74,20 +78,22 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		if (refusesUntransformedElements(model)) {
 			return;
 		}
-		Logger.getLogger(KodkodModelValidator.class).setLevel(Level.WARN);
-		Logger.getLogger(KodkodSolver.class).setLevel(Level.WARN);
-		LOG.setLevel(Level.INFO);
 
 		Collection<IInvariant> invariants = model.classInvariants();
-		activateAllInvariants(invariants);
+		saveInvariantStates(invariants);
+		Map<Logger, Level> logLevels = saveLogLevels();
+		try {
+			changeLogLevels(Level.WARN);
+			activateAllInvariants(invariants);
 
-		for (IInvariant invariant : invariants) {
-			currentInvariant = invariant;
-			checkInvariant(model);
+			for (IInvariant invariant : invariants) {
+				currentInvariant = invariant;
+				checkInvariant(model);
+			}
+		} finally {
+			resetInvariantStates(invariants);
+			resetLogLevels(logLevels);
 		}
-
-		resetInvariantStates(invariants);
-		Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
 	private void checkInvariant(IModel model) {
@@ -97,21 +103,33 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 	}
 
 	private void activateAllInvariants(Collection<IInvariant> invariants) {
+		for (IInvariant inv : invariants) {
+			inv.reset();
+		}
+	}
+
+	/**
+	 * Records which invariants are inactive and which are negated, so that
+	 * resetInvariantStates can give them these states back.
+	 */
+	private void saveInvariantStates(Collection<IInvariant> invariants) {
 		inactiveInvariants = new ArrayList<IInvariant>();
 		negatedInvariants = new ArrayList<IInvariant>();
 
 		for (IInvariant inv : invariants) {
 			if (!inv.isActivated()) {
 				inactiveInvariants.add(inv);
-			} else if (inv.isNegated()) {
+			}
+			if (inv.isNegated()) {
 				negatedInvariants.add(inv);
 			}
-
-			inv.reset();
 		}
 	}
 
 	private void resetInvariantStates(Collection<IInvariant> invariants) {
+		for (IInvariant inv : invariants) {
+			inv.reset();
+		}
 		for (IInvariant inv : negatedInvariants) {
 			inv.negate();
 		}
@@ -120,22 +138,35 @@ public class InvariantIndepChecker extends KodkodModelValidator {
 		}
 	}
 
-	private void changeLogLevels() {
-		Logger mv = Logger.getLogger(KodkodModelValidator.class);
-		Logger ks = Logger.getLogger(KodkodSolver.class);
+	private Map<Logger, Level> saveLogLevels() {
+		Map<Logger, Level> logLevels = new HashMap<Logger, Level>();
+		for (Logger log : loggers()) {
+			logLevels.put(log, log.getLevel());
+		}
+		return logLevels;
+	}
 
-		logLevels = new HashMap<Logger, Level>();
-		logLevels.put(mv, mv.getEffectiveLevel());
-		logLevels.put(ks, ks.getEffectiveLevel());
-		logLevels.put(LOG, LOG.getEffectiveLevel());
-
+	/**
+	 * Sets the level of the solver's logger and of this checker's logger.
+	 *
+	 * @param validatorLevel the level of the model validator's logger, or null to keep it.
+	 */
+	private void changeLogLevels(Level validatorLevel) {
+		if (validatorLevel != null) {
+			Logger.getLogger(KodkodModelValidator.class).setLevel(validatorLevel);
+			Logger.getLogger(KodkodSolver.class).setLevel(validatorLevel);
+		}
 		LOG.setLevel(Level.INFO);
 	}
 
-	private void resetLogLevels() {
-		for (Logger log : logLevels.keySet()) {
-			log.setLevel(logLevels.get(log));
+	private void resetLogLevels(Map<Logger, Level> logLevels) {
+		for (Map.Entry<Logger, Level> entry : logLevels.entrySet()) {
+			entry.getKey().setLevel(entry.getValue());
 		}
+	}
+
+	private Logger[] loggers() {
+		return new Logger[] { Logger.getLogger(KodkodModelValidator.class), Logger.getLogger(KodkodSolver.class), LOG };
 	}
 
 	/**

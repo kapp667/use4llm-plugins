@@ -95,6 +95,15 @@ public class ObjectDiagramCreator {
 		}
 	}
 
+	/**
+	 * Sets the kept values of the attributes that the translation leaves out on the objects of the diagram.
+	 *
+	 * @return false if a value cannot be set, after an error has been logged
+	 */
+	public boolean restoreNonTranslatedValues(NonTranslatedValues values) throws UseApiException {
+		return values.restore(systemApi, systemApi.getSystem().state());
+	}
+
 	public ErrorType hasDiagramErrors() {
 		StringWriter buffer = new StringWriter();
 		PrintWriter out = new PrintWriter(buffer);
@@ -207,7 +216,7 @@ public class ObjectDiagramCreator {
 			IAttribute attribute = attributes.get(relation);
 
 			if (attribute != null) {
-				strategy = new AttributeStrategy(systemApi, objectStates, attribute.name());
+				strategy = new AttributeStrategy(systemApi, objectStates, attribute.owner().name(), attribute.name());
 			} else if (isAssociation(relation)) {
 				strategy = new LinkStrategy(systemApi, objectStates, relation.name());
 			}

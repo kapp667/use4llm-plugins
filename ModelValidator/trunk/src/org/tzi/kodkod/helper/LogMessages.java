@@ -113,6 +113,14 @@ public final class LogMessages {
 		return "Cannot transform invariant " + inQuotes(name) + ".";
 	}
 
+	/**
+	 * The error that replaces an unsatisfiable verdict when USE refused solutions of the translation.
+	 */
+	public static String notProvedError(String outcome, int refusals) {
+		return "No verdict. USE refused " + refusals + " solution(s) of the translation and the search found no other one."
+				+ " The translation and USE disagree on this model, so UNSATISFIABLE is not proved.";
+	}
+
 	public static String untransformedElementsError(List<String> errors) {
 		return "Cannot validate the model: the following elements cannot be transformed, and a solution would ignore them.\n"
 				+ String.join("\n", errors);
@@ -352,6 +360,16 @@ public final class LogMessages {
 		return "Cannot convert type " + name;
 	}
 
+	public static String nonTranslatedAttributeInfo(String clazz, String attribute, String typeName) {
+		return "Attribute " + clazz + "::" + attribute + " of type " + typeName
+				+ " is not translated by the model validator, so the solver does not search with it. Its value is kept in the object diagram.";
+	}
+
+	public static String nonTranslatedValueError(String object, String attribute) {
+		return "Cannot keep the value of " + object + "." + attribute
+				+ " in the object diagram: it refers to an object that is not in the diagram, or it is a tuple that holds an object.";
+	}
+
 	public static String noEnumTypeError(String name) {
 		return "No enum type " + name;
 	}
@@ -376,22 +394,7 @@ public final class LogMessages {
 		return "Class " + inQuotes(className) + " does not exist";
 	}
 
-	public static String aggregationcyclefreenessInfo() {
-		String status = DefaultConfigurationValues.AGGREGATIONCYCLEFREENESS ? "on" : "off";
-		return "Only on and off are possible values of aggregationcyclefreeness! Using default " + inQuotes(status) + ".";
-	}
-
-	public static String forbiddensharingInfo() {
-		String status = DefaultConfigurationValues.FORBIDDENSHARING ? "on" : "off";
-		return "Only on and off are possible values of forbiddensharing! Using default " + inQuotes(status) + ".";
-	}
 	
-	public static String invariantConfigWarning(String state) {
-		return state + " is not possible for an invariant. Possible states for an invariant are "
-				+ inQuotes("active") + ", " + inQuotes("inactive") + " and "
-				+ inQuotes("negate") + ". Using default " + inQuotes("active") + ".";
-	}
-
 	public static String showSolution(int index) {
 		return "Show solution " + index;
 	}

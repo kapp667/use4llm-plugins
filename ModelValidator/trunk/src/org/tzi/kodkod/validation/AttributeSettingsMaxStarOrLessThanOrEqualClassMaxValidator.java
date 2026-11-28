@@ -58,9 +58,12 @@ final class AttributeSettingsMaxStarOrLessThanOrEqualClassMaxValidator
 								String.valueOf(newMax)),
 						true, minimum, newMax, config));
 			}
-			fixes.add(new SetInstanceSettingsMinMaxFix(config.getSettingsConfiguration(), model,
-					UIElements.SetToValue(className + PropertyEntry.objMax, String.valueOf(maximum)), true,
-					parentConfig.getLowerBound(), maximum, parentConfig));
+			if (!parentConfig.getCls().isAbstract()) {
+				// An abstract class has no objects of its own, so its maximum cannot make the attribute defined.
+				fixes.add(new SetInstanceSettingsMinMaxFix(config.getSettingsConfiguration(), model,
+						UIElements.SetToValue(className + PropertyEntry.objMax, String.valueOf(maximum)), true,
+						parentConfig.getLowerBound(), maximum, parentConfig));
+			}
 		}
 		if (!fixes.isEmpty()) {
 			return new ValidityRuleViolence[] { new ValidityRuleViolence(

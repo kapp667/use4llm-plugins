@@ -27,6 +27,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		CollectionKind_Test.class,
 		StringOperation_Test.class,
 		SolutionRecheck_Test.class,
+		RefusedSolutionVerdict_Test.class,
 		IndepSolutionCheck_Test.class,
 		SetAny_Test.class,
 		ZeroOrOneNavigation_Test.class,
@@ -55,8 +56,19 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		ScrollingNext_Test.class,
 		StructureCheck_Test.class,
 		ObjectDiagramExtraction_Test.class,
+		ObjectDiagramCollectionExtraction_Test.class,
 		CollectDuplicates_Test.class,
 		SubclassSetAttributeBounds_Test.class,
-		SubclassAttributeMaxValidation_Test.class })
+		SubclassAttributeMaxValidation_Test.class,
+		MultipleInheritanceAttribute_Test.class,
+		InvariantIndepRestore_Test.class,
+		QueryLiterals_Test.class,
+		AbstractOwnerAttributeRules_Test.class,
+		UndefinedSetSize_Test.class,
+		ValidConfigurationLoads_Test.class,
+		DerivedEndMultiplicity_Test.class,
+		NonTranslatedAttribute_Test.class,
+		UnionAndAbstractBounds_Test.class,
+		InvariantAndOptionValues_Test.class })
 public class TestSuite {
 }

@@ -124,15 +124,17 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 		String status = config.getString(name);
 		invariant.reset();
 		if (status != null) {
-			if (status.equals("negate")) {
-				invariant.negate();
-			} else if (status.equals("inactive")) {
-				invariant.deactivate();
-			} else {
-				if (!status.equals("active")) {
-					warning(invariant.qualifiedName() + ": " + LogMessages.invariantConfigWarning(status));
+			try {
+				String state = PropertyEntry.readInvariantState(invariant.qualifiedName(), status);
+				if (state.equals(PropertyEntry.INVARIANT_NEGATE)) {
+					invariant.negate();
+				} else if (state.equals(PropertyEntry.INVARIANT_INACTIVE)) {
+					invariant.deactivate();
+				} else {
+					invariant.activate();
 				}
-				invariant.activate();
+			} catch (ConversionException e) {
+				error(LogMessages.configurationValueError + ": " + e.getMessage());
 			}
 		}
 	}
@@ -241,28 +243,19 @@ public class PropertyConfigurationVisitor extends SimpleVisitor {
 
 		String cyclefreenessState = config.getString(PropertyEntry.aggregationcyclefreeness,
 				DefaultConfigurationValues.AGGREGATIONCYCLEFREENESS ? "on" : "off" );
-		if (cyclefreenessState.equals("on")) {
-			configurator.setAggregationCycleFreeness(true);
-		} else {
-			if (cyclefreenessState.equals("off")) {
-				configurator.setAggregationCycleFreeness(false);
-			} else {
-				LOG.info(LogMessages.aggregationcyclefreenessInfo());
-				configurator.setAggregationCycleFreeness(DefaultConfigurationValues.AGGREGATIONCYCLEFREENESS);
-			}
+		try {
+			configurator.setAggregationCycleFreeness(
+					PropertyEntry.readOnOff(PropertyEntry.aggregationcyclefreeness, cyclefreenessState));
+		} catch (ConversionException e) {
+			error(LogMessages.configurationValueError + ": " + e.getMessage());
 		}
-		
+
 		String forbiddensharingState = config.getString(PropertyEntry.forbiddensharing,
 				DefaultConfigurationValues.FORBIDDENSHARING ? "on" : "off");
-		if (forbiddensharingState.equals("on")) {
-			configurator.setForbiddensharing(true);
-		} else {
-			if (forbiddensharingState.equals("off")) {
-				configurator.setForbiddensharing(false);
-			} else {
-				LOG.info(LogMessages.forbiddensharingInfo());
-				configurator.setForbiddensharing(DefaultConfigurationValues.FORBIDDENSHARING);
-			}
+		try {
+			configurator.setForbiddensharing(PropertyEntry.readOnOff(PropertyEntry.forbiddensharing, forbiddensharingState));
+		} catch (ConversionException e) {
+			error(LogMessages.configurationValueError + ": " + e.getMessage());
 		}
 	}
 

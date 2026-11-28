@@ -3,10 +3,12 @@ package org.tzi.use.kodkod;
 import java.util.Map;
 
 import kodkod.ast.Relation;
+import kodkod.engine.Solution;
 import kodkod.instance.TupleSet;
 
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.KodkodModelValidator;
+import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.helper.ProofHelper;
@@ -14,6 +16,7 @@ import org.tzi.kodkod.model.config.impl.ModelConfigurator;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.use.api.UseApiException;
+import org.tzi.use.kodkod.solution.NonTranslatedValues;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator.ErrorType;
 import org.tzi.use.main.Session;
@@ -30,6 +33,9 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	protected static final Logger LOG = Logger.getLogger(UseKodkodModelValidator.class);
 
 	protected Session session;
+
+	/** The solutions USE refused in the run of this validator. */
+	protected int refusedSolutions = 0;
 
 	public UseKodkodModelValidator(Session session) {
 		this.session = session;
@@ -50,6 +56,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 */
 	protected void handleSolution() {
 		if(showDiagramAndCacheEvaluator()){
+			refusedSolutions++;
 			LOG.info("USE found errors in the solution. Trying to find a new solution!");
 			
 			session.reset();
@@ -70,8 +77,24 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	}
 
 	private void handleFailure() {
-		if(solution.proof() != null){
+		// a proof concerns the translation; after a refused solution it does not hold for USE
+		if(solution.proof() != null && refusedSolutions == 0){
 			LOG.info(ProofHelper.buildProofString(solution.proof(), true));
+		}
+	}
+
+	/**
+	 * Logs an error instead of an UNSATISFIABLE verdict when USE refused a
+	 * solution of the translation: the search then proves nothing about USE.
+	 */
+	@Override
+	protected void reportOutcome(Solution.Outcome outcome) {
+		boolean unsatisfiable = outcome == Solution.Outcome.UNSATISFIABLE
+				|| outcome == Solution.Outcome.TRIVIALLY_UNSATISFIABLE;
+		if (unsatisfiable && refusedSolutions > 0) {
+			LOG.error(LogMessages.notProvedError(outcome.toString(), refusedSolutions));
+		} else {
+			super.reportOutcome(outcome);
 		}
 	}
 	
@@ -104,11 +127,25 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	private Diagram showInUse(Map<Relation, TupleSet> relationTuples) {
 		LOG.info(LogMessages.objDiagramCreation);
 
+		// the values of the attributes the translation leaves out are not in the solution: keep them across the reset
+		NonTranslatedValues kept = null;
+		if (KodkodModelValidatorConfiguration.getInstance().isAutomaticDiagramExtraction()) {
+			try {
+				kept = NonTranslatedValues.collect(model, session.system().state());
+			} catch (IllegalStateException ex) {
+				LOG.error(ex.getMessage());
+				return Diagram.NOT_CREATED;
+			}
+		}
+
 		KodkodQueryCache.INSTANCE.clear();
 		session.reset();
 		ObjectDiagramCreator diagramCreator = new ObjectDiagramCreator(model, session);
 		try {
 			diagramCreator.create(relationTuples);
+			if (kept != null && !diagramCreator.restoreNonTranslatedValues(kept)) {
+				return Diagram.NOT_CREATED;
+			}
 		} catch (UseApiException ex) {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.objDiagramCreationError, ex);
