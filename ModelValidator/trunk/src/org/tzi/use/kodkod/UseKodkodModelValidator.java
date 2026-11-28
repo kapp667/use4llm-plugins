@@ -55,7 +55,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * Handles a satisfiable solution.
 	 */
 	protected void handleSolution() {
-		if(showDiagramAndCacheEvaluator()){
+		if(showDiagramAndCacheEvaluator() == Diagram.REFUSED){
 			refusedSolutions++;
 			LOG.info("USE found errors in the solution. Trying to find a new solution!");
 			
@@ -103,12 +103,12 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * does. Once USE accepts the diagram, queries compare their value in it
 	 * with the solution.
 	 */
-	protected boolean showDiagramAndCacheEvaluator() {
+	protected Diagram showDiagramAndCacheEvaluator() {
 		Diagram diagram = showInUse(solution.instance().relationTuples());
 		if (diagram == Diagram.ACCEPTED) {
 			KodkodQueryCache.INSTANCE.cache(evaluator, session.system().state());
 		}
-		return diagram == Diagram.REFUSED;
+		return diagram;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 		return showInUse(relationTuples) == Diagram.REFUSED;
 	}
 
-	private enum Diagram {
+	public enum Diagram {
 		NOT_CREATED, REFUSED, ACCEPTED
 	}
 

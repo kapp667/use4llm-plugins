@@ -71,7 +71,7 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = showDiagramAndCacheEvaluator();
+		boolean errors = showDiagramAndCacheEvaluator() == Diagram.REFUSED;
 		if (!errors) {
 			readSolutionTerms(session.system().state());
 			

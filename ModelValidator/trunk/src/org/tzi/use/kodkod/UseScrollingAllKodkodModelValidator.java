@@ -10,7 +10,7 @@ public class UseScrollingAllKodkodModelValidator extends UseScrollingKodkodModel
 
 	@Override
 	protected void handleSolution() {
-		boolean errors = showDiagramAndCacheEvaluator();
+		boolean errors = showDiagramAndCacheEvaluator() == Diagram.REFUSED;
 		if (!errors) {
 			solutions.add(solution.instance().relationTuples());
 		} else {
