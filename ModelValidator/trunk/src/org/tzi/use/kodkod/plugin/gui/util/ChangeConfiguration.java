@@ -238,8 +238,13 @@ public final class ChangeConfiguration {
 		
 		// Associations
 		for(AssociationSettings as : settings.getAllAssociationSettings()){
-			if(as.getAssociation() instanceof DerivedAssociation || as.getAssociation() instanceof UnionAssociation){
+			if(as.getAssociation() instanceof DerivedAssociation){
 				continue;
+			}
+			if(as.getAssociation() instanceof UnionAssociation){
+				// The loader's defaults for a union association: no default number of links.
+				as.setLowerBound(0);
+				as.setUpperBound(-1);
 			}
 			String assocName = as.getAssociation().name();
 			if(pc.containsKey(assocName + PropertyEntry.linksMin)){
