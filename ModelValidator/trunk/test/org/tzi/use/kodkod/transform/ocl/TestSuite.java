@@ -28,6 +28,8 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		StringOperation_Test.class,
 		SolutionRecheck_Test.class,
 		RefusedSolutionVerdict_Test.class,
+		NotCreatedSolution_Test.class,
+		RefusedSolutionLimit_Test.class,
 		IndepSolutionCheck_Test.class,
 		SetAny_Test.class,
 		ZeroOrOneNavigation_Test.class,
@@ -69,6 +71,8 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		DerivedEndMultiplicity_Test.class,
 		NonTranslatedAttribute_Test.class,
 		UnionAndAbstractBounds_Test.class,
-		InvariantAndOptionValues_Test.class })
+		InvariantAndOptionValues_Test.class,
+		CollectionLiteralVerdict_Test.class,
+		CollectionLiteralOperationSweep_Test.class })
 public class TestSuite {
 }

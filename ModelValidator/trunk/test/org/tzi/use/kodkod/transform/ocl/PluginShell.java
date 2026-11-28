@@ -78,6 +78,10 @@ class PluginShell {
 		return session.system();
 	}
 
+	Session session() {
+		return session;
+	}
+
 	void type(String line) {
 		Shell.getInstance().processLineSafely(line);
 	}

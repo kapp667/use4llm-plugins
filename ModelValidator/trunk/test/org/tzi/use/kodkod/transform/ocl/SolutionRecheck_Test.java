@@ -115,12 +115,12 @@ public class SolutionRecheck_Test {
 		final List<Boolean> retries = new ArrayList<Boolean>();
 		new UseKodkodModelValidator(session) {
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				five.activate();
-				boolean retry = super.showDiagramAndCacheEvaluator();
+				Diagram diagram = super.showDiagramAndCacheEvaluator();
 				five.deactivate();
-				retries.add(retry);
-				return retry;
+				retries.add(diagram == Diagram.REFUSED);
+				return diagram;
 			}
 		}.validate(model);
 

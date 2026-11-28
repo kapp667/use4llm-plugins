@@ -96,11 +96,11 @@ public class RefusedSolutionVerdict_Test {
 		five.deactivate();
 		new UseKodkodModelValidator(session) {
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				five.activate();
-				boolean refused = super.showDiagramAndCacheEvaluator();
+				Diagram diagram = super.showDiagramAndCacheEvaluator();
 				five.deactivate();
-				return refused;
+				return diagram;
 			}
 		}.validate(model);
 
@@ -117,10 +117,10 @@ public class RefusedSolutionVerdict_Test {
 			private boolean first = true;
 
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				if (first) {
 					first = false;
-					return true;
+					return Diagram.REFUSED;
 				}
 				return super.showDiagramAndCacheEvaluator();
 			}
@@ -139,8 +139,8 @@ public class RefusedSolutionVerdict_Test {
 			private int refusals = 2;
 
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
-				return refusals-- > 0;
+			protected Diagram showDiagramAndCacheEvaluator() {
+				return refusals-- > 0 ? Diagram.REFUSED : Diagram.ACCEPTED;
 			}
 		}.validate(model);
 
@@ -157,10 +157,10 @@ public class RefusedSolutionVerdict_Test {
 			private boolean first = true;
 
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				if (first) {
 					first = false;
-					return true;
+					return Diagram.REFUSED;
 				}
 				return super.showDiagramAndCacheEvaluator();
 			}
@@ -191,10 +191,10 @@ public class RefusedSolutionVerdict_Test {
 			private boolean first = true;
 
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				if (first) {
 					first = false;
-					return true;
+					return Diagram.REFUSED;
 				}
 				return super.showDiagramAndCacheEvaluator();
 			}
@@ -213,10 +213,10 @@ public class RefusedSolutionVerdict_Test {
 			private boolean first = true;
 
 			@Override
-			protected boolean showDiagramAndCacheEvaluator() {
+			protected Diagram showDiagramAndCacheEvaluator() {
 				if (first) {
 					first = false;
-					return true;
+					return Diagram.REFUSED;
 				}
 				return super.showDiagramAndCacheEvaluator();
 			}

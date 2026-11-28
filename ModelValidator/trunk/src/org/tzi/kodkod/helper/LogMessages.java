@@ -121,6 +121,14 @@ public final class LogMessages {
 				+ " The translation and USE disagree on this model, so UNSATISFIABLE is not proved.";
 	}
 
+	/**
+	 * The error that ends a search in which USE refused the given number of solutions.
+	 */
+	public static String refusedLimitError(int limit) {
+		return "No verdict. USE refused " + limit + " solution(s) of the translation, the limit of refused solutions"
+				+ " in one search. The search stops here, so the model is neither SATISFIABLE nor UNSATISFIABLE for USE.";
+	}
+
 	public static String untransformedElementsError(List<String> errors) {
 		return "Cannot validate the model: the following elements cannot be transformed, and a solution would ignore them.\n"
 				+ String.join("\n", errors);
