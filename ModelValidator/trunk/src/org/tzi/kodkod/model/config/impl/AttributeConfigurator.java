@@ -66,6 +66,7 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 		TupleSet lower = tupleFactory.noneOf(2);
 
 		Type type = attribute.type();
+		Type elemType = type.isCollection() ? ((SetType) type).elemType() : type;
 		String object;
 		for (String[] specific : specificValues) {
 			object = specific[0];
@@ -74,16 +75,12 @@ public class AttributeConfigurator extends Configurator<IAttribute> {
 						&& !(specific[i].equals(TypeConstants.UNDEFINED) || specific[i].equals(TypeConstants.UNDEFINED_SET))) {
 					lower.add(tupleFactory.tuple(object, Integer.valueOf(specific[i])));
 				} 
-				else if(type.isObjectType() || type.isEnum()){
+				else if (elemType.isObjectType() || elemType.isEnum()) {
 					lower.add(tupleFactory.tuple(object, specific[i]));
 				}
 				
 				else {
-					if (type.isCollection()) {
-						type = ((SetType) type).elemType();
-					}
-
-					lower.add(tupleFactory.tuple(object, getValue(type, specific[i])));
+					lower.add(tupleFactory.tuple(object, getValue(elemType, specific[i])));
 				}
 			}
 			specified.add(tupleFactory.tuple(object));
