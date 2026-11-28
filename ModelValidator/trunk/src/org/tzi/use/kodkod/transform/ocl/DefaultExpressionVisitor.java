@@ -184,7 +184,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitBagLiteral(ExpBagLiteral exp) {
 		super.visitBagLiteral(exp);
-		LOG.warn(LogMessages.unsupportedCollectionWarning("bags"));
 		visitCollectionLiteral(exp, "bagLiteral");
 	}
 
@@ -345,7 +344,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitOrderedSetLiteral(ExpOrderedSetLiteral exp) {
 		super.visitOrderedSetLiteral(exp);
-		LOG.warn(LogMessages.unsupportedCollectionWarning("orderedSets"));
 		visitCollectionLiteral(exp, "orderedSetLiteral");
 	}
 
@@ -378,7 +376,6 @@ public class DefaultExpressionVisitor extends SimpleExpressionVisitor {
 	@Override
 	public void visitSequenceLiteral(ExpSequenceLiteral exp) {
 		super.visitSequenceLiteral(exp);
-		LOG.warn(LogMessages.unsupportedCollectionWarning("sequences"));
 		visitCollectionLiteral(exp, "sequenceLiteral");
 	}
 

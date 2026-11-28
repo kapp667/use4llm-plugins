@@ -71,6 +71,8 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		DerivedEndMultiplicity_Test.class,
 		NonTranslatedAttribute_Test.class,
 		UnionAndAbstractBounds_Test.class,
-		InvariantAndOptionValues_Test.class })
+		InvariantAndOptionValues_Test.class,
+		CollectionLiteralVerdict_Test.class,
+		CollectionLiteralOperationSweep_Test.class })
 public class TestSuite {
 }
