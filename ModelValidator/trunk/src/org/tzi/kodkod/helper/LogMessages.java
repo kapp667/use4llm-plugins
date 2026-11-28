@@ -117,8 +117,8 @@ public final class LogMessages {
 	 * The error that replaces an unsatisfiable verdict when USE refused solutions of the translation.
 	 */
 	public static String notProvedError(String outcome, int refusals) {
-		return outcome + " is not proved: USE refused " + refusals + " solution" + (refusals == 1 ? "" : "s")
-				+ " of the translation, so the translation and USE disagree on the model and the search cannot prove that no solution exists.";
+		return "No verdict. USE refused " + refusals + " solution(s) of the translation and the search found no other one."
+				+ " The translation and USE disagree on this model, so UNSATISFIABLE is not proved.";
 	}
 
 	public static String untransformedElementsError(List<String> errors) {
