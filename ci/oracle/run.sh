@@ -135,7 +135,7 @@ for model in "${models[@]}"; do
     elif [ "$objects" = 0 ] || [ "$objects" = unknown ]; then
       skip witness "the state of $(basename "$witness") has no object"
     else
-      "$here/witness.sh" "$defaults" "$dir/replay.cmd" "$dir/replay.txt" >"$dir/witness.properties"
+      "$here/witness.sh" "$defaults" "$dir/replay.cmd" "$dir/replay.txt" "$dir/output.txt" >"$dir/witness.properties"
       printf 'mv -validate witness.properties\ninfo state\ncheck\nexit\n' >"$dir/witness.cmd"
       solve witness "$dir/witness.cmd" witness.txt
     fi

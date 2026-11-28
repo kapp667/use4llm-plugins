@@ -65,7 +65,8 @@ public class ModelTransformator {
 		IModel model = factory.createModel(mModel.name(), factory, typeFactory);
 
 		try {
-			transformEnums(model, mModel.enumTypes());
+			// includes the enumerations the model imports: an attribute of an imported enumeration is translated like any other
+			transformEnums(model, mModel.getEnumTypesIncludingImports());
 
 			List<MAssociationClass> associationClasses = new ArrayList<MAssociationClass>(mModel.getAssociationClassesOnly());
 
