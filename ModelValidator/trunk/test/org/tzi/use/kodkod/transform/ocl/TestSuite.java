@@ -64,6 +64,7 @@ import org.tzi.use.kodkod.transform.ocl.setOperation.SetTestSuite;
 		QueryLiterals_Test.class,
 		AbstractOwnerAttributeRules_Test.class,
 		UndefinedSetSize_Test.class,
-		ValidConfigurationLoads_Test.class })
+		ValidConfigurationLoads_Test.class,
+		DerivedEndMultiplicity_Test.class })
 public class TestSuite {
 }
