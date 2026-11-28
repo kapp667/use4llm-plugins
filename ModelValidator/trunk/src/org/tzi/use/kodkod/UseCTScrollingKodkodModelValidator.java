@@ -71,17 +71,15 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = showDiagramAndCacheEvaluator();
-		if (!errors) {
+		if (showDiagramAndCacheEvaluator() == Diagram.ACCEPTED) {
 			readSolutionTerms(session.system().state());
-			
+
 			solutions.add(solution.instance().relationTuples());
+			refusedInSearch = 0;
 			LOG.info(LogMessages.pagingNext);
 			previousLog();
 		} else {
-			refusedSolutions++;
-			session.reset();
-			newSolution(solution.instance().relationTuples());
+			refuseSolution();
 		}
 	}
 
@@ -127,8 +125,9 @@ public class UseCTScrollingKodkodModelValidator extends UseScrollingKodkodModelV
 	@Override
 	protected void newSolution(Map<Relation, TupleSet> relationTuples) {
 		Formula f = genClassifyingTermFormula();
-		((ModelConfigurator) model.getConfigurator()).setSolutionFormula(f);
-		validate(model);
+		// with no accepted solution yet there is no term to exclude: the refused solution alone is forbidden
+		((ModelConfigurator) model.getConfigurator()).setSolutionFormula(f == null ? Formula.TRUE : f);
+		super.newSolution(relationTuples);
 	}
 
 	protected Formula genClassifyingTermFormula() {
