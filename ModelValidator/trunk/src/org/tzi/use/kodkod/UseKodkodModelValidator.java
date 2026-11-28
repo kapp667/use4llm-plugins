@@ -15,6 +15,7 @@ import org.tzi.kodkod.helper.ProofHelper;
 import org.tzi.kodkod.model.config.impl.ModelConfigurator;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IInvariant;
+import org.tzi.kodkod.model.iface.IModel;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.kodkod.solution.NonTranslatedValues;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator;
@@ -34,11 +35,33 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 
 	protected Session session;
 
+	/** The most solutions USE may refuse in one search. Reaching it stops the search with an error. */
+	public static final int MAX_REFUSED_SOLUTIONS = 10;
+
 	/** The solutions USE refused in the run of this validator. */
 	protected int refusedSolutions = 0;
 
+	/** The solutions USE refused since the search started or since its last accepted solution. */
+	protected int refusedInSearch = 0;
+
+	/** Set when a solution is forbidden, so that the search runs again. */
+	private boolean searchAgain = false;
+
 	public UseKodkodModelValidator(Session session) {
 		this.session = session;
+	}
+
+	/**
+	 * Validates the model. A refused solution asks for another search, which runs in this loop and not
+	 * inside the search that found the refused solution, so that the retries do not nest.
+	 */
+	@Override
+	public void validate(IModel model) {
+		refusedInSearch = 0;
+		do {
+			searchAgain = false;
+			super.validate(model);
+		} while (searchAgain);
 	}
 
 	@Override
@@ -55,15 +78,28 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * Handles a satisfiable solution.
 	 */
 	protected void handleSolution() {
-		if(showDiagramAndCacheEvaluator() == Diagram.REFUSED){
-			refusedSolutions++;
-			LOG.info("USE found errors in the solution. Trying to find a new solution!");
-			
-			session.reset();
-			newSolution(solution.instance().relationTuples());
-		} else {
+		if (showDiagramAndCacheEvaluator() == Diagram.ACCEPTED) {
 			evaluateInactiveInvariants();
+		} else {
+			refuseSolution();
 		}
+	}
+
+	/**
+	 * Counts the solution just found as refused by USE, and forbids it so that the search looks for
+	 * another one. The refusal that reaches MAX_REFUSED_SOLUTIONS in one search stops the search with an
+	 * error, and gives no verdict.
+	 */
+	protected void refuseSolution() {
+		refusedSolutions++;
+		refusedInSearch++;
+		session.reset();
+		if (refusedInSearch >= MAX_REFUSED_SOLUTIONS) {
+			LOG.error(LogMessages.refusedLimitError(MAX_REFUSED_SOLUTIONS));
+			return;
+		}
+		LOG.info("USE found errors in the solution. Trying to find a new solution!");
+		newSolution(solution.instance().relationTuples());
 	}
 
 	@Override
@@ -117,7 +153,7 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	 * false, so that the caller looks for another solution.
 	 */
 	protected boolean showDiagram(Map<Relation, TupleSet> relationTuples) {
-		return showInUse(relationTuples) == Diagram.REFUSED;
+		return showInUse(relationTuples) != Diagram.ACCEPTED;
 	}
 
 	public enum Diagram {
@@ -158,13 +194,13 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	}
 
 	/**
-	 * Set up the model to forbid previous solutions and start a model
-	 * validation to find a new solution.
+	 * Forbids the given solution, so that the next search does not find it again. The search
+	 * itself is run by validate.
 	 */
 	protected void newSolution(Map<Relation, TupleSet> relationTuples) {
 		ModelConfigurator modelConfigurator = (ModelConfigurator) model.getConfigurator();
 		modelConfigurator.forbid(relationTuples);
-		validate(model);
+		searchAgain = true;
 	}
 
 	/**

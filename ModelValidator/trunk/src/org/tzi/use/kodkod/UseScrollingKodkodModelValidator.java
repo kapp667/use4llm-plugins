@@ -27,15 +27,13 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 	
 	@Override
 	protected void handleSolution() {
-		boolean errors = showDiagramAndCacheEvaluator() == Diagram.REFUSED;
-		if (!errors) {
+		if (showDiagramAndCacheEvaluator() == Diagram.ACCEPTED) {
 			solutions.add(solution.instance().relationTuples());
+			refusedInSearch = 0;
 			LOG.info(LogMessages.pagingNext);
 			previousLog();
 		} else {
-			refusedSolutions++;
-			session.reset();
-			newSolution(solution.instance().relationTuples());
+			refuseSolution();
 		}
 	}
 
@@ -64,6 +62,7 @@ public class UseScrollingKodkodModelValidator extends UseKodkodModelValidator {
 		solutionIndex++;
 		if (solutionIndex == solutions.size()) {
 			newSolution(solutions.get(solutionIndex-1));
+			validate(model);
 		} else {
 			showDiagram(solutions.get(solutionIndex));
 		}

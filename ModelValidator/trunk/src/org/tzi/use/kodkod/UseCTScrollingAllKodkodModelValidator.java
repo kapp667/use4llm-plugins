@@ -15,16 +15,15 @@ public class UseCTScrollingAllKodkodModelValidator extends UseCTScrollingKodkodM
 
 	@Override
 	protected void handleSolution() {
-		boolean errors = showDiagramAndCacheEvaluator() == Diagram.REFUSED;
-		if (!errors) {
+		if (showDiagramAndCacheEvaluator() == Diagram.ACCEPTED) {
 			readSolutionTerms(session.system().state());
 			solutions.add(solution.instance().relationTuples());
+			refusedInSearch = 0;
 			LOG.info("Found solution no. " + solutions.size());
+			newSolution(solution.instance().relationTuples());
 		} else {
-			refusedSolutions++;
-			session.reset();
+			refuseSolution();
 		}
-		newSolution(solution.instance().relationTuples());
 	}
 	
 	@Override
