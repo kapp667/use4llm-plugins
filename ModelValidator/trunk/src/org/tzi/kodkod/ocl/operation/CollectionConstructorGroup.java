@@ -60,32 +60,26 @@ public class CollectionConstructorGroup extends OCLOperationGroup {
 	}
 
 	public Expression bagLiteral(Expression... elem) {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("bags"));
 		return setLiteral(elem);
 	}
 
 	public Expression bagLiteral() {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("bags"));
 		return setLiteral();
 	}
 
 	public Expression orderedSetLiteral(Expression... elem) {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("orderedSets"));
 		return setLiteral(elem);
 	}
 
 	public Expression orderedSetLiteral() {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("orderedSets"));
 		return setLiteral();
 	}
 
 	public Expression sequenceLiteral(Expression... elem) {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("sequences"));
 		return setLiteral(elem);
 	}
 
 	public Expression sequenceLiteral() {
-		LOG.warn(LogMessages.unsupportedCollectionWarning("sequences"));
 		return setLiteral();
 	}
 }
