@@ -352,6 +352,16 @@ public final class LogMessages {
 		return "Cannot convert type " + name;
 	}
 
+	public static String nonTranslatedAttributeInfo(String clazz, String attribute, String typeName) {
+		return "Attribute " + clazz + "::" + attribute + " of type " + typeName
+				+ " is not translated by the model validator, so the solver does not search with it. Its value is kept in the object diagram.";
+	}
+
+	public static String nonTranslatedValueError(String object, String attribute) {
+		return "Cannot keep the value of " + object + "." + attribute
+				+ " in the object diagram: it refers to an object that is not in the diagram, or it is a tuple that holds an object.";
+	}
+
 	public static String noEnumTypeError(String name) {
 		return "No enum type " + name;
 	}

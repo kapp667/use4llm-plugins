@@ -7,6 +7,7 @@ import kodkod.instance.TupleSet;
 
 import org.apache.log4j.Logger;
 import org.tzi.kodkod.KodkodModelValidator;
+import org.tzi.kodkod.KodkodModelValidatorConfiguration;
 import org.tzi.kodkod.KodkodQueryCache;
 import org.tzi.kodkod.helper.LogMessages;
 import org.tzi.kodkod.helper.ProofHelper;
@@ -14,6 +15,7 @@ import org.tzi.kodkod.model.config.impl.ModelConfigurator;
 import org.tzi.kodkod.model.iface.IClass;
 import org.tzi.kodkod.model.iface.IInvariant;
 import org.tzi.use.api.UseApiException;
+import org.tzi.use.kodkod.solution.NonTranslatedValues;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator;
 import org.tzi.use.kodkod.solution.ObjectDiagramCreator.ErrorType;
 import org.tzi.use.main.Session;
@@ -104,11 +106,25 @@ public class UseKodkodModelValidator extends KodkodModelValidator {
 	private Diagram showInUse(Map<Relation, TupleSet> relationTuples) {
 		LOG.info(LogMessages.objDiagramCreation);
 
+		// the values of the attributes the translation leaves out are not in the solution: keep them across the reset
+		NonTranslatedValues kept = null;
+		if (KodkodModelValidatorConfiguration.getInstance().isAutomaticDiagramExtraction()) {
+			try {
+				kept = NonTranslatedValues.collect(model, session.system().state());
+			} catch (IllegalStateException ex) {
+				LOG.error(ex.getMessage());
+				return Diagram.NOT_CREATED;
+			}
+		}
+
 		KodkodQueryCache.INSTANCE.clear();
 		session.reset();
 		ObjectDiagramCreator diagramCreator = new ObjectDiagramCreator(model, session);
 		try {
 			diagramCreator.create(relationTuples);
+			if (kept != null && !diagramCreator.restoreNonTranslatedValues(kept)) {
+				return Diagram.NOT_CREATED;
+			}
 		} catch (UseApiException ex) {
 			if (LOG.isDebugEnabled()) {
 				LOG.error(LogMessages.objDiagramCreationError, ex);

@@ -13,6 +13,7 @@ import org.tzi.kodkod.model.type.ConfigurableType;
 import org.tzi.kodkod.model.type.Type;
 import org.tzi.kodkod.model.type.TypeLiterals;
 import org.tzi.use.kodkod.transform.TypeConverter;
+import org.tzi.use.kodkod.solution.NonTranslatedValues;
 import org.tzi.use.kodkod.transform.ValueConverter;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.ocl.value.CollectionValue;
@@ -45,6 +46,8 @@ public class ObjectDiagramModelEnricher implements ModelEnricher{
 	public void enrichModel(MSystem mSystem,IModel model) {
 		try {
 			MSystemState systemState = mSystem.state();
+			// refuses a value of an attribute the model does not translate that cannot be kept (see NonTranslatedValues)
+			NonTranslatedValues.collect(model, systemState);
 			extractObjects(model, systemState);
 			extractLinks(model, systemState);
 		} catch (Exception e) {
