@@ -376,22 +376,7 @@ public final class LogMessages {
 		return "Class " + inQuotes(className) + " does not exist";
 	}
 
-	public static String aggregationcyclefreenessInfo() {
-		String status = DefaultConfigurationValues.AGGREGATIONCYCLEFREENESS ? "on" : "off";
-		return "Only on and off are possible values of aggregationcyclefreeness! Using default " + inQuotes(status) + ".";
-	}
-
-	public static String forbiddensharingInfo() {
-		String status = DefaultConfigurationValues.FORBIDDENSHARING ? "on" : "off";
-		return "Only on and off are possible values of forbiddensharing! Using default " + inQuotes(status) + ".";
-	}
 	
-	public static String invariantConfigWarning(String state) {
-		return state + " is not possible for an invariant. Possible states for an invariant are "
-				+ inQuotes("active") + ", " + inQuotes("inactive") + " and "
-				+ inQuotes("negate") + ". Using default " + inQuotes("active") + ".";
-	}
-
 	public static String showSolution(int index) {
 		return "Show solution " + index;
 	}

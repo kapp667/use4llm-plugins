@@ -61,7 +61,8 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 			return;
 		}
 		filterForNameArguments(configurationsForNames, names);
-		processValidation(model, configurationsForNames, loaded.getSections(), loaded.getUnknownKeys(), LOG);
+		processValidation(model, configurationsForNames, loaded.getSections(), loaded.getUnknownKeys(),
+				loaded.getReadErrors(), LOG);
 	}
 
 	/**
@@ -79,7 +80,8 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 	 *            The logger.
 	 */
 	private void processValidation(final IModel model, final Map<String, SettingsConfiguration> configurationsForNames,
-			final Map<String, Configuration> sections, final Map<String, List<String>> unknownKeys, final Logger log) {
+			final Map<String, Configuration> sections, final Map<String, List<String>> unknownKeys,
+			final Map<String, String> readErrors, final Logger log) {
 		String logString = "Validation results:\n\n";
 		for (Entry<String, SettingsConfiguration> configurationForName : configurationsForNames.entrySet()) {
 			String name = configurationForName.getKey();
@@ -91,6 +93,13 @@ public final class ConfigurationValidationCmd extends AbstractConfigurationProce
 					logString += "    " + UnknownConfigurationKeys.message(key) + "\n";
 				}
 				logString += "\n";
+				continue;
+			}
+
+			String readError = readErrors.get(name);
+			if (readError != null) {
+				logString += "Config " + name + " is invalid.\n";
+				logString += "    " + readError + "\n\n";
 				continue;
 			}
 

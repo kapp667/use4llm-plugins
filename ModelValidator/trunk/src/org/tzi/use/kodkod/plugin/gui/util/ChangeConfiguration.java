@@ -269,10 +269,10 @@ public final class ChangeConfiguration {
 		for(InvariantSettings invS : settings.getAllInvariantsSettings()){
 			String propertyName = invS.getInvariant().clazz().name() + "_" + invS.getInvariant().name();
 			if(pc.containsKey(propertyName)){
-				String value = pc.getString(propertyName);
-				if(value.equalsIgnoreCase(PropertyEntry.INVARIANT_INACTIVE)){
+				String state = PropertyEntry.readInvariantState(invS.getInvariant().qualifiedName(), pc.getString(propertyName));
+				if(state.equals(PropertyEntry.INVARIANT_INACTIVE)){
 					invS.setActive(false);
-				} else if(value.equalsIgnoreCase(PropertyEntry.INVARIANT_NEGATE)){
+				} else if(state.equals(PropertyEntry.INVARIANT_NEGATE)){
 					invS.setNegate(true);
 				}
 			}
@@ -281,10 +281,10 @@ public final class ChangeConfiguration {
 		// Options
 		OptionSettings os = settings.getOptionSettings();
 		if(pc.containsKey(PropertyEntry.aggregationcyclefreeness)){
-			os.setAggregationcyclefreeness(pc.getString(PropertyEntry.aggregationcyclefreeness).equalsIgnoreCase("on"));
+			os.setAggregationcyclefreeness(PropertyEntry.readOnOff(PropertyEntry.aggregationcyclefreeness, pc.getString(PropertyEntry.aggregationcyclefreeness)));
 		}
 		if(pc.containsKey(PropertyEntry.forbiddensharing)){
-			os.setForbiddensharing(pc.getString(PropertyEntry.forbiddensharing).equalsIgnoreCase("on"));
+			os.setForbiddensharing(PropertyEntry.readOnOff(PropertyEntry.forbiddensharing, pc.getString(PropertyEntry.forbiddensharing)));
 		}
 	}
 
